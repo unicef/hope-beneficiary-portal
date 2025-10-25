@@ -34,6 +34,19 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.run_tests == 'true'
     runs-on: ubuntu-latest
     services:
+      db:
+        image: postgres:14
+        env:
+          POSTGRES_DATABASE: country_workspace
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USERNAME: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       redis:
         image: redis:7
         ports:
@@ -42,11 +55,13 @@ jobs:
         image: rabbitmq:3-management
         ports:
           - 5672:5672
-    strategy:
-      fail-fast: false
-      matrix:
-        cfg: [ "d52-py313",
-               "d42-py310" ]
+    env:
+      DOCKER_DEFAULT_PLATFORM: linux/amd64
+      DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/country_workspace
+      CELERY_BROKER_URL: redis://localhost:6379/1
+      CACHE_URL: redis://localhost:16379/2
+      DOCKER_BUILDKIT: 1
     steps:
       - uses: actions/checkout@v5
         with:
@@ -68,10 +83,10 @@ jobs:
         run: uv tool install --python-preference only-managed --python 3.13 tox --with tox-uv --with tox-gh-actions
 
       - name: Setup test suite
-        run: tox run -vv --notest --skip-missing-interpreters false -e ${{ matrix.cfg }}
+        run: tox run -vv --notest --skip-missing-interpreters false -e tests
 
-      - name: Run test suite ${{ matrix.cfg }}
-        run: tox -e ${{ matrix.cfg }}
+      - name: Run test suite
+        run: tox -e tests
 
       - name: Archive selenium results
         uses: actions/upload-artifact@v4
