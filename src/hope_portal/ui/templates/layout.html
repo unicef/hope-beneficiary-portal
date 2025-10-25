@@ -1,0 +1,34 @@
+{% load issues static tailwind_tags %}
+<html lang="en" data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="lang"  content="en" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HOPE Portal</title>
+        <script src="{% static 'js/theme.min.js' %}"></script>
+        {% tailwind_css %}
+        {% issues_tags %}
+        {{ media }}
+        {% block extra_head %}
+        {% endblock extra_head %}
+    </head>
+    <body data-timeout="{{ LOGOUT_TIMEOUT_MS|default:300000 }}" data-logout-url="{% url 'ui:logout' %}">
+        {% include "includes/header.html" %}
+        {% block page %}
+            <div class="flex flex-row">
+                {% block menu %}
+                {% endblock menu %}
+                <div class="w-full">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+            </div>
+        {% endblock page %}
+        <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
+        {% block footer %}
+            {% include "includes/footer.html" %}
+        {% endblock footer %}
+        {% block extra_js %}
+        {% endblock extra_js %}
+    </body>
+</html>

@@ -1,0 +1,12 @@
+<fieldset class="form-group">
+    <legend>
+        {{ field.label_tag }}
+    </legend>
+    {{ field.errors }}
+    {{ field }}
+    {% if field.help_text %}
+        <div class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>
+            {{ field.help_text|safe }}
+        </div>
+    {% endif %}
+</fieldset>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512"
+     xmlns="http://www.w3.org/2000/svg" role="img" aria-label="HOPE dashboard icon">
+  <!-- Background rounded square -->
+  <rect x="12" y="12" width="488" height="488" rx="72" ry="72" fill="#2196F3"/>
+
+  <!-- Inner panel -->
+  <g transform="translate(56,56)">
+    <rect x="0" y="0" width="400" height="400" rx="28" ry="28"
+          fill="none" stroke="#FFFFFF" stroke-width="12" opacity="0.98"/>
+    <!-- Top header area -->
+    <rect x="14" y="14" width="372" height="76" rx="16" ry="16"
+          fill="none" stroke="#FFFFFF" stroke-width="10"/>
+
+    <!-- HOPE text -->
+    <text x="200" y="64" text-anchor="middle"
+          font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+          font-weight="700" font-size="44" fill="#FFFFFF" letter-spacing="2">HOPE</text>
+
+    <!-- Content grid outline (sub-panel) -->
+    <rect x="14" y="104" width="372" height="246" rx="14" ry="14" fill="none" stroke="#FFFFFF" stroke-width="10"/>
+
+    <!-- Pie chart (left) -->
+    <g transform="translate(44,136)">
+      <!-- full circle background piece -->
+      <circle cx="56" cy="56" r="48" fill="#FFFFFF" />
+      <!-- mask a slice to make it look like pie with a slice removed -->
+      <path d="M56 56 L56 8
+               A48 48 0 0 1 103 86
+               Z" fill="#2196F3"/>
+      <!-- smaller slice to show segmentation -->
+      <path d="M56 56 L20 96 A48 48 0 0 0 56 8 Z" fill="#BBDEFB" opacity="0.85"/>
+    </g>
+
+    <!-- Bar chart (left-bottom) -->
+    <g transform="translate(34,230)">
+      <rect x="6" y="34" width="22" height="40" rx="4" ry="4" fill="#FFFFFF" opacity="0.95"/>
+      <rect x="38" y="18" width="22" height="56" rx="4" ry="4" fill="#FFFFFF" opacity="0.95"/>
+      <rect x="70" y="4" width="22" height="70" rx="4" ry="4" fill="#FFFFFF" opacity="0.95"/>
+    </g>
+
+    <!-- Line chart (right) -->
+    <g transform="translate(200,136)">
+      <!-- axes -->
+      <path d="M0 150 L0 20 L150 20" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- line polyline with circles -->
+      <polyline points="10,120 40,86 70,102 100,56 130,70"
+                fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="10" cy="120" r="8" fill="#FFFFFF"/>
+      <circle cx="40" cy="86" r="8" fill="#FFFFFF"/>
+      <circle cx="70" cy="102" r="8" fill="#FFFFFF"/>
+      <circle cx="100" cy="56" r="8" fill="#FFFFFF"/>
+      <circle cx="130" cy="70" r="8" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Small decorative separator lines (optional) -->
+    <line x1="200" y1="104" x2="200" y2="350" stroke="#FFFFFF" stroke-width="6" opacity="0.9" stroke-linecap="round"/>
+
+    <!-- UNICEF wordmark (simple text, generic font) -->
+    <text x="200" y="390" text-anchor="middle"
+          font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+          font-weight="600" font-size="36" fill="#FFFFFF" letter-spacing="2">unicef</text>
+  </g>
+</svg>

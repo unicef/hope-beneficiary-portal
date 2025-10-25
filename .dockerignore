@@ -1,0 +1,14 @@
+# Created by .ignore support plugin (hsz.mobi)
+.*
+~*
+!.gitignore
+!.python-version
+
+node_modules/
+dist/
+docs/
+tests/
+mypy_tools/
+
+!.git
+!src/hope_portal/version.py

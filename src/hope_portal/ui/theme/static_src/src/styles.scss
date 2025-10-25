@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(12% 0.042 264.695);
+  --color-base-200: oklch(20% 0.042 265.755);
+  --color-base-300: oklch(27% 0.041 260.031);
+  --color-base-content: oklch(96% 0.007 247.896);
+  --color-primary: oklch(68% 0.169 237.323);
+  --color-primary-content: oklch(100% 0 0);
+  --color-secondary: oklch(50% 0.134 242.749);
+  --color-secondary-content: oklch(98% 0.003 247.858);
+  --color-accent: oklch(62% 0.214 259.815);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(12% 0.042 264.695);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(68% 0.169 237.323);
+  --color-info-content: oklch(97% 0.013 236.62);
+  --color-success: oklch(69% 0.17 162.48);
+  --color-success-content: oklch(97% 0.021 166.113);
+  --color-warning: oklch(79% 0.184 86.047);
+  --color-warning-content: oklch(98% 0.026 102.212);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(92% 0.013 255.508);
+  --color-base-200: oklch(98% 0.002 247.839);
+  --color-base-300: oklch(98% 0.002 247.839);
+  --color-base-content: oklch(20% 0.042 265.755);
+  --color-primary: oklch(68% 0.169 237.323);
+  --color-primary-content: oklch(12% 0.042 264.695);
+  --color-secondary: oklch(50% 0.134 242.749);
+  --color-secondary-content: oklch(98% 0.003 247.858);
+  --color-accent: oklch(62% 0.214 259.815);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(55% 0.046 257.417);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(68% 0.169 237.323);
+  --color-info-content: oklch(97% 0.013 236.62);
+  --color-success: oklch(69% 0.17 162.48);
+  --color-success-content: oklch(97% 0.021 166.113);
+  --color-warning: oklch(79% 0.184 86.047);
+  --color-warning-content: oklch(98% 0.026 102.212);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/**
+  * A catch-all path to Django template files, JavaScript, and Python files
+  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
+  *
+  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
+  * the scope of this path.
+  */
+@source "../../../**/*.{html,py,js}";
+@source "../../../../**/*.{html,py,js}";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+.font-size-selector {
+  @apply flex;
+  div {
+    @apply flex-1 mx-2 p-1 cursor-pointer text-center m-auto;
+    &.selected{
+      @apply bg-amber-100 rounded-lg text-black;
+    }
+    &.font-1 {
+      font-size: 16px;
+    }
+    &.font-2 {
+      font-size: 24px;
+    }
+    &.font-3 {
+      font-size: 32px;
+    }
+  }
+}
+ul.errorlist{
+  li{
+    @apply text-red-600;
+  }
+}
+fieldset{
+  @apply p-3 my-4;
+  legend{
+
+  }
+  .helptext{
+    font-size: 80%;
+    @apply dark:text-gray-400 text-gray-900 mt-1;
+  }
+
+}
+.font-size-normal {
+  font-size: 100% !important;
+}
+
+.font-size-medium {
+  font-size: 120% !important;
+}
+
+.font-size-big {
+  font-size: 150% !important;
+}
+
+aside {
+  @apply text-gray-900 bg-gray-100;
+  @apply dark:text-white dark:bg-gray-900;
+  ul {
+    li {
+      a {
+        @apply flex items-center p-2 rounded-lg;
+        @apply bg-gray-100 text-gray-700;
+        @apply dark:text-white dark:bg-gray-900;
+        @apply hover:bg-gray-300 dark:hover:bg-gray-700;
+      }
+    }
+  }
+}

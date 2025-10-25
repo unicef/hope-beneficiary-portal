@@ -1,0 +1,11 @@
+{% extends "pages/flow/_base.html" %}
+{% load i18n %}
+{% block page %}
+    <div>
+        Welcome {{ household.head_of_household.given_name }}
+    </div>
+    {{ household }}
+    <div class="m-auto text-center">
+        <a href="{% url "ui:logout" %}">{% trans "Done" %}</a>
+    </div>
+{% endblock page %}

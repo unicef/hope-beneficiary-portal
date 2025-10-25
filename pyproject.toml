@@ -1,0 +1,153 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+  "hatch-vcs>=0.4",
+  "hatchling>=1.25",
+]
+
+[project]
+name = "hope-beneficiary-portal"
+description = ""
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+  { name = "sax", email = "s.apostolico@gmail.com" },
+]
+requires-python = ">=3.13"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+]
+dynamic = [
+  "version",
+]
+dependencies = [
+  "celery",
+  "django==5.2.*",
+  "django-admin-extra-buttons>=2.1.1",
+  "django-adminactions>=2.4",
+  "django-adminfilters>=2.6",
+  "django-celery-boost>=0.6.2",
+  "django-constance>=4.3.2",
+  "django-cors-headers",
+  "django-csp",
+  "django-debug-toolbar",
+  "django-filter",
+  "django-flags",
+  "django-online-issues[github]>=0.6",
+  "django-redis",
+  "django-regex",
+  "django-smart-env",
+  "django-streaming",
+  "django-stubs[compatible-mypy]",
+  "django-tailwind>=4.2",
+  "django-unfold",
+  "djangorestframework",
+  "drf-spectacular",
+  "drf-spectacular-sidecar",
+  "inflect>=7.5",
+  "pdbpp>=0.11.7",
+  "pillow>=12",
+  "psycopg2-binary",
+  "pytz",
+  "sentry-sdk",
+  "social-auth-app-django",
+  "unicef-security",
+]
+urls.Documentation = "https://unicef.github.io/hope-beneficiary-portal/"
+urls.Homepage = "https://github.com/Hope Beneficiary Portal/hope-beneficiary-portal"
+urls.Issues = "https://github.com/Hope Beneficiary Portal/hope-beneficiary-portal/issues"
+urls.Repository = "https://github.com/Hope Beneficiary Portal/hope-beneficiary-portal"
+
+[dependency-groups]
+dev = [
+  "coverage",
+  "django-browser-reload",
+  "django-regex",
+  "django-webtest>=1.9.13",
+  "djlint",
+  "factory-boy",
+  "freezegun",
+  "pre-commit",
+  "pyquery",
+  "pytest",
+  "pytest-cov",
+  "pytest-django",
+  "pytest-echo",
+  "responses",
+  "ruff",
+  "seleniumbase",
+  "tox>=4.2",
+  "transifex-python",
+]
+
+docs = [
+  "cairosvg>=2.7.1",
+  "markupsafe>=2.1.5",
+  "mdx-gh-links>=0.4",
+  "mkdocs>=1.6.1",
+  "mkdocs-autolinks-plugin>=0.7.1",
+  "mkdocs-awesome-pages-plugin>=2.9.3",
+  "mkdocs-click>=0.8.1",
+  "mkdocs-embed-external-markdown>=3.0.2",
+  "mkdocs-ezglossary-plugin>=1.6.10",
+  "mkdocs-ezlinks-plugin>=0.1.14",
+  "mkdocs-gen-files>=0.5",
+  "mkdocs-get-deps>=0.2",
+  "mkdocs-include-markdown-plugin>=6.2.2",
+  "mkdocs-link-marker>=0.1.3",
+  "mkdocs-macros-plugin>=1.0.5",
+  "mkdocs-material>=9.5.36",
+  "mkdocs-redirects>=1.2.1",
+  "mkdocs-simple-hooks>=0.1.5",
+  "mkdocstrings[python]>=0.24.1",
+  "mkdocstrings-python",
+  "pymdown-extensions>=10.7.1",
+]
+
+type-check = [
+  "django-stubs[compatible-mypy]",
+  "djangorestframework-stubs",
+  "lxml-stubs",
+  "mypy",
+  "types-defusedxml",
+  "types-gevent",
+  "types-html5lib",
+  "types-jmespath",
+  "types-markdown",
+  "types-psycopg2",
+  "types-pygments",
+  "types-python-dateutil",
+  "types-pytz",
+  "types-qrcode",
+  "types-requests",
+]
+
+[tool.hatch]
+build.hooks.vcs.version-file = "src/hope_portal/version.py"
+version.source = "vcs"
+raw-options = { root = "../.." }
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.hatch.build.targets.sdist]
+ignore-vcs = true
+include = [
+  "src/hope_portal/**/*.*",
+]
+exclude = [
+  "~*",
+  "src/hope_portal/ui/theme/static_src/**/*.*",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/hope_portal",
+]
+exclude = [
+  "~*",
+]
+
+[tool.uv]
+package = true

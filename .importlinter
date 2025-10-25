@@ -1,0 +1,20 @@
+[importlinter]
+root_package = hope_portal
+exclude_type_checking_imports = True
+include_external_packages = True
+
+
+[importlinter:contract:1]
+name = Models must not import Views or Forms
+type = layers
+containers =
+    hope_portal
+layers =
+    utils
+    api
+    admin
+    ui
+    modules
+    models
+    utils
+exhaustive = false

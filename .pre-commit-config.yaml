@@ -1,0 +1,82 @@
+repos:
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/djlint/djLint
+    rev: v1.36.4
+    hooks:
+      - id: djlint-reformat
+        args: ["--configuration", "djlint.toml"]
+
+
+  - repo: https://github.com/tox-dev/tox-ini-fmt
+    rev: "1.6.0"
+    hooks:
+      - id: tox-ini-fmt
+        args: [ "-p", "lint" ]
+
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: "v2.6.0"
+    hooks:
+      - id: pyproject-fmt
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.1
+    hooks:
+      - id: ruff
+      - id: ruff-format
+        args:
+          - --check
+          - --config
+          - ruff.toml
+
+  - repo: https://github.com/saxix/pch
+    rev: '79b0c0e'
+    hooks:
+
+      - id: check-missed-migrations
+        args:
+          - src
+        stages: [ pre-commit ]
+        additional_dependencies: [ setuptools ]
+
+      - id: check-untracked
+        args:
+          - src
+          - tests
+        stages: [ pre-push ]
+
+      - id: check-forbidden
+        args:
+          - -i
+          - "pyproject.toml"
+          - -p
+          - "/\\[tool.uv.sources\\]/"
+        stages: [ pre-push ]
+
+      - id: check-tailwind
+        name: check tailwind CSS ready for production
+        files: src/hope_portal/ui/theme/static_src/src/styles.scss
+        args:
+          - -o
+          - src/hope_portal/ui/theme/static/css/styles.css
+
+      - id: check-minimized
+        name: check missing minimized javascript
+        files: (\.js)$
+        exclude: (\.min\.js)$
+        args:
+          - -i
+          - "src/hope_portal/ui/theme/static_src/*.js"
+
+      - id: check-forbidden
+        name: check pyproject to avoid editable sources/deps
+        files: pyproject.toml
+        language: python
+        args:
+          - -p
+          - /\[tool\.uv\.sources\]\s/s

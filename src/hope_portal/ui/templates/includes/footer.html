@@ -1,0 +1,27 @@
+{% load i18n %}
+<footer class="footer footer-horizontal footer-center bg-base-200 text-base-content rounded p-2">
+    <nav class="grid grid-flow-col gap-4 mb-0">
+        <a class="link link-hover" href="{% url 'ui:index' %}">{% trans "About us" %}</a>
+        <a class="link link-hover" href="{% url 'ui:index' %}">{% trans "Contact" %}</a>
+        {% if user.is_staff %}
+            <a class="link link-hover" href="{% url 'admin:index' %}">{% trans "Admin" %}</a>
+        {% endif %}
+    </nav>
+    <div class="inline-flex">
+        {% blocktranslate %}Copyright © {{ year }} - All right reserved by UNICEF{% endblocktranslate %}
+        - {{ app.version }}
+        -
+        {% include "includes/_language_switch.html" %}
+        <div class="font-size-selector">
+            <div class="font-1" data-size="font-size-normal">
+                Az
+            </div>
+            <div class="font-2" data-size="font-size-medium">
+                Az
+            </div>
+            <div class="font-3" data-size="font-size-big">
+                Az
+            </div>
+        </div>
+    </div>
+</footer>

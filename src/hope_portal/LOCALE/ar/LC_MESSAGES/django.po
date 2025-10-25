@@ -1,0 +1,85 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-23 09:54+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: src/django_project_sample/config/settings.py:164
+msgid "Spanish"
+msgstr "الإسبانية"
+
+#: src/django_project_sample/config/settings.py:165
+msgid "French"
+msgstr "الفرنسية"
+
+#: src/django_project_sample/config/settings.py:166
+msgid "English"
+msgstr "الإنجليزية"
+
+#: src/django_project_sample/config/settings.py:167
+msgid "Arabic"
+msgstr "العربية"
+
+#: src/django_project_sample/ui/templates/admin/base_site.html:6
+#, fuzzy
+#| msgid "Django site admin"
+msgid "Site admin"
+msgstr "إدارة الموقع"
+
+#: src/django_project_sample/ui/templates/errors/403.html:15
+msgid "Forbidden"
+msgstr " ممنوع"
+
+#: src/django_project_sample/ui/templates/errors/403.html:18
+#: src/django_project_sample/ui/templates/errors/404.html:16
+#: src/django_project_sample/ui/templates/errors/500.html:16
+#, fuzzy
+#| msgid "Go back"
+msgid "back"
+msgstr "العودة"
+
+#: src/django_project_sample/ui/templates/errors/404.html:13
+#: src/django_project_sample/ui/templates/errors/500.html:13
+msgid "Object Not Found or you do not have permissions to access it"
+msgstr "لم يتم العثور على الكائن أو ليس لديك أذونات للوصول إليه"
+
+#: src/django_project_sample/ui/templates/includes/footer.html:8
+#, python-format
+msgid "Copyright © %(year)s - All right reserved by UNICEF"
+msgstr "حقوق النشر © %(year)s - جميع الحقوق محفوظة لليونيسف"
+
+#: src/django_project_sample/ui/templates/unfold/helpers/header_back_button.html:5
+#: src/django_project_sample/ui/templates/unfold/helpers/header_back_button.html:10
+msgid "Go back"
+msgstr "العودة"
+
+#: src/django_project_sample/ui/templates/unfold/helpers/site_branding.html:3
+#: src/django_project_sample/ui/templates/unfold/helpers/site_branding.html:5
+#, fuzzy
+#| msgid "Django administration"
+msgid "Administration"
+msgstr "الإدارة"
+
+#: src/django_project_sample/ui/templates/unfold/helpers/site_icon.html:12
+#: src/django_project_sample/ui/templates/unfold/helpers/site_icon.html:13
+#: src/django_project_sample/ui/templates/unfold/helpers/site_icon.html:15
+#: src/django_project_sample/ui/templates/unfold/helpers/site_logo.html:4
+#: src/django_project_sample/ui/templates/unfold/helpers/site_logo.html:5
+#: src/django_project_sample/ui/templates/unfold/helpers/site_logo.html:7
+msgid "Home"
+msgstr "الرئيسية"

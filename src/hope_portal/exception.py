@@ -1,0 +1,2 @@
+class FlowTimeoutError(Exception):
+    pass
