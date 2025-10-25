@@ -1,27 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const FONT_KEY = 'user_font_size';
-
     const toggler = document.getElementById("theme-toggler");
     const HTML = document.getElementsByTagName('html')[0];
-    const stored_theme = localStorage.getItem("theme") || "dark"
-    const stored_size = localStorage.getItem(FONT_KEY) || 'font-size-normal'; // Default
     const body = document.body;
     const selectors = body.querySelectorAll('.font-size-selector div');
     const FONT_CLASSES = ['font-size-normal', 'font-size-medium', 'font-size-big'];
-
-    HTML.dataset.theme = stored_theme;
     toggler.checked = (HTML.dataset.theme === "dark");
-    HTML.dataset.theme = localStorage.theme || "dark";
-    localStorage.setItem("theme", HTML.dataset.theme);
+    console.log(HTML.dataset.theme)
+    console.log(HTML.dataset.size)
+    Cookies.set("theme", HTML.dataset.theme);
+    Cookies.set("size", HTML.dataset.size);
+
     toggler.addEventListener("click", () => {
         HTML.dataset.theme = toggler.checked ? "dark" : "light"
-        localStorage.theme = HTML.dataset.theme;
+        console.log(HTML.dataset.theme);
+        Cookies.set("theme", HTML.dataset.theme);
     })
 
     function applyFontSize(newSize) {
         HTML.classList.remove(...FONT_CLASSES);
         HTML.classList.add(newSize);
-        localStorage.setItem(FONT_KEY, newSize);
+        Cookies.set("size", newSize);
         let old_selection = body.querySelector('.font-size-selector div.selected');
         if (old_selection){
             old_selection.classList.remove("selected");
@@ -39,5 +37,5 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     }
-   applyFontSize(stored_size);
+   applyFontSize(HTML.dataset.size);
 })

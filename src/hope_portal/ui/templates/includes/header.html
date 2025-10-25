@@ -1,10 +1,11 @@
 {% load static %}
-<div class="navbar bg-base-100 shadow-sm m-0 p-0">
-    <div class="navbar-start">
-        <a class="text-xl">HOPE Portal</a>
+<header class="navbar bg-base-100 shadow-sm m-0 p-0">
+    <div class="bg-primary-100">
+        <a href="/">
+            <img class="w-32" src="{% static "images/hope_logo.png" %}" alt="logo" />
+        </a>
     </div>
     <div class="navbar-end">
-        {% include "includes/theme_switch.html" %}
         {% if request.user.is_staff %}
             <a id="issue-opener" class="btn btn-warning text-gray-900 ml-2 px-1">
                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -21,4 +22,4 @@
         <div class="mr-4">
         </div>
     </div>
-</div>
+</header>

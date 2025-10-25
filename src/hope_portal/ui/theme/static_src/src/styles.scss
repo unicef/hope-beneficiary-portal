@@ -83,6 +83,9 @@
 @source "../../../../**/*.{html,py,js}";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+header{
+  background-color: var(--color-primary);
+}
 .font-size-selector {
   @apply flex;
   div {

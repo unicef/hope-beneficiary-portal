@@ -223,6 +223,7 @@ TEMPLATES = [
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
                 "hope_portal.ui.context_processors.app",
+                "hope_portal.ui.context_processors.theme_processor",
             ],
         },
     },

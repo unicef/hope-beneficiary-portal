@@ -15,3 +15,9 @@ def app(request: HttpRequest) -> dict[str, Any]:
             "branch": os.environ.get("BRANCH", "-"),
         }
     }
+
+
+def theme_processor(request: HttpRequest) -> dict[str, Any]:
+    mode = request.COOKIES.get("theme", "light")
+    size = request.COOKIES.get("size", "font-size-normal")
+    return {"theme": {"mode": mode, "size": size}}
