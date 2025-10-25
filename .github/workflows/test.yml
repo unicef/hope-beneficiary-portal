@@ -97,9 +97,9 @@ jobs:
           retention-days: 5
 
       - name: Upload pytest test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: pytest-results-${{ matrix.cfg }}
+          name: pytest-results-tests
           path: junit.xml
         if: ${{ always() }}
 
