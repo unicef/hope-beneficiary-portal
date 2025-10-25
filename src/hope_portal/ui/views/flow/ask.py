@@ -6,6 +6,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBase, HttpRespons
 from django.urls import reverse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
+from flags.state import flag_enabled
 
 from hope_portal.modules.hope.models import Household
 from hope_portal.modules.inspect import Inspector
@@ -20,14 +21,17 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
 
     def get_formset(self) -> BaseFormSet[QuestionForm]:
         key = self.kwargs["signed_data"]
-
+        frm: QuestionForm
         if self.request.method == "GET":
             questions = self.inspector.get_questions()
             fs = QuestionFormSet(initial=[{} for __ in questions], form_kwargs={"key": key})
-            for q, f in zip(questions, fs, strict=True):
-                f.fields["question"].label = q.question
-                f.fields["question"].help_text = q.answer
-                f.fields["signed"].initial = f.sign(q.question, q.answer)
+            for q, frm in zip(questions, fs, strict=True):
+                frm.fields["question"].label = q.question
+                if settings.DEBUG and flag_enabled("DEVELOP_QUESTION_DEBUG", request=self.request):
+                    frm.fields["question"].help_text = f"{q.hint} ({q.answer})"
+                else:
+                    frm.fields["question"].help_text = q.hint
+                frm.fields["signed"].initial = frm.sign(q.question, q.answer)
         else:
             fs = QuestionFormSet(data=self.request.POST)
             for frm in fs.forms:

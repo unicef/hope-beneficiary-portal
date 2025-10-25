@@ -10,10 +10,5 @@
         <div class="mx-auto mb-10">
             <a class="btn btn-primary" href="{% url "ui:flow:start" %}">{% trans "Start" %}</a>
         </div>
-        <div class="mx-auto mb-10">
-            {% if user.is_anonymous %}
-                <a class="btn btn-primary" href="{% url "ui:login" %}">{% trans "Login" %}</a>
-            {% endif %}
-        </div>
     </div>
 {% endblock page %}
