@@ -49,3 +49,5 @@ def patch() -> None:
             model._meta.ordering = ordering[model]
         else:
             model._meta.ordering = ["pk"]
+
+    from . import hh  # noqa

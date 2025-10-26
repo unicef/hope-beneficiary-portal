@@ -15,7 +15,7 @@ INSTALLED_APPS = [
     "hope_portal.api",
     "hope_portal.ui.theme",
     "hope_portal.ui",
-    "hope_portal.modules.hope",
+    "hope_portal.modules.hope.apps.Config",
     "hope_portal.modules.security",
     "unfold",  # before django.contrib.admin
     "unfold.contrib.filters",  # optional, if special filters are needed
@@ -100,6 +100,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "hope_portal.modules.security.middleware.VisitorAttemptMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",

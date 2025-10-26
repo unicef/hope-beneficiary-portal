@@ -1,8 +1,11 @@
 from unittest import mock
 
 import pytest
+from constance.test import override_config
 from django.urls import reverse
 from testutils.factories.hope.houshold import HouseholdFactory
+
+from hope_portal.modules.security.guards import RegistrationAttemptGuard
 
 
 @pytest.fixture
@@ -11,7 +14,9 @@ def household():
 
 
 @pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_not_found(django_app, household):
+    RegistrationAttemptGuard.clear()
     url = reverse("ui:flow:start")
     res = django_app.get(url)
     res.forms["reg-form"]["registration_number"] = household.detail_id
@@ -26,6 +31,7 @@ def test_flow_not_found(django_app, household):
 
 
 @pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_found(django_app, household):
     url = reverse("ui:flow:start")
     res = django_app.get(url)
@@ -33,7 +39,7 @@ def test_flow_found(django_app, household):
     res = res.forms["reg-form"].submit().follow()
     res = res.forms["ask-form"].submit()
     assert res.status_code == 200
-    with mock.patch("hope_portal.ui.forms.ask.QuestionForm.check_value", return_value=True):
+    with mock.patch("hope_portal.ui.forms.flow.QuestionForm.check_value", return_value=True):
         res.forms["ask-form"]["form-0-question"] = "--"
         res.forms["ask-form"]["form-1-question"] = "--"
         res.forms["ask-form"]["form-2-question"] = "--"

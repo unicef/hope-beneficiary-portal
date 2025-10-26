@@ -25,4 +25,14 @@ CONSTANCE_CONFIG: dict[str, tuple[Any, str, Any]] = {
     "LOGIN_SSO": (True, "Enable SSO logon", bool),
     "MAILJET_API_KEY": (MAILJET_API_KEY, "Mailjet API key", str),
     "MAILJET_SECRET_KEY": (MAILJET_SECRET_KEY, "Mailjet secret key", "write_only_input"),
+    "CACHE_QUESTIONS_TIMEOUT": (86400, "Questions cache time-to-live", int),
+    "MAX_QUESTIONS": (20, "Max number if questions to ask to indentify beneficiart", int),
+    "MIN_QUESTIONS": (8, "Min number if questions that must be available to make identification safe", int),
+    "MAX_VISITOR_ATTEMPTS": (5, "Max number of attempts per user (cookie based, not really safe)", int),
+    "MAX_REGISTRATION_ATTEMPTS": (5, "Max number of attempts per registration number", int),
+    "MAX_REGISTRATION_LOCKOUT_HOURS": (
+        24,
+        "Number of hours to lock out a registration number after too many attempts",
+        int,
+    ),
 }

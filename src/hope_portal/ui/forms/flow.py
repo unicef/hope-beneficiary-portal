@@ -4,9 +4,31 @@ from django import forms
 from django.core import signing
 from django.forms.renderers import DjangoTemplates
 
+from hope_portal.exception import FlowLockoutError
+from hope_portal.modules.hope.models import Household
+from hope_portal.modules.security.guards import RegistrationAttemptGuard
+
 
 class QuestionRenderer(DjangoTemplates):
     field_template_name = "forms/question/field.html"
+
+
+class StartForm(forms.Form):
+    registration_number = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full"}))
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        kwargs["renderer"] = QuestionRenderer()
+        self.key = kwargs.pop("key", None)
+        super().__init__(*args, **kwargs)
+
+    def clean_registration_number(self) -> Household:
+        try:
+            guard = RegistrationAttemptGuard(self.cleaned_data["registration_number"])
+            if guard.is_locked_out():
+                raise FlowLockoutError(guard.get_lockout_message())
+            return Household.objects.get(detail_id=self.cleaned_data["registration_number"])
+        except Household.DoesNotExist:
+            raise forms.ValidationError("Registration number not found") from None
 
 
 class QuestionForm(forms.Form):

@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% load i18n %}
+{% block title %}
+    {% trans "Access Temporarily Restricted" %}
+{% endblock %}
+{% block content %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 text-center">
+            <div>
+                <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+                    {% trans "Too Many Attempts" %}
+                </h2>
+                <p class="mt-2 text-sm text-gray-600">
+                    {% blocktrans %}
+                For security reasons, access from your device has been temporarily restricted.
+                Please try again later.
+                {% endblocktrans %}
+                </p>
+                {% if message %}
+                    <p class="mt-4 text-sm font-medium text-red-600">
+                        {{ message }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

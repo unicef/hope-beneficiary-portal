@@ -14,4 +14,5 @@ urlpatterns = [
     path("healthcheck/", views.HealthCheckView.as_view(), name="login"),
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("locked-out/", views.LockedOutView.as_view(), name="locked_out"),
 ]

@@ -5,7 +5,6 @@ from datetime import date
 from typing import Any
 
 import inflect
-from django.core import signing
 from django.utils.translation import gettext_lazy as _
 
 p = inflect.engine()
@@ -79,7 +78,6 @@ class DateExtractor(Extractor):
         self.selected_part = ""
         self.selected_value = ""
         self._select_random_part()
-        self.signer = signing.Signer(key=key)
 
     def _select_random_part(self) -> None:
         if self.value:
@@ -95,7 +93,7 @@ class DateExtractor(Extractor):
     def get_question(self) -> QuestionData:
         if self.selected_part:
             part_name = {"day": _("day"), "month": _("month"), "year": _("year")}[self.selected_part]
-            q = _("What is the {part} of your '{label}'?").format(part=part_name, label=self.label)
+            q = _("What is the {part} (as number) of your '{label}'?").format(part=part_name, label=self.label)
             return QuestionData(question=q, answer=self.selected_value, hint=self.HINT)
         raise Exception("No part selected")
 
