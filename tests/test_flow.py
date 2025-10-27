@@ -17,7 +17,7 @@ def household():
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_not_found(django_app, household):
     RegistrationAttemptGuard.clear()
-    url = reverse("ui:flow:start")
+    url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
     res.forms["reg-form"]["registration_number"] = household.detail_id
     res = res.forms["reg-form"].submit().follow()
@@ -33,7 +33,7 @@ def test_flow_not_found(django_app, household):
 @pytest.mark.django_db
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_found(django_app, household):
-    url = reverse("ui:flow:start")
+    url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
     res.forms["reg-form"]["registration_number"] = household.detail_id
     res = res.forms["reg-form"].submit().follow()

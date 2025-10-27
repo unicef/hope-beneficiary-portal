@@ -47,11 +47,13 @@ dependencies = [
   "drf-spectacular-sidecar",
   "inflect>=7.5",
   "pdbpp>=0.11.7",
+  "phonenumbers>=9.0.17",
   "pillow>=12",
   "psycopg2-binary",
   "pytz",
   "sentry-sdk",
   "social-auth-app-django",
+  "twilio>=9.8.4",
   "unicef-security",
 ]
 urls.Documentation = "https://unicef.github.io/hope-beneficiary-portal/"

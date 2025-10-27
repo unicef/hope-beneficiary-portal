@@ -115,7 +115,7 @@ class Command(BaseCommand):
             for line in self.handle_inspection(options):
                 buffer.write(f"{line}\n")
 
-            output_filepath = resource_path(f"models/hope/{output_file}")
+            output_filepath = resource_path(f"modules/hope/models/{output_file}")
             Path(output_filepath).write_text(buffer.getvalue())
             os.system(f"ruff format {output_filepath}")  # noqa: S605
 

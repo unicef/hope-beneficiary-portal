@@ -51,3 +51,4 @@ def patch() -> None:
             model._meta.ordering = ["pk"]
 
     from . import hh  # noqa
+    from . import tickets  # noqa

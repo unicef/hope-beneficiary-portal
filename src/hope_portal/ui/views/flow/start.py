@@ -1,13 +1,18 @@
 from typing import TYPE_CHECKING
 
 from django import forms
+from django.conf import settings
+from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.generic import FormView, TemplateView
 
 from hope_portal.exception import FlowLockoutError
-from hope_portal.ui.forms.flow import StartForm
+from hope_portal.models.beneficiary import Beneficiary
+from hope_portal.modules.hope.models import Individual
+from hope_portal.modules.security.otp import generate_otp, send_otp_sms, store_otp
+from hope_portal.ui.forms.flow import AuthForm, EmailForm, SMSForm, StartForm
 from hope_portal.ui.views.flow.crypt import sign_household
 
 if TYPE_CHECKING:
@@ -23,6 +28,59 @@ class StartView(FormView[StartForm]):
             hh: Household = form.cleaned_data["registration_number"]
             key = sign_household(self.request, hh)
             url = reverse("ui:flow:ask", kwargs={"signed_data": key})
+            return HttpResponseRedirect(url)
+        except FlowLockoutError as e:
+            return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
+
+
+class SMSView(FormView[SMSForm]):
+    form_class = SMSForm
+    template_name = "pages/flow/start.html"
+
+    def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
+        try:
+            url = reverse("ui:flow:sms-sent")
+            phone_number = form.cleaned_data["number"]
+            try:
+                Individual.objects.get(phone_no=phone_number)
+                otp = generate_otp()
+                store_otp(phone_number, otp)
+                send_otp_sms(phone_number, otp)
+            except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
+                pass
+            return HttpResponseRedirect(url)
+        except FlowLockoutError as e:
+            return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
+
+
+class EmailView(FormView[EmailForm]):
+    form_class = EmailForm
+    template_name = "pages/flow/start.html"
+
+    def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
+        try:
+            url = reverse("ui:flow:email-sent")
+            email = form.cleaned_data["email"]
+            try:
+                Individual.objects.get(email=email)
+                send_mail("subject", "message", from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[email])
+            except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
+                pass
+            return HttpResponseRedirect(url)
+        except FlowLockoutError as e:
+            return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
+
+
+class AuthView(FormView[AuthForm]):
+    form_class = AuthForm
+    template_name = "pages/flow/start.html"
+
+    def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
+        try:
+            url = reverse("ui:index")
+            ben = Beneficiary.objects.get(username=form.cleaned_data["username"])  # type: ignore[attr-defined]
+            if ben.check_password(form.cleaned_data["password"]):
+                url = reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, ben.household)})
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})

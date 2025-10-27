@@ -79,6 +79,7 @@ UNFOLD = {
             "950": "8, 54, 68",
         },
     },
+    # https://fonts.google.com/icons
     "SIDEBAR": {
         "show_search": True,  # Search in applications and models names
         "show_all_applications": True,  # Dropdown with all applications and models
@@ -89,23 +90,33 @@ UNFOLD = {
                 "collapsible": False,  # Collapsible group of links
                 "items": [
                     {
+                        "title": _("Programs"),
+                        "icon": "folder",
+                        "link": reverse_lazy("admin:hope_program_changelist"),
+                    },
+                    {
+                        "title": _("Offices"),
+                        "icon": "domain",
+                        "link": reverse_lazy("admin:hope_businessarea_changelist"),
+                    },
+                    {
                         "title": _("Household"),
                         "icon": "people",
                         "link": reverse_lazy("admin:hope_household_changelist"),
                     },
                     {
                         "title": _("Individual"),
-                        "icon": "people",
+                        "icon": "person",
                         "link": reverse_lazy("admin:hope_individual_changelist"),
                     },
                     {
                         "title": _("Payment Plans"),
-                        "icon": "people",
+                        "icon": "assignment",
                         "link": reverse_lazy("admin:hope_paymentplan_changelist"),
                     },
                     {
                         "title": _("Payments"),
-                        "icon": "people",
+                        "icon": "payments",
                         "link": reverse_lazy("admin:hope_payment_changelist"),
                     },
                 ],

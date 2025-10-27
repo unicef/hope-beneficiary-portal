@@ -1,11 +1,8 @@
-{% spaceless %}
-    <li class="border-base-200 dark:border-base-700 hover:text-primary-600 max-md:last:rounded-b-default max-md:first:rounded-t-default md:first:rounded-l-default md:last:rounded-r-default dark:hover:text-primary-500 max-md:-mt-px border md:-ml-px">
-        <a href="{{ button.url }}{% if is_popup %}&_popup=1{% endif %}
-            {% include "admin_extra_buttons/includes/attrs.html" with button=button %}>
-            {% if button.icon %}
-                <i class="{{ button.icon }}"></i>&nbsp;
-            {% endif %}
-            {{ button.label|title }}
-        </a>
-    </li>
-{% endspaceless %}
+<li class="max-md:first:rounded-t-default border border-base-200 max-md:-mt-px md:first:rounded-l-default hover:text-primary-600 dark:hover:text-primary-500 max-md:last:rounded-b-default dark:border-base-700 md:-ml-px md:last:rounded-r-default">
+    <a href="{{ button.url }}" class="cursor-pointer flex grow items-center gap-2 px-3 py-2 text-left whitespace-nowrap">
+        {% if button.icon %}
+            <i class="{{ button.icon }}"></i>&nbsp;
+        {% endif %}
+        {{ button.label|title }}
+    </a>
+</li>

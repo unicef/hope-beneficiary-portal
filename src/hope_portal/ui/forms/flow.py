@@ -1,16 +1,43 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+import phonenumbers
 from django import forms
 from django.core import signing
 from django.forms.renderers import DjangoTemplates
+from phonenumbers import NumberParseException
 
 from hope_portal.exception import FlowLockoutError
 from hope_portal.modules.hope.models import Household
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
 
+if TYPE_CHECKING:
+    from phonenumbers.phonenumber import PhoneNumber
+
 
 class QuestionRenderer(DjangoTemplates):
     field_template_name = "forms/question/field.html"
+
+
+def validate_phonenumber(value: Any) -> None:
+    try:
+        parsed: PhoneNumber = phonenumbers.parse(value)
+        if not phonenumbers.is_valid_number(parsed):
+            raise forms.ValidationError("Invalid phone number")
+    except NumberParseException:
+        raise forms.ValidationError("Invalid phone number") from None
+
+
+class SMSForm(forms.Form):
+    number = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full"}), validators=[validate_phonenumber])
+
+
+class EmailForm(forms.Form):
+    email = forms.EmailField(widget=forms.TextInput(attrs={"class": "input w-full"}))
+
+
+class AuthForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full"}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input w-full"}))
 
 
 class StartForm(forms.Form):
@@ -26,7 +53,13 @@ class StartForm(forms.Form):
             guard = RegistrationAttemptGuard(self.cleaned_data["registration_number"])
             if guard.is_locked_out():
                 raise FlowLockoutError(guard.get_lockout_message())
-            return Household.objects.get(detail_id=self.cleaned_data["registration_number"])
+            if not (
+                hh := Household.objects.filter(detail_id=self.cleaned_data["registration_number"])
+                .order_by("-created_at")
+                .first()
+            ):
+                raise Household.DoesNotExist()
+            return hh
         except Household.DoesNotExist:
             raise forms.ValidationError("Registration number not found") from None
 

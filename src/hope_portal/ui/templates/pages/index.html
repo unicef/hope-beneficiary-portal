@@ -12,7 +12,13 @@
             <img class="rounded-md" src="{% static "images/hope_logo_big.png" %}" alt="logo" />
         </div>
         <div class="mx-auto mb-10">
-            <a class="btn btn-primary" href="{% url "ui:flow:start" %}">{% trans "Start" %}</a>
+            Enter using...
+        </div>
+        <div class="mx-auto mb-10">
+            <a class="btn btn-primary" href="{% url "ui:flow:start-registration" %}">{% trans "Registration Number" %}</a>
+            <a class="btn btn-primary" href="{% url "ui:flow:start-sms" %}">{% trans "SMS" %}</a>
+            <a class="btn btn-primary" href="{% url "ui:flow:start-email" %}">{% trans "Email" %}</a>
+            <a class="btn btn-primary" href="{% url "ui:flow:start-auth" %}">{% trans "Login" %}</a>
         </div>
     </div>
 {% endblock page %}

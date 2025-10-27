@@ -54,6 +54,7 @@ DEFAULTS = {
     "MAILJET_API_KEY": (str, "", "", False, "Mailjet API key"),
     "MAILJET_SECRET_KEY": (str, "", "", False, "Mailjet API secret key"),
     "MEDIA_ROOT": (str, os.path.join(tempfile.gettempdir(), "hope_portal", "media")),
+    "OTP_VALIDITY_MINUTES": (int, 5, 5, False, ""),
     "REDIS_CACHE_URL": (str, "redis://localhost:6379/0"),
     "REDIS_LOCK_URL": (str, "redis://localhost:6379/1?backend=django_redis.cache.RedisCache"),
     "REDIS_TSDB_URL": (str, "redis://localhost:6379/2"),
@@ -74,6 +75,9 @@ DEFAULTS = {
         """,
     ),
     "TIME_ZONE": (str, "UTC"),
+    "TWILIO_ACCOUNT_SID": (str, "", "", False, "Twilio Account SID"),
+    "TWILIO_AUTH_TOKEN": (str, "", "", False, "Twilio Account Token"),
+    "TWILIO_FROM_NUMBER": (str, "", "", False, "Twilio Default Sender"),
     "URL_PREFIX": (str, ""),
 }
 

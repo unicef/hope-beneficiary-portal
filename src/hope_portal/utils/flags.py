@@ -43,8 +43,10 @@ def debug(value: str, **kwargs: "Any") -> bool:
 
 
 @conditions.register("hostname")
-def hostname(value: str, request: "HttpRequest | None", **kwargs: "Any") -> bool:
-    return request.get_host().split(":")[0] in value.split(",")
+def hostname(value: str, request: "HttpRequest | None" = None, **kwargs: "Any") -> bool:
+    if request:
+        return request.get_host().split(":")[0] in value.split(",")
+    return None
 
 
 @conditions.register("Environment Variable")
