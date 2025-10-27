@@ -11,7 +11,7 @@ from flags.state import flag_enabled
 from hope_portal.modules.hope.models import Household
 from hope_portal.modules.inspect import Inspector, QuestionData
 from hope_portal.ui.forms.flow import QuestionForm, QuestionFormSet
-from hope_portal.ui.views.flow.crypt import unsign_household
+from hope_portal.ui.views.flow.crypt import sign, unsign_household
 
 
 class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
@@ -59,7 +59,8 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         return fs
 
     def form_valid(self, formset: BaseFormSet[QuestionForm]) -> HttpResponse:
-        return HttpResponseRedirect(reverse("ui:flow:info", kwargs={"signed_data": self.kwargs["signed_data"]}))
+        key = sign(self.request, {"source": self.kwargs["signed_data"], "id": str(self.household.pk)})
+        return HttpResponseRedirect(reverse("ui:flow:info", kwargs={"signed_data": key}))
 
     def form_invalid(self, formset: BaseFormSet[QuestionForm]) -> HttpResponse:
         return self.render_to_response(self.get_context_data(formset=formset))

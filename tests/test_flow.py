@@ -46,4 +46,4 @@ def test_flow_found(django_app, household):
         res = res.forms["ask-form"].submit()
     assert res.status_code == 302
     res = res.follow()
-    assert b"Welcome" in res.content
+    assert b"Welcome" in res.content, res.showbrowser()

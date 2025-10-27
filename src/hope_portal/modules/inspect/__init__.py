@@ -81,4 +81,4 @@ class Inspector:
                 f"Not available question ({len(ret)}) to proceed with identification. (min. {config.MIN_QUESTIONS})"
             )
             return []
-        return random.sample(ret, min(config.MAX_QUESTIONS + 1, len(ret)))
+        return random.sample(ret, min(config.MAX_QUESTIONS, len(ret)))
