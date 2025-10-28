@@ -46,5 +46,11 @@
     </div>
     <div class="m-auto text-center my-10">
         <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
+        {% if signed_data %}
+            <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="{% trans "Create account" %}" />
+            </form>
+        {% endif %}
     </div>
 {% endblock page %}

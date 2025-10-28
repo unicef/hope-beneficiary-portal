@@ -60,6 +60,7 @@ class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         kwargs["hhs"] = dict(hhs)
         kwargs["detail_id"] = hh.detail_id
         kwargs["household"] = hh
+        kwargs["signed_data"] = self.kwargs["signed_data"]
 
         return super().get_context_data(**kwargs)
 

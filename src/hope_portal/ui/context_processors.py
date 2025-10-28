@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Any
 
 from django.http import HttpRequest
@@ -8,12 +9,13 @@ from .. import VERSION
 
 def app(request: HttpRequest) -> dict[str, Any]:
     return {
+        "year": datetime.now().year,
         "app": {
             "version": VERSION,
             "build_date": os.environ.get("BUILD_DATE", ""),
             "commit": os.environ.get("GIT_SHA", "-"),
             "branch": os.environ.get("BRANCH", "-"),
-        }
+        },
     }
 
 

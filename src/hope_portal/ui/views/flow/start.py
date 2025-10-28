@@ -78,7 +78,7 @@ class AuthView(FormView[AuthForm]):
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
             url = reverse("ui:index")
-            ben = Beneficiary.objects.get(username=form.cleaned_data["username"])  # type: ignore[attr-defined]
+            ben = Beneficiary.objects.get(username=form.cleaned_data["username"])
             if ben.check_password(form.cleaned_data["password"]):
                 url = reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, ben.household)})
             return HttpResponseRedirect(url)

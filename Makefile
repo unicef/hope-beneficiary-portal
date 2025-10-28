@@ -38,7 +38,7 @@ i18n:  ## update translation files
 
 
 reset_migrations:  ## reset database migrations. WARNING!!: Use only until first deployment
-	rm -f src/hope_portal/migrations/0002*
+	rm -f src/hope_portal/migrations/000*
 	dropdb --if-exists hope_portal
 	createdb hope_portal
 	./manage.py makemigrations hope_portal

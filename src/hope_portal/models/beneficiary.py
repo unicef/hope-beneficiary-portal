@@ -8,9 +8,9 @@ from hope_portal.modules.hope.models import Household
 
 class Beneficiary(models.Model):
     username = models.CharField(_("username"), max_length=150, unique=True)
+    household_id = models.CharField(_("household id"), max_length=150, unique=True)
     password = models.CharField(_("password"), max_length=128)
     last_login = models.DateTimeField(_("last login"), blank=True, null=True)
-    household_id = models.CharField(_("household id"), max_length=150)
     suspended = models.BooleanField(_("suspended"), default=False)
 
     def __str__(self) -> str:

@@ -1,6 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
+from .account import AccountCreate
 from .ask import AskView
 from .info import InfoView, InspectView
 from .start import AuthView, EmailView, NotAvailable, SMSView, StartView
@@ -12,6 +13,7 @@ urlpatterns = [
     path("start/sms/", SMSView.as_view(), name="start-sms"),
     path("start/email/", EmailView.as_view(), name="start-email"),
     path("start/auth/", AuthView.as_view(), name="start-auth"),
+    path("account/create/<str:signed_data>/", AccountCreate.as_view(), name="account-create"),
     path("ask/<str:signed_data>/", AskView.as_view(), name="ask"),
     path("info/<str:signed_data>/", InfoView.as_view(), name="info"),
     path("inspect/<str:uniced_id>/", InspectView.as_view(), name="inspect"),

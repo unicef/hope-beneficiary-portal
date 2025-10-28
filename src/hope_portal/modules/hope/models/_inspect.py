@@ -424,6 +424,9 @@ class Grievanceticket(HopeModel):
         "self", on_delete=models.DO_NOTHING, related_name="grievanceticket_copied_from", blank=True, null=True
     )
 
+    class Routing:
+        key = "hope"
+
     class Meta:
         managed = False
         db_table = "grievance_grievanceticket"
