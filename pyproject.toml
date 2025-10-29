@@ -65,6 +65,7 @@ urls.Repository = "https://github.com/Hope Beneficiary Portal/hope-beneficiary-p
 [dependency-groups]
 dev = [
   "coverage",
+  "deptry>=0.23.1",
   "django-browser-reload",
   "django-regex",
   "django-webtest>=1.9.13",

@@ -6,6 +6,7 @@ __pycache__
 !.git
 !.python-version
 !.github/
+!.semgrep/
 !.gitignore
 !.pre-commit-config.yaml
 !.gitattributes

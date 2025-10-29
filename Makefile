@@ -27,7 +27,7 @@ help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 clean: ## clean development tree
-	rm -fr ${BUILDDIR} build pip-wheel-metadata dist src/*.egg-info .coverage coverage.xml .eggs .pytest_cache *.egg-info
+	rm -fr ${BUILDDIR} ./~build junit.xml build pip-wheel-metadata dist src/*.egg-info .coverage coverage.xml .eggs .pytest_cache *.egg-info
 	find src -name __pycache__ -o -name "*.py?" -o -name "*.orig" -prune | xargs rm -rf
 	find tests -name __pycache__ -o -name "*.py?" -o -name "*.orig" -prune | xargs rm -rf
 

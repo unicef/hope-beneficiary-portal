@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 class StartView(FormView[StartForm]):
     form_class = StartForm
-    template_name = "pages/flow/start.html"
+    template_name = "pages/flow/start_reg.html"
 
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
@@ -35,7 +35,7 @@ class StartView(FormView[StartForm]):
 
 class SMSView(FormView[SMSForm]):
     form_class = SMSForm
-    template_name = "pages/flow/start.html"
+    template_name = "pages/flow/start_sms.html"
 
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
@@ -55,7 +55,7 @@ class SMSView(FormView[SMSForm]):
 
 class EmailView(FormView[EmailForm]):
     form_class = EmailForm
-    template_name = "pages/flow/start.html"
+    template_name = "pages/flow/start_email.html"
 
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
@@ -73,7 +73,7 @@ class EmailView(FormView[EmailForm]):
 
 class AuthView(FormView[AuthForm]):
     form_class = AuthForm
-    template_name = "pages/flow/start.html"
+    template_name = "pages/flow/start_auth.html"
 
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:

@@ -123,7 +123,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-SESSION_COOKIE_NAME = "hope_portalid"
+SESSION_COOKIE_NAME = "hope_portal_id"
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 # DEBUG
 # ------------------------------------------------------------------------------

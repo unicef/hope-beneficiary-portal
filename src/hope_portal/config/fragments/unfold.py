@@ -19,7 +19,7 @@ UNFOLD = {
         # ...
     ],
     "LOGIN": {
-        "image": lambda request: static("images/logo.png"),
+        "image": lambda request: static("images/logo_small.svg"),
         "redirect_after": lambda request: reverse_lazy("admin:index"),
     },
     "ENVIRONMENT": "hope_portal.config.fragments.unfold.environment_callback",  # environment name in header
@@ -32,24 +32,22 @@ UNFOLD = {
             "rel": "icon",
             "sizes": "32x32",
             "type": "image/x-icon",
-            "href": lambda request: static("images/img.svg"),
+            "href": lambda request: static("images/logo_small.svg"),
         },
         {
             "rel": "icon",
             "sizes": "64x64",
             "type": "image/x-icon",
-            "href": lambda request: static("images/img.svg"),
+            "href": lambda request: static("images/logo_small.svg"),
         },
     ],
     "SITE_SYMBOL": "speed",  # symbol from icon set
     "SITE_URL": "/",
     "SITE_ICON": {
-        "light": lambda request: static("images/img.svg"),  # light mode
-        "dark": lambda request: static("images/img.svg"),  # dark mode
+        "light": lambda request: static("images/logo_small.svg"),  # light mode
+        "dark": lambda request: static("images/logo_small.svg"),  # dark mode
     },
-    "STYLES": [
-        # lmbda request: static("/css/styles_admin.css"),
-    ],
+    "STYLES": [],
     "BORDER_RADIUS": "6px",
     "COLORS": {
         "base": {

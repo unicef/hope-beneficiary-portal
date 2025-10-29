@@ -2,5 +2,8 @@
 docker/*.*                              @unicef/hope-arch
 
 src/hope_live/migrations/*.py           @saxix @unicef/hope-arch
-pyproject.toml                          @saxix @unicef/hope-arch
 uv.lock                                 @saxix @unicef/hope-arch
+.pre-commit-config.yaml                 @saxix @unicef/hope-arch
+*.toml                                  @saxix @unicef/hope-arch
+.*                                      @saxix @unicef/hope-arch
+tox.ini                                 @saxix @unicef/hope-arch
