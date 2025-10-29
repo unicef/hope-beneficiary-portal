@@ -22,6 +22,8 @@ repos:
           - scan
           - --config
           - .semgrep/
+          - --config
+          - 'p/python'
           # Do not try to scan '.semgrep/' directories as they contain test files
           # thus they will trigger findings.
           - --exclude=.semgrep/
