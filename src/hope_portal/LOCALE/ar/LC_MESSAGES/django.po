@@ -21,55 +21,55 @@ msgstr ""
 
 #: config/fragments/unfold.py:86
 msgid "HOPE"
-msgstr ""
+msgstr "HOPE"
 
 #: config/fragments/unfold.py:91
 msgid "Programs"
-msgstr ""
+msgstr "Programs"
 
 #: config/fragments/unfold.py:96
 msgid "Offices"
-msgstr ""
+msgstr "Offices"
 
 #: config/fragments/unfold.py:101
 msgid "Household"
-msgstr ""
+msgstr "Household"
 
 #: config/fragments/unfold.py:106
 msgid "Individual"
-msgstr ""
+msgstr "Individual"
 
 #: config/fragments/unfold.py:111
 msgid "Payment Plans"
-msgstr ""
+msgstr "Payment Plans"
 
 #: config/fragments/unfold.py:116
 msgid "Payments"
-msgstr ""
+msgstr "Payments"
 
 #: config/fragments/unfold.py:123
 msgid "Security"
-msgstr ""
+msgstr "Security"
 
 #: config/fragments/unfold.py:128 config/fragments/unfold.py:163
 msgid "Users"
-msgstr ""
+msgstr "Users"
 
 #: config/fragments/unfold.py:133 config/fragments/unfold.py:174
 msgid "Groups"
-msgstr ""
+msgstr "Groups"
 
 #: config/fragments/unfold.py:140
 msgid "Configuration"
-msgstr ""
+msgstr "Configuration"
 
 #: config/fragments/unfold.py:145
 msgid "Constance"
-msgstr ""
+msgstr "Constance"
 
 #: config/fragments/unfold.py:149
 msgid "Flags"
-msgstr ""
+msgstr "Flags"
 
 #: config/settings.py:174
 msgid "Spanish"
@@ -89,232 +89,233 @@ msgstr "العربية"
 
 #: models/beneficiary.py:10
 msgid "username"
-msgstr ""
+msgstr "username"
 
 #: models/beneficiary.py:11
 msgid "household id"
-msgstr ""
+msgstr "household id"
 
 #: models/beneficiary.py:12
 msgid "password"
-msgstr ""
+msgstr "password"
 
 #: models/beneficiary.py:13
 msgid "last login"
-msgstr ""
+msgstr "last login"
 
 #: models/beneficiary.py:14
 msgid "suspended"
-msgstr ""
+msgstr "suspended"
 
 #: modules/hope/patcher/tickets.py:53
 msgid "Add Individual"
-msgstr ""
+msgstr "Add Individual"
 
 #: modules/hope/patcher/tickets.py:54
 msgid "Household Data Update"
-msgstr ""
+msgstr "Household Data Update"
 
 #: modules/hope/patcher/tickets.py:55
 msgid "Individual Data Update"
-msgstr ""
+msgstr "Individual Data Update"
 
 #: modules/hope/patcher/tickets.py:56
 msgid "Withdraw Individual"
-msgstr ""
+msgstr "Withdraw Individual"
 
 #: modules/hope/patcher/tickets.py:57
 msgid "Withdraw Household"
-msgstr ""
+msgstr "Withdraw Household"
 
 #: modules/hope/patcher/tickets.py:60
 msgid "Bribery, corruption or kickback"
-msgstr ""
+msgstr "Bribery, corruption or kickback"
 
 #: modules/hope/patcher/tickets.py:61
 msgid "Data breach"
-msgstr ""
+msgstr "Data breach"
 
 #: modules/hope/patcher/tickets.py:62
 msgid "Conflict of interest"
-msgstr ""
+msgstr "Conflict of interest"
 
 #: modules/hope/patcher/tickets.py:63
 msgid "Fraud and forgery"
-msgstr ""
+msgstr "Fraud and forgery"
 
 #: modules/hope/patcher/tickets.py:64
 msgid "Fraud involving misuse of programme funds by third party"
-msgstr ""
+msgstr "Fraud involving misuse of programme funds by third party"
 
 #: modules/hope/patcher/tickets.py:65
 msgid "Gross mismanagement"
-msgstr ""
+msgstr "Gross mismanagement"
 
 #: modules/hope/patcher/tickets.py:66
 msgid "Harassment and abuse of authority"
-msgstr ""
+msgstr "Harassment and abuse of authority"
 
 #: modules/hope/patcher/tickets.py:67
 msgid "Inappropriate staff conduct"
-msgstr ""
+msgstr "Inappropriate staff conduct"
 
 #: modules/hope/patcher/tickets.py:68
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Miscellaneous"
 
 #: modules/hope/patcher/tickets.py:69
 msgid "Personal disputes"
-msgstr ""
+msgstr "Personal disputes"
 
 #: modules/hope/patcher/tickets.py:70
 msgid "Sexual harassment and sexual exploitation"
-msgstr ""
+msgstr "Sexual harassment and sexual exploitation"
 
 #: modules/hope/patcher/tickets.py:71
 msgid "Unauthorized use, misuse or waste of UNICEF property or funds"
-msgstr ""
+msgstr "Unauthorized use, misuse or waste of UNICEF property or funds"
 
 #: modules/hope/patcher/tickets.py:74
 msgid "Payment Related Complaint"
-msgstr ""
+msgstr "Payment Related Complaint"
 
 #: modules/hope/patcher/tickets.py:75
 msgid "FSP Related Complaint"
-msgstr ""
+msgstr "FSP Related Complaint"
 
 #: modules/hope/patcher/tickets.py:76
 msgid "Registration Related Complaint"
-msgstr ""
+msgstr "Registration Related Complaint"
 
 #: modules/hope/patcher/tickets.py:77
 msgid "Other Complaint"
-msgstr ""
+msgstr "Other Complaint"
 
 #: modules/hope/patcher/tickets.py:78
 msgid "Partner Related Complaint"
-msgstr ""
+msgstr "Partner Related Complaint"
 
 #: modules/hope/patcher/tickets.py:81
 msgid "Unique Identifiers Similarity"
-msgstr ""
+msgstr "Unique Identifiers Similarity"
 
 #: modules/hope/patcher/tickets.py:82
 msgid "Biographical Data Similarity"
-msgstr ""
+msgstr "Biographical Data Similarity"
 
 #: modules/hope/patcher/tickets.py:83
 msgid "Biometrics Similarity"
-msgstr ""
+msgstr "Biometrics Similarity"
 
 #: modules/hope/patcher/tickets.py:88
 msgid "New"
-msgstr ""
+msgstr "New"
 
 #: modules/hope/patcher/tickets.py:89
 msgid "Assigned"
-msgstr ""
+msgstr "Assigned"
 
 #: modules/hope/patcher/tickets.py:90
 msgid "Closed"
-msgstr ""
+msgstr "Closed"
 
 #: modules/hope/patcher/tickets.py:91
 msgid "For Approval"
-msgstr ""
+msgstr "For Approval"
 
 #: modules/hope/patcher/tickets.py:92
 msgid "In Progress"
-msgstr ""
+msgstr "In Progress"
 
 #: modules/hope/patcher/tickets.py:93
 msgid "On Hold"
-msgstr ""
+msgstr "On Hold"
 
 #: modules/hope/patcher/tickets.py:97 modules/hope/patcher/tickets.py:112
 msgid "Data Change"
-msgstr ""
+msgstr "Data Change"
 
 #: modules/hope/patcher/tickets.py:98 modules/hope/patcher/tickets.py:113
 msgid "Grievance Complaint"
-msgstr ""
+msgstr "Grievance Complaint"
 
 #: modules/hope/patcher/tickets.py:99
 msgid "Negative Feedback"
-msgstr ""
+msgstr "Negative Feedback"
 
 #: modules/hope/patcher/tickets.py:100
 msgid "Positive Feedback"
-msgstr ""
+msgstr "Positive Feedback"
 
 #: modules/hope/patcher/tickets.py:101 modules/hope/patcher/tickets.py:114
 msgid "Referral"
-msgstr ""
+msgstr "Referral"
 
 #: modules/hope/patcher/tickets.py:102 modules/hope/patcher/tickets.py:115
 msgid "Sensitive Grievance"
-msgstr ""
+msgstr "Sensitive Grievance"
 
 #: modules/hope/patcher/tickets.py:105
 msgid "Needs Adjudication"
-msgstr ""
+msgstr "Needs Adjudication"
 
 #: modules/hope/patcher/tickets.py:106
 msgid "Payment Verification"
-msgstr ""
+msgstr "Payment Verification"
 
 #: modules/hope/patcher/tickets.py:107
 msgid "System Flagging"
-msgstr ""
+msgstr "System Flagging"
 
 #: modules/inspect/__init__.py:64
 msgid "Head of Household"
-msgstr ""
+msgstr "Head of Household"
 
 #: modules/inspect/__init__.py:64
 msgid "Primary Collector"
-msgstr ""
+msgstr "Primary Collector"
 
 #: modules/inspect/extractors.py:95
 msgid "day"
-msgstr ""
+msgstr "day"
 
 #: modules/inspect/extractors.py:95
 msgid "month"
-msgstr ""
+msgstr "month"
 
 #: modules/inspect/extractors.py:95
 msgid "year"
-msgstr ""
+msgstr "year"
 
 #: modules/inspect/extractors.py:96
 #, python-brace-format
 msgid "What is the {part} (as number) of your '{label}'?"
-msgstr ""
+msgstr "What is the {part} (as number) of your '{label}'?"
 
 #: modules/security/guards.py:30
 #, python-brace-format
 msgid "Too many attempts. Please try again after {expiry_time}."
-msgstr ""
+msgstr "Too many attempts. Please try again after {expiry_time}."
 
 #: modules/security/guards.py:33
 msgid "Too many attempts. Please try again later."
-msgstr ""
+msgstr "Too many attempts. Please try again later."
 
 #: modules/security/guards.py:92
 #, python-brace-format
 msgid ""
 "Too many attempts from your device. Please try again after {expiry_time}."
 msgstr ""
+"Too many attempts from your device. Please try again after {expiry_time}."
 
 #: modules/security/guards.py:95
 msgid "Too many attempts from your device. Please try again later."
-msgstr ""
+msgstr "Too many attempts from your device. Please try again later."
 
 #: modules/security/otp.py:18
 #, python-brace-format
 msgid "Your OTP is: {otp}. It is valid for {minutes} minutes."
-msgstr ""
+msgstr "Your OTP is: {otp}. It is valid for {minutes} minutes."
 
 #: ui/templates/admin/base_site.html:6
 #, fuzzy
@@ -339,15 +340,15 @@ msgstr "لم يتم العثور على الكائن أو ليس لديك أذو
 
 #: ui/templates/includes/footer.html:4
 msgid "About us"
-msgstr ""
+msgstr "About us"
 
 #: ui/templates/includes/footer.html:5
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 #: ui/templates/includes/footer.html:7
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: ui/templates/includes/footer.html:11
 #, python-format
@@ -356,36 +357,36 @@ msgstr "حقوق النشر © %(year)s - جميع الحقوق محفوظة ل�
 
 #: ui/templates/pages/flow/_start.html:15 ui/templates/pages/flow/ask.html:21
 msgid "Validate"
-msgstr ""
+msgstr "Validate"
 
 #: ui/templates/pages/flow/_start.html:16
 #: ui/templates/pages/flow/not_available.html:9
 msgid "Back"
-msgstr ""
+msgstr "Back"
 
 #: ui/templates/pages/flow/ask.html:6
 msgid "Sorry cannot find your data"
-msgstr ""
+msgstr "Sorry cannot find your data"
 
 #: ui/templates/pages/flow/info.html:48
 msgid "Done"
-msgstr ""
+msgstr "Done"
 
 #: ui/templates/pages/flow/info.html:52
 msgid "Create account"
-msgstr ""
+msgstr "Create account"
 
 #: ui/templates/pages/flow/locked_out.html:6
 msgid "Locked out"
-msgstr ""
+msgstr "Locked out"
 
 #: ui/templates/pages/flow/not_available.html:6
 msgid "Not Available"
-msgstr ""
+msgstr "Not Available"
 
 #: ui/templates/pages/flow/sent.html:6
 msgid "Done."
-msgstr ""
+msgstr "Done."
 
 #: ui/templates/pages/flow/start_auth.html:4
 msgid ""
@@ -393,6 +394,9 @@ msgid ""
 "        After a successful identification, you can ask for your username and "
 "password.\n"
 msgstr ""
+"\n"
+"        After a successful identification, you can ask for your username and "
+"password.\n"
 
 #: ui/templates/pages/flow/start_email.html:4
 #: ui/templates/pages/flow/start_sms.html:4
@@ -400,35 +404,37 @@ msgid ""
 "Please type mobile number you provided during registration, we will send a "
 "code to enter the portal\n"
 msgstr ""
+"Please type mobile number you provided during registration, we will send a "
+"code to enter the portal\n"
 
 #: ui/templates/pages/flow/start_reg.html:4
 msgid "Please provide Registration number provided at registration time.\n"
-msgstr ""
+msgstr "Please provide Registration number provided at registration time.\n"
 
 #: ui/templates/pages/index.html:18
 msgid "Registration Number"
-msgstr ""
+msgstr "Registration Number"
 
 #: ui/templates/pages/index.html:19
 msgid "SMS"
-msgstr ""
+msgstr "SMS"
 
 #: ui/templates/pages/index.html:20
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: ui/templates/pages/index.html:21 ui/templates/registration/login.html:12
 #: ui/templates/registration/login.html:23
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 #: ui/templates/pages/lockout.html:4
 msgid "Access Temporarily Restricted"
-msgstr ""
+msgstr "Access Temporarily Restricted"
 
 #: ui/templates/pages/lockout.html:11
 msgid "Too Many Attempts"
-msgstr ""
+msgstr "Too Many Attempts"
 
 #: ui/templates/pages/lockout.html:14
 msgid ""
@@ -438,22 +444,27 @@ msgid ""
 "                Please try again later.\n"
 "                "
 msgstr ""
+"\n"
+"                For security reasons, access from your device has been "
+"temporarily restricted.\n"
+"                Please try again later.\n"
+"                "
 
 #: ui/templates/registration/login.html:17
 msgid "email address"
-msgstr ""
+msgstr "email address"
 
 #: ui/templates/registration/login.html:19
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 #: ui/templates/registration/login.html:21
 msgid "your password"
-msgstr ""
+msgstr "your password"
 
 #: ui/templates/registration/login.html:32
 msgid "Login with Azure"
-msgstr ""
+msgstr "Login with Azure"
 
 #: ui/templates/unfold/helpers/header_back_button.html:5
 #: ui/templates/unfold/helpers/header_back_button.html:10
@@ -478,7 +489,7 @@ msgstr "الرئيسية"
 
 #: ui/templates/unfold/helpers/userlinks.html:12
 msgid "Open Issue"
-msgstr ""
+msgstr "Open Issue"
 
 #: ui/templates/unfold/layouts/base.html:9 ui/templates/unfold/login.html:11
 #, fuzzy
@@ -488,7 +499,7 @@ msgstr "إدارة الموقع"
 
 #: ui/templates/unfold/login.html:11
 msgid "Welcome back to"
-msgstr ""
+msgstr "Welcome back to"
 
 #: ui/templates/unfold/login.html:18
 #, python-format
@@ -496,11 +507,13 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
 
 #: ui/templates/unfold/login.html:34
 msgid "Log in"
-msgstr ""
+msgstr "Log in"
 
 #: ui/templates/unfold/login.html:40
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Forgotten your password or username?"

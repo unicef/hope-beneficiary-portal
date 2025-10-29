@@ -27,24 +27,38 @@ def validate_phonenumber(value: Any) -> None:
         raise forms.ValidationError("Invalid phone number") from None
 
 
-class SMSForm(forms.Form):
-    number = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full"}), validators=[validate_phonenumber])
-
-
-class EmailForm(forms.Form):
-    email = forms.EmailField(widget=forms.TextInput(attrs={"class": "input w-full"}))
-
-
-class AuthForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full"}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input w-full"}))
-
-
-class StartForm(forms.Form):
-    registration_number = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full"}))
-
+class BaseForm(forms.Form):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs["renderer"] = QuestionRenderer()
+        super().__init__(*args, **kwargs)
+
+
+class SMSForm(BaseForm):
+    number = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "autocomplete": "off"}),
+        validators=[validate_phonenumber],
+    )
+
+
+class EmailForm(BaseForm):
+    email = forms.EmailField(
+        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "autocomplete": "off"})
+    )
+
+
+class AuthForm(BaseForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "autocomplete": "new-password"})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "input w-full", "autocomplete": "new-password"})
+    )
+
+
+class StartForm(BaseForm):
+    registration_number = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True}))
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.key = kwargs.pop("key", None)
         super().__init__(*args, **kwargs)
 
@@ -66,7 +80,7 @@ class StartForm(forms.Form):
 
 class QuestionForm(forms.Form):
     question = forms.CharField(
-        label="Question", max_length=100, widget=forms.TextInput(attrs={"class": "input w-full"})
+        label="Question", max_length=100, widget=forms.TextInput(attrs={"class": "input w-full", "autocomplete": "off"})
     )
     signed = forms.CharField(label="Signed", widget=forms.HiddenInput)
 

@@ -39,6 +39,7 @@ build: ## build docker image
 .run:
 	cd .. && docker run \
 	 		--rm \
+	 		--platform=linux/amd64 \
 			-p 8000:8000 \
 			-e ADMIN_EMAIL="${ADMIN_EMAIL}" \
 			-e ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
@@ -51,7 +52,6 @@ build: ## build docker image
 			-e DEBUG="1" \
 			-e DJANGO_ADMIN_URL=admin/ \
 			-e DJANGO_SETTINGS_MODULE=hope_portal.config.settings \
-			-e FERNET_KEY=123 \
 			-e LOGGING_LEVEL="DEBUG" \
 			-e SECRET_KEY="super-secret-key-just-for-testing" \
 			-e SENTRY_DSN="${SENTRY_DSN}" \
@@ -64,16 +64,16 @@ build: ## build docker image
 			${CMD}
 
 run: ## Run docker build
-	DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${VERSION} \
+	DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:local \
 	$(MAKE) .run
 
 check: ## Check docker build
 	CMD='sh /usr/local/bin/check.sh' \
-	DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${VERSION} \
+	DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:local \
 	$(MAKE) .run
 
 shell:  ## Run shell into docker
-	DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:${VERSION} \
+	DOCKER_IMAGE=${DOCKER_IMAGE_NAME}:local \
 	RUN_OPTIONS="-it" \
  	CMD='/bin/bash' \
 	$(MAKE) .run

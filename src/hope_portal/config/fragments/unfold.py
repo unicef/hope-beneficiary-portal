@@ -126,7 +126,7 @@ UNFOLD = {
                 "items": [
                     {
                         "title": _("Users"),
-                        "icon": "people",
+                        "icon": "person",
                         "link": reverse_lazy("admin:hope_portal_user_changelist"),
                     },
                     {
@@ -143,10 +143,12 @@ UNFOLD = {
                 "items": [
                     {
                         "title": _("Constance"),
+                        "icon": "settings",
                         "link": reverse_lazy("admin:constance_config_changelist"),
                     },
                     {
                         "title": _("Flags"),
+                        "icon": "done",
                         "link": reverse_lazy("admin:flags_flagstate_changelist"),
                     },
                 ],

@@ -1,7 +1,9 @@
+from admin_extra_buttons.decorators import button
 from adminfilters.autocomplete import LinkedAutoCompleteFilter
 from django.contrib import admin
 from django.db import models
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 
 from ...modules.hope.models import Payment, PaymentPlan
 from ._base import BaseHopeAdmin
@@ -33,3 +35,10 @@ class PaymentAdmin(BaseHopeAdmin):
                 "head_of_household",
             )
         )
+
+    @button()  # type: ignore[arg-type]
+    def inspect_household(self, request: HttpRequest, pk: str) -> HttpResponse | None:
+        hh = self.get_object(request, pk)
+        if hh:
+            return HttpResponseRedirect(reverse("ui:flow:inspect", args=[hh.household.unicef_id]))
+        return None

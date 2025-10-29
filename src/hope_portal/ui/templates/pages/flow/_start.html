@@ -5,7 +5,7 @@
         <div class="m-auto w-1/2 border-2 dark:border-gray-200 border-b-gray-900 rounded-2xl  items-center p-5 my-10">
             {% block message %}
             {% endblock message %}
-            <form method="POST" action="." id="reg-form">
+            <form method="POST" action="." id="reg-form" autocomplete="off">
                 {% csrf_token %}
                 {{ formset.management_form }}
                 <fieldset class="form-group">

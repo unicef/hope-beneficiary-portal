@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm AS base_os
+FROM python:3.13-slim-bookworm AS base_os
 ARG VERSION
 ARG GIT_SHA
 ARG BUILD_DATE
@@ -10,6 +10,8 @@ RUN set -x \
     libmagic1 \
     libxml2 \
     libldap-2.5-0 \
+    python3-gdal \
+    gdal-bin \
   " \
   && buildDeps=" \
 wget \
@@ -61,7 +63,7 @@ EOF
 WORKDIR /code
 COPY . /code
 
-RUN uv venv $VIRTUAL_ENV \
+RUN uv venv --relocatable --system-site-packages $VIRTUAL_ENV \
     && uv sync --frozen --no-editable
 
 FROM base_os AS dist
@@ -70,6 +72,7 @@ ADD docker/bin/* /usr/local/bin/
 
 COPY --from=builder /usr/local/bin/uwsgi /usr/local/bin/
 COPY --from=builder /venv /venv
+COPY --from=builder /RELEASE /RELEASE
 
 ENV PATH=/venv/bin:/usr/local/bin/:/usr/bin:/bin:/usr/sbin \
     VERSION=$VERSION \
