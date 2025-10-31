@@ -1,4 +1,6 @@
 nav:
   - Home: index.md
-  - contributing.md
-  - settings.md
+  - Contributing: contributing.md
+  - Commands: commands.md
+  - Settings: settings.md
+  - Docker: docker.md

@@ -14,6 +14,7 @@ __pycache__
 !tests/.coveragerc
 !docs/**/.pages
 /DATA
+/specs
 junit.xml
 coverage.xml
 

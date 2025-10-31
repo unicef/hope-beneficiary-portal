@@ -1,19 +1,39 @@
-# Build and use your docker
+# Docker
 
-After you have cloned the repo, be sure to have a Reddis and PostgreSQL server running on your machine
+This project provides a Dockerfile to build and run the application in a container.
 
-    export ADMIN_EMAIL=admin@example.com
-    export ADMIN_PASSWORD=password
-    export DATABASE_URL=postgres://postgres:@127.0.0.1:5432/hope_portal
-    export CACHE_URL=redis://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient
+## Building the image
 
-    cd docker
+To build the image, you can use the `make build` command from the `docker` folder. This will build the image with the name `unicef/hope-beneficiary-portal:local`.
 
-    make build run
+```shell
+cd docker
+make build
+```
 
+## Running the image
 
-## Use provided compose.yml
+To run the image, you can use the `make run` command from the `docker` folder. This will run the image and expose the port 8000.
 
-    docker compose up
+```shell
+cd docker
+make run
+```
 
-navigate to http://localhost:8000/admin/ and login using `admin@example.com/password`
+## Checking the image
+
+To check the image, you can use the `make check` command from the `docker` folder. This will run the `check.sh` script inside the container.
+
+```shell
+cd docker
+make check
+```
+
+## Shell
+
+To get a shell inside the container, you can use the `make shell` command from the `docker` folder.
+
+```shell
+cd docker
+make shell
+```
