@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const toggler = document.getElementById("theme-toggler");
     const HTML = document.getElementsByTagName('html')[0];
     const body = document.body;
-    const selectors = body.querySelectorAll('.font-size-selector div');
+    const selectors = body.querySelectorAll('.font-size-selector span');
     const FONT_CLASSES = ['font-size-normal', 'font-size-medium', 'font-size-big'];
     toggler.checked = (HTML.dataset.theme === "dark");
     console.log(HTML.dataset.theme)
@@ -20,11 +20,11 @@ document.addEventListener("DOMContentLoaded", function () {
         HTML.classList.remove(...FONT_CLASSES);
         HTML.classList.add(newSize);
         Cookies.set("size", newSize);
-        let old_selection = body.querySelector('.font-size-selector div.selected');
+        let old_selection = body.querySelector('.font-size-selector span.selected');
         if (old_selection){
             old_selection.classList.remove("selected");
         }
-        let selection = body.querySelector(`.font-size-selector div[data-size=${newSize}]`);
+        let selection = body.querySelector(`.font-size-selector span[data-size=${newSize}]`);
         if (selection){
             selection.classList.add("selected");
         }

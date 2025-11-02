@@ -167,14 +167,13 @@ DATABASE_APPS_MAPPING: dict[str, str] = {
 TIME_ZONE = env("TIME_ZONE")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#GUAguage-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 LANGUAGE_COOKIE_NAME = "language"
-ugettext = lambda s: s
 LANGUAGES = (
-    ("es", ugettext("Spanish")),
-    ("fr", ugettext("French")),
-    ("en", ugettext("English")),
-    ("ar", ugettext("Arabic")),
+    ("es", "Español"),
+    ("fr", "Français"),
+    ("en", "English"),
+    ("ar", "العربية"),
 )
 
 LOCALE_PATHS = (str(PACKAGE_DIR / "LOCALE"),)

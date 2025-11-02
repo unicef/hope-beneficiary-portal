@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 @plugin "daisyui";
+
 @plugin "daisyui/theme" {
-  name: "dark";
+  name: dark;
   default: false;
   prefersdark: true;
-  color-scheme: "dark";
+  color-scheme: dark;
   --color-base-100: oklch(12% 0.042 264.695);
   --color-base-200: oklch(20% 0.042 265.755);
   --color-base-300: oklch(27% 0.041 260.031);
@@ -38,10 +39,10 @@
 
 
 @plugin "daisyui/theme" {
-  name: "light";
+  name: light;
   default: true;
   prefersdark: false;
-  color-scheme: "light";
+  color-scheme: light;
   --color-base-100: oklch(92% 0.013 255.508);
   --color-base-200: oklch(98% 0.002 247.839);
   --color-base-300: oklch(98% 0.002 247.839);
@@ -72,56 +73,105 @@
   --noise: 0;
 }
 
-/**
-  * A catch-all path to Django template files, JavaScript, and Python files
-  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
-  *
-  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
-  * the scope of this path.
-  */
+@source "*.scss";
 @source "../../../**/*.{html,py,js}";
-@source "../../../../**/*.{html,py,js}";
+
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-header{
+.lang-en {
+  .no-eng {
+    @apply hidden;
+  }
+}
+
+.banner {
+  @apply w-1/2 border border-white rounded-lg py-5 bg-primary;
+  @apply dark:border-gray-400;
+  min-height: 300px;
+
+  .app-name {
+    @apply m-auto text-center text-white text-5xl;
+  }
+
+  .app-local-name {
+    @apply m-auto text-center text-white text-2xl;
+  }
+}
+
+header {
   background-color: var(--color-primary);
 }
+
+footer {
+  nav {
+    @apply grid grid-flow-col m-0 p-0;
+    a {
+      @apply p-0 m-0 cursor-pointer font-light;
+      &:not(:last-child) {
+        &:after {
+          content: "  -"
+        }
+      }
+    }
+  }
+
+  .info-line {
+    @apply inline-flex;
+    div {
+      @apply inline-flex;
+      &:after {
+        padding-right: 2px;
+        padding-left: 2px;
+        content: " -";
+      }
+    }
+  }
+}
+
 .font-size-selector {
   @apply flex;
-  div {
+  span {
     @apply flex-1 mx-2 p-1 cursor-pointer text-center m-auto;
-    &.selected{
+    &.selected {
       @apply bg-amber-100 rounded-lg text-black;
     }
+
     &.font-1 {
       font-size: 16px;
     }
+
     &.font-2 {
       font-size: 24px;
     }
+
     &.font-3 {
       font-size: 32px;
     }
   }
 }
-ul.errorlist{
-  li{
+
+ul.errorlist {
+  li {
     @apply text-red-600;
   }
 }
-fieldset{
+
+fieldset {
   @apply p-3 my-4;
-  legend{
+  legend {
 
   }
-  .helptext{
+
+  .helptext {
     font-size: 80%;
     @apply dark:text-gray-400 text-gray-900 mt-1;
   }
 
 }
+
 .font-size-normal {
-  font-size: 100% !important;
+
 }
 
 .font-size-medium {

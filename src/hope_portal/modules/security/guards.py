@@ -89,10 +89,10 @@ class CookieAttemptGuard:
         if self.is_locked_out():
             expiry_time = cache.get(self.cache_key_lockout_expiry)
             if expiry_time and isinstance(expiry_time, datetime):
-                return _("Too many attempts from your device. Please try again after {expiry_time}.").format(
+                return _("Too many attempts. Please try again after {expiry_time}.").format(
                     expiry_time=expiry_time.strftime("%Y-%m-%d %H:%M:%S %Z")
                 )
-            return _("Too many attempts from your device. Please try again later.")
+            return _("Too many attempts. Please try again later.")
         return ""
 
     def record_attempt(self) -> None:

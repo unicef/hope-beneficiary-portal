@@ -19,7 +19,7 @@ UNFOLD = {
         # ...
     ],
     "LOGIN": {
-        "image": lambda request: static("images/logo_small.svg"),
+        "image": lambda request: static("images/hope_logo.png"),
         "redirect_after": lambda request: reverse_lazy("admin:index"),
     },
     "ENVIRONMENT": "hope_portal.config.fragments.unfold.environment_callback",  # environment name in header
@@ -32,20 +32,20 @@ UNFOLD = {
             "rel": "icon",
             "sizes": "32x32",
             "type": "image/x-icon",
-            "href": lambda request: static("images/logo_small.svg"),
+            "href": lambda request: static("images/hope_logo.png"),
         },
         {
             "rel": "icon",
             "sizes": "64x64",
             "type": "image/x-icon",
-            "href": lambda request: static("images/logo_small.svg"),
+            "href": lambda request: static("images/hope_logo.png"),
         },
     ],
     "SITE_SYMBOL": "speed",  # symbol from icon set
     "SITE_URL": "/",
     "SITE_ICON": {
-        "light": lambda request: static("images/logo_small.svg"),  # light mode
-        "dark": lambda request: static("images/logo_small.svg"),  # dark mode
+        "light": lambda request: static("images/hope_logo.png"),  # light mode
+        "dark": lambda request: static("images/hope_logo.png"),  # dark mode
     },
     "STYLES": [],
     "BORDER_RADIUS": "6px",
@@ -83,7 +83,7 @@ UNFOLD = {
         "show_all_applications": True,  # Dropdown with all applications and models
         "navigation": [
             {
-                "title": _("HOPE"),
+                "title": "HOPE",
                 "separator": True,  # Top border
                 "collapsible": False,  # Collapsible group of links
                 "items": [

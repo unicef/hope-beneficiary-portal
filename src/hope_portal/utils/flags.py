@@ -46,7 +46,7 @@ def debug(value: str, **kwargs: "Any") -> bool:
 def hostname(value: str, request: "HttpRequest | None" = None, **kwargs: "Any") -> bool:
     if request:
         return request.get_host().split(":")[0] in value.split(",")
-    return None
+    return False
 
 
 @conditions.register("Environment Variable")

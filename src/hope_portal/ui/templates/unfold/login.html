@@ -8,7 +8,7 @@
     {{ title }} | {{ site_title }}
 {% endblock %}
 {% block content3 %}
-    {% include "unfold/helpers/unauthenticated_title.html" with title=site_title|default:_('Django site admin') subtitle=_('Welcome back to') %}
+    {% include "unfold/helpers/unauthenticated_title.html" with title=site_title|default:_('Portal site admin') subtitle=_('Welcome back to') %}
     {% include "unfold/helpers/messages.html" %}
     {% if form.errors or form.non_field_errors %}
         <div class="flex flex-col gap-4 mb-8 *:mb-0">

@@ -1,12 +1,13 @@
-{% load static %}
+{% load static feature_flags %}
 <header class="navbar bg-base-100 shadow-sm m-0 p-0">
     <div class="navbar-start bg-primary-100 mx-5">
         <a href="/">
-            <img class="w-32" src="{% static "images/hope_logo.png" %}" alt="logo" />
+            <img class="w-32" src="{% static "images/hope_logo_transparent.png" %}" alt="logo" />
         </a>
     </div>
     <div class="navbar-end">
-        {% if request.user.is_staff %}
+        {% flag_enabled "SHOW_OPEN_ISSUE" as show_open_issue %}
+        {% if show_open_issue %}
             <a id="issue-opener" class="btn btn-warning text-gray-900 ml-2 px-1">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      fill="none"

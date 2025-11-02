@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-29 10:34+0000\n"
+"POT-Creation-Date: 2025-11-02 13:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: config/fragments/unfold.py:86
-msgid "HOPE"
-msgstr ""
 
 #: config/fragments/unfold.py:91
 msgid "Programs"
@@ -50,11 +46,11 @@ msgstr ""
 msgid "Security"
 msgstr ""
 
-#: config/fragments/unfold.py:128 config/fragments/unfold.py:163
+#: config/fragments/unfold.py:128 config/fragments/unfold.py:165
 msgid "Users"
 msgstr ""
 
-#: config/fragments/unfold.py:133 config/fragments/unfold.py:174
+#: config/fragments/unfold.py:133 config/fragments/unfold.py:176
 msgid "Groups"
 msgstr ""
 
@@ -66,25 +62,9 @@ msgstr ""
 msgid "Constance"
 msgstr ""
 
-#: config/fragments/unfold.py:149
+#: config/fragments/unfold.py:150
 msgid "Flags"
 msgstr ""
-
-#: config/settings.py:174
-msgid "Spanish"
-msgstr "Espagnol"
-
-#: config/settings.py:175
-msgid "French"
-msgstr "Français"
-
-#: config/settings.py:176
-msgid "English"
-msgstr "Anglais"
-
-#: config/settings.py:177
-msgid "Arabic"
-msgstr "Arabe"
 
 #: models/beneficiary.py:10
 msgid "username"
@@ -291,23 +271,13 @@ msgstr ""
 msgid "What is the {part} (as number) of your '{label}'?"
 msgstr ""
 
-#: modules/security/guards.py:30
+#: modules/security/guards.py:30 modules/security/guards.py:92
 #, python-brace-format
 msgid "Too many attempts. Please try again after {expiry_time}."
 msgstr ""
 
-#: modules/security/guards.py:33
+#: modules/security/guards.py:33 modules/security/guards.py:95
 msgid "Too many attempts. Please try again later."
-msgstr ""
-
-#: modules/security/guards.py:92
-#, python-brace-format
-msgid ""
-"Too many attempts from your device. Please try again after {expiry_time}."
-msgstr ""
-
-#: modules/security/guards.py:95
-msgid "Too many attempts from your device. Please try again later."
 msgstr ""
 
 #: modules/security/otp.py:18
@@ -320,6 +290,32 @@ msgstr ""
 #| msgid "Django site admin"
 msgid "Site admin"
 msgstr "Administration du site"
+
+#: ui/templates/admin/login.html:11 ui/templates/unfold/layouts/base.html:9
+#: ui/templates/unfold/login.html:11
+#, fuzzy
+#| msgid "Django site admin"
+msgid "Portal site admin"
+msgstr "Administration du site"
+
+#: ui/templates/admin/login.html:11 ui/templates/unfold/login.html:11
+msgid "Welcome back to"
+msgstr ""
+
+#: ui/templates/admin/login.html:18 ui/templates/unfold/login.html:18
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+#: ui/templates/admin/login.html:34 ui/templates/unfold/login.html:34
+msgid "Log in"
+msgstr ""
+
+#: ui/templates/admin/login.html:40 ui/templates/unfold/login.html:40
+msgid "Forgotten your password or username?"
+msgstr ""
 
 #: ui/templates/errors/403.html:15
 msgid "Forbidden"
@@ -344,13 +340,14 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: ui/templates/includes/footer.html:7
+#: ui/templates/includes/footer.html:8
 msgid "Admin"
 msgstr ""
 
-#: ui/templates/includes/footer.html:11
-#, python-format
-msgid "Copyright © %(year)s - All right reserved by UNICEF"
+#: ui/templates/includes/footer.html:12
+#, fuzzy, python-format
+#| msgid "Copyright © %(year)s - All right reserved by UNICEF"
+msgid "Copyright © %(year)s All right reserved by UNICEF"
 msgstr "Copyright © %(year)s - Tous droits réservés par l'UNICEF"
 
 #: ui/templates/pages/flow/_start.html:15 ui/templates/pages/flow/ask.html:21
@@ -366,11 +363,15 @@ msgstr ""
 msgid "Sorry cannot find your data"
 msgstr ""
 
-#: ui/templates/pages/flow/info.html:48
+#: ui/templates/pages/flow/info.html:23
+msgid "Program"
+msgstr ""
+
+#: ui/templates/pages/flow/info.html:59
 msgid "Done"
 msgstr ""
 
-#: ui/templates/pages/flow/info.html:52
+#: ui/templates/pages/flow/info.html:63
 msgid "Create account"
 msgstr ""
 
@@ -401,22 +402,30 @@ msgid ""
 msgstr ""
 
 #: ui/templates/pages/flow/start_reg.html:4
-msgid "Please provide Registration number provided at registration time.\n"
+msgid "Please provide Registration number provided at registration time."
 msgstr ""
 
-#: ui/templates/pages/index.html:18
+#: ui/templates/pages/index.html:10
+msgid "Beneficiary Portal"
+msgstr "Portail des bénéficiaires"
+
+#: ui/templates/pages/index.html:13
+msgid "Enter using..."
+msgstr "Entrez en utilisant..."
+
+#: ui/templates/pages/index.html:16
 msgid "Registration Number"
-msgstr ""
+msgstr "Numéro d'immatriculation"
 
-#: ui/templates/pages/index.html:19
+#: ui/templates/pages/index.html:17
 msgid "SMS"
 msgstr ""
 
-#: ui/templates/pages/index.html:20
+#: ui/templates/pages/index.html:18
 msgid "Email"
 msgstr ""
 
-#: ui/templates/pages/index.html:21 ui/templates/registration/login.html:12
+#: ui/templates/pages/index.html:19 ui/templates/registration/login.html:12
 #: ui/templates/registration/login.html:23
 msgid "Login"
 msgstr ""
@@ -431,24 +440,23 @@ msgstr ""
 
 #: ui/templates/pages/lockout.html:14
 msgid ""
-"\n"
-"                For security reasons, access from your device has been "
-"temporarily restricted.\n"
-"                Please try again later.\n"
-"                "
+"For security reasons, access from your device has been temporarily "
+"restricted. Please try again later."
 msgstr ""
+"Pour des raisons de sécurité, l'accès depuis votre appareil a été temporairement restreint. Veuillez réessayer plus tard."
+"Veuillez réessayer plus tard."
 
 #: ui/templates/registration/login.html:17
 msgid "email address"
-msgstr ""
+msgstr "adresse email"
 
 #: ui/templates/registration/login.html:19
 msgid "Password"
-msgstr ""
+msgstr "Mot de passe"
 
 #: ui/templates/registration/login.html:21
 msgid "your password"
-msgstr ""
+msgstr "votre mot de passe"
 
 #: ui/templates/registration/login.html:32
 msgid "Login with Azure"
@@ -479,27 +487,14 @@ msgstr "Accueil"
 msgid "Open Issue"
 msgstr ""
 
-#: ui/templates/unfold/layouts/base.html:9 ui/templates/unfold/login.html:11
-#, fuzzy
-#| msgid "Django site admin"
-msgid "Django site admin"
-msgstr "Administration du site"
+#~ msgid "Spanish"
+#~ msgstr "Espagnol"
 
-#: ui/templates/unfold/login.html:11
-msgid "Welcome back to"
-msgstr ""
+#~ msgid "French"
+#~ msgstr "Français"
 
-#: ui/templates/unfold/login.html:18
-#, python-format
-msgid ""
-"You are authenticated as %(username)s, but are not authorized to access this "
-"page. Would you like to login to a different account?"
-msgstr ""
+#~ msgid "English"
+#~ msgstr "Anglais"
 
-#: ui/templates/unfold/login.html:34
-msgid "Log in"
-msgstr ""
-
-#: ui/templates/unfold/login.html:40
-msgid "Forgotten your password or username?"
-msgstr ""
+#~ msgid "Arabic"
+#~ msgstr "Arabe"

@@ -11,10 +11,10 @@
                     {% trans "Too Many Attempts" %}
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">
-                    {% blocktrans %}
-                For security reasons, access from your device has been temporarily restricted.
-                Please try again later.
-                {% endblocktrans %}
+                    {% blocktrans trimmed %}
+                        For security reasons, access from your device has been temporarily restricted.
+                        Please try again later.
+                    {% endblocktrans %}
                 </p>
                 {% if message %}
                     <p class="mt-4 text-sm font-medium text-red-600">

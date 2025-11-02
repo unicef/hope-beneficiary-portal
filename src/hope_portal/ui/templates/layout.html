@@ -13,7 +13,9 @@
         {% block extra_head %}
         {% endblock extra_head %}
     </head>
-    <body data-timeout="{{ LOGOUT_TIMEOUT_MS|default:300000 }}" data-logout-url="{% url 'ui:logout' %}">
+    <body class="lang-{{ LANGUAGE_CODE }}"
+          data-timeout="{{ LOGOUT_TIMEOUT_MS|default:300000 }}"
+          data-logout-url="{% url 'ui:logout' %}">
         {% block header %}
             {% include "includes/header.html" %}
         {% endblock header %}

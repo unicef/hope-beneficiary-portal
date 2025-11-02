@@ -6,309 +6,297 @@
 #, fuzzy
 msgid ""
 msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 13:38+0000\n"
+"POT-Creation-Date: 2025-11-02 10:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: ar\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-"اليونيسفProject-Id-Version: PACKAGE VERSION\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: config/fragments/unfold.py:91
 msgid "Programs"
-msgstr "البرامج"
+msgstr ""
 
 #: config/fragments/unfold.py:96
 msgid "Offices"
-msgstr "المكاتب"
+msgstr ""
 
 #: config/fragments/unfold.py:101
 msgid "Household"
-msgstr "الأسرة"
+msgstr ""
 
 #: config/fragments/unfold.py:106
 msgid "Individual"
-msgstr "فرد"
+msgstr ""
 
 #: config/fragments/unfold.py:111
 msgid "Payment Plans"
-msgstr "خطط الدفع"
+msgstr ""
 
 #: config/fragments/unfold.py:116
 msgid "Payments"
-msgstr "المدفوعات"
+msgstr ""
 
 #: config/fragments/unfold.py:123
 msgid "Security"
-msgstr "الأمان"
+msgstr ""
 
 #: config/fragments/unfold.py:128 config/fragments/unfold.py:165
 msgid "Users"
-msgstr "المستخدمون"
+msgstr ""
 
 #: config/fragments/unfold.py:133 config/fragments/unfold.py:176
 msgid "Groups"
-msgstr "المجموعات"
+msgstr ""
 
 #: config/fragments/unfold.py:140
 msgid "Configuration"
-msgstr "الإعدادات"
+msgstr ""
 
 #: config/fragments/unfold.py:145
 msgid "Constance"
-msgstr "Constance"
+msgstr ""
 
 #: config/fragments/unfold.py:150
 msgid "Flags"
-msgstr "Flags"
+msgstr ""
 
 #: models/beneficiary.py:10
 msgid "username"
-msgstr "اسم المستخدم"
+msgstr ""
 
 #: models/beneficiary.py:11
 msgid "household id"
-msgstr "معرف الأسرة"
+msgstr ""
 
 #: models/beneficiary.py:12
 msgid "password"
-msgstr "كلمة المرور"
+msgstr ""
 
 #: models/beneficiary.py:13
 msgid "last login"
-msgstr "آخر تسجيل دخول"
+msgstr ""
 
 #: models/beneficiary.py:14
 msgid "suspended"
-msgstr "معلق"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:53
 msgid "Add Individual"
-msgstr "إضافة فرد"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:54
 msgid "Household Data Update"
-msgstr "تحديث بيانات الأسرة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:55
 msgid "Individual Data Update"
-msgstr "تحديث بيانات الفرد"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:56
 msgid "Withdraw Individual"
-msgstr "سحب فرد"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:57
 msgid "Withdraw Household"
-msgstr "سحب الأسرة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:60
 msgid "Bribery, corruption or kickback"
-msgstr "رشوة أو فساد أو عمولة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:61
 msgid "Data breach"
-msgstr "خرق البيانات"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:62
 msgid "Conflict of interest"
-msgstr "تضارب المصالح"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:63
 msgid "Fraud and forgery"
-msgstr "الاحتيال والتزوير"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:64
 msgid "Fraud involving misuse of programme funds by third party"
-msgstr "الاحتيال الذي ينطوي على إساءة استخدام أموال البرنامج من قبل طرف ثالث"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:65
 msgid "Gross mismanagement"
-msgstr "سوء الإدارة الجسيم"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:66
 msgid "Harassment and abuse of authority"
-msgstr "المضايقة وإساءة استخدام السلطة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:67
 msgid "Inappropriate staff conduct"
-msgstr "سلوك غير لائق من قبل الموظفين"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:68
 msgid "Miscellaneous"
-msgstr "متنوع"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:69
 msgid "Personal disputes"
-msgstr "نزاعات شخصية"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:70
 msgid "Sexual harassment and sexual exploitation"
-msgstr "التحرش الجنسي والاستغلال الجنسي"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:71
 msgid "Unauthorized use, misuse or waste of UNICEF property or funds"
 msgstr ""
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-"اليونيسفالاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-"اليونيسف"
 
 #: modules/hope/patcher/tickets.py:74
 msgid "Payment Related Complaint"
-msgstr "شكوى متعلقة بالدفع"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:75
 msgid "FSP Related Complaint"
-msgstr "شكوى متعلقة بمقدم الخدمة المالية"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:76
 msgid "Registration Related Complaint"
-msgstr "شكوى متعلقة بالتسجيل"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:77
 msgid "Other Complaint"
-msgstr "شكوى أخرى"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:78
 msgid "Partner Related Complaint"
-msgstr "شكوى متعلقة بالشريك"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:81
 msgid "Unique Identifiers Similarity"
-msgstr "تشابه المعرفات الفريدة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:82
 msgid "Biographical Data Similarity"
-msgstr "تشابه البيانات الشخصية"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:83
 msgid "Biometrics Similarity"
-msgstr "تشابه القياسات الحيوية"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:88
 msgid "New"
-msgstr "جديد"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:89
 msgid "Assigned"
-msgstr "معين"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:90
 msgid "Closed"
-msgstr "مغلق"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:91
 msgid "For Approval"
-msgstr "للموافقة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:92
 msgid "In Progress"
-msgstr "قيد التنفيذ"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:93
 msgid "On Hold"
-msgstr "معلق"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:97 modules/hope/patcher/tickets.py:112
 msgid "Data Change"
-msgstr "تغيير البيانات"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:98 modules/hope/patcher/tickets.py:113
 msgid "Grievance Complaint"
-msgstr "شكوى تظلم"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:99
 msgid "Negative Feedback"
-msgstr "ردود فعل سلبية"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:100
 msgid "Positive Feedback"
-msgstr "ردود فعل إيجابية"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:101 modules/hope/patcher/tickets.py:114
 msgid "Referral"
-msgstr "إحالة"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:102 modules/hope/patcher/tickets.py:115
 msgid "Sensitive Grievance"
-msgstr "تظلم حساس"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:105
 msgid "Needs Adjudication"
-msgstr "يحتاج إلى تحكيم"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:106
 msgid "Payment Verification"
-msgstr "التحقق من الدفع"
+msgstr ""
 
 #: modules/hope/patcher/tickets.py:107
 msgid "System Flagging"
-msgstr "إبلاغ النظام"
+msgstr ""
 
 #: modules/inspect/__init__.py:64
 msgid "Head of Household"
-msgstr "رب الأسرة"
+msgstr ""
 
 #: modules/inspect/__init__.py:64
 msgid "Primary Collector"
-msgstr "المجمع الأساسي"
+msgstr ""
 
 #: modules/inspect/extractors.py:95
 msgid "day"
-msgstr "يوم"
+msgstr ""
 
 #: modules/inspect/extractors.py:95
 msgid "month"
-msgstr "شهر"
+msgstr ""
 
 #: modules/inspect/extractors.py:95
 msgid "year"
-msgstr "سنة"
+msgstr ""
 
 #: modules/inspect/extractors.py:96
 #, python-brace-format
 msgid "What is the {part} (as number) of your '{label}'?"
-msgstr "ما هو {part} (كرقم) من '{label}' الخاص بك؟"
+msgstr ""
 
 #: modules/security/guards.py:30 modules/security/guards.py:92
 #, python-brace-format
 msgid "Too many attempts. Please try again after {expiry_time}."
-msgstr "محاولات كثيرة جدًا. يُرجى المحاولة مرة أخرى بعد {expiry_time}."
+msgstr ""
 
 #: modules/security/guards.py:33 modules/security/guards.py:95
 msgid "Too many attempts. Please try again later."
-msgstr "محاولات كثيرة. يُرجى المحاولة لاحقًا."
+msgstr ""
 
 #: modules/security/otp.py:18
 #, python-brace-format
 msgid "Your OTP is: {otp}. It is valid for {minutes} minutes."
 msgstr ""
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-"اليونيسفرمز التحقق لمرة واحدة (OTP) الخاص بك هو: {otp}. وهو صالح لمدة "
-"{minutes} دقيقة."
 
 #: ui/templates/admin/base_site.html:6
-#, fuzzy
-#| msgid "Django site admin"
 msgid "Site admin"
-msgstr "إدارة الموقع"
+msgstr ""
 
 #: ui/templates/admin/login.html:11 ui/templates/unfold/layouts/base.html:9
 #: ui/templates/unfold/login.html:11
-#, fuzzy
-#| msgid "Django site admin"
 msgid "Portal site admin"
-msgstr "إدارة الموقع"
+msgstr ""
 
 #: ui/templates/admin/login.html:11 ui/templates/unfold/login.html:11
 msgid "Welcome back to"
-msgstr "مرحبا بعودتك إلى"
+msgstr ""
 
 #: ui/templates/admin/login.html:18 ui/templates/unfold/login.html:18
 #, python-format
@@ -316,89 +304,81 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-"اليونيسفأنت مسجل الدخول باسم %(username)s، ولكن غير مصرح لك بالوصول إلى هذه "
-"الصفحة. هل ترغب في تسجيل الدخول إلى حساب مختلف؟"
 
 #: ui/templates/admin/login.html:34 ui/templates/unfold/login.html:34
 msgid "Log in"
-msgstr "تسجيل الدخول"
+msgstr ""
 
 #: ui/templates/admin/login.html:40 ui/templates/unfold/login.html:40
 msgid "Forgotten your password or username?"
-msgstr "هل نسيت كلمة المرور أو اسم المستخدم؟"
+msgstr ""
 
 #: ui/templates/errors/403.html:15
 msgid "Forbidden"
-msgstr " ممنوع"
+msgstr ""
 
 #: ui/templates/errors/403.html:18 ui/templates/errors/404.html:16
 #: ui/templates/errors/500.html:16
-#, fuzzy
-#| msgid "Go back"
 msgid "back"
-msgstr "العودة"
+msgstr ""
 
 #: ui/templates/errors/404.html:13 ui/templates/errors/500.html:13
 msgid "Object Not Found or you do not have permissions to access it"
-msgstr "لم يتم العثور على الكائن أو ليس لديك أذونات للوصول إليه"
+msgstr ""
 
 #: ui/templates/includes/footer.html:4
 msgid "About us"
-msgstr "معلومات عنا"
+msgstr ""
 
 #: ui/templates/includes/footer.html:5
 msgid "Contact"
-msgstr "اتصل"
+msgstr ""
 
 #: ui/templates/includes/footer.html:8
 msgid "Admin"
-msgstr "مسؤل"
+msgstr ""
 
 #: ui/templates/includes/footer.html:12
-#, fuzzy, python-format
-#| msgid "Copyright © %(year)s - All right reserved by UNICEF"
+#, python-format
 msgid "Copyright © %(year)s All right reserved by UNICEF"
-msgstr "حقوق النشر © %(year)s - جميع الحقوق محفوظة لليونيسف"
+msgstr ""
 
 #: ui/templates/pages/flow/_start.html:15 ui/templates/pages/flow/ask.html:21
 msgid "Validate"
-msgstr "التحقق من صحة"
+msgstr ""
 
 #: ui/templates/pages/flow/_start.html:16
 #: ui/templates/pages/flow/not_available.html:9
 msgid "Back"
-msgstr "خلف"
+msgstr ""
 
 #: ui/templates/pages/flow/ask.html:6
 msgid "Sorry cannot find your data"
-msgstr "عذرا، لا يمكن العثور على بياناتك"
+msgstr ""
 
 #: ui/templates/pages/flow/info.html:23
-#, fuzzy
-#| msgid "Programs"
 msgid "Program"
-msgstr "برنامج"
+msgstr ""
 
 #: ui/templates/pages/flow/info.html:59
 msgid "Done"
-msgstr "تم"
+msgstr ""
 
 #: ui/templates/pages/flow/info.html:63
 msgid "Create account"
-msgstr "إنشاء حساب"
+msgstr ""
 
 #: ui/templates/pages/flow/locked_out.html:6
 msgid "Locked out"
-msgstr "مقفل"
+msgstr ""
 
 #: ui/templates/pages/flow/not_available.html:6
 msgid "Not Available"
-msgstr "غير متوفر"
+msgstr ""
 
 #: ui/templates/pages/flow/sent.html:6
 msgid "Done."
-msgstr "تم."
+msgstr ""
 
 #: ui/templates/pages/flow/start_auth.html:4
 msgid ""
@@ -406,9 +386,6 @@ msgid ""
 "        After a successful identification, you can ask for your username and "
 "password.\n"
 msgstr ""
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال اليونيسف\n"
-"        بعد تحديد الهوية بنجاح، يمكنك طلب اسم المستخدم وكلمة المرور الخاصة "
-"بك.\n"
 
 #: ui/templates/pages/flow/start_email.html:4
 #: ui/templates/pages/flow/start_sms.html:4
@@ -416,91 +393,75 @@ msgid ""
 "Please type mobile number you provided during registration, we will send a "
 "code to enter the portal\n"
 msgstr ""
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-"اليونيسفيرجى كتابة رقم الهاتف المحمول الذي قدمته أثناء التسجيل، وسوف نرسل "
-"رمزًا للدخول إلى البوابة\n"
 
 #: ui/templates/pages/flow/start_reg.html:4
 msgid "Please provide Registration number provided at registration time."
-msgstr "يرجى تقديم رقم التسجيل المقدم في وقت التسجيل."
+msgstr ""
 
 #: ui/templates/pages/index.html:10
 msgid "Beneficiary Portal"
-msgstr "بوابة المستفيدين"
+msgstr ""
 
 #: ui/templates/pages/index.html:13
 msgid "Enter using..."
-msgstr "أدخل باستخدام..."
+msgstr ""
 
 #: ui/templates/pages/index.html:16
 msgid "Registration Number"
-msgstr "رقم التسجيل"
+msgstr ""
 
 #: ui/templates/pages/index.html:17
 msgid "SMS"
-msgstr "رسالة قصيرة"
+msgstr ""
 
 #: ui/templates/pages/index.html:18
 msgid "Email"
-msgstr "بريد إلكتروني"
+msgstr ""
 
 #: ui/templates/pages/index.html:19 ui/templates/registration/login.html:12
 #: ui/templates/registration/login.html:23
 msgid "Login"
-msgstr "تسجيل الدخول"
+msgstr ""
 
 #: ui/templates/pages/lockout.html:4
 msgid "Access Temporarily Restricted"
-msgstr "تم تقييد الوصول مؤقتًا"
+msgstr ""
 
 #: ui/templates/pages/lockout.html:11
 msgid "Too Many Attempts"
-msgstr "محاولات كثيرة جدًا"
+msgstr ""
 
 #: ui/templates/pages/lockout.html:14
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "                For security reasons, access from your device has been "
-#| "temporarily restricted.\n"
-#| "                Please try again later.\n"
-#| "                "
 msgid ""
 "For security reasons, access from your device has been temporarily "
 "restricted. Please try again later."
 msgstr ""
-"الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال اليونيسف\n"
-"                لأسباب أمنية، تم تقييد الوصول من جهازك مؤقتًا.\n"
-"                يرجى المحاولة مرة أخرى في وقت لاحق.\n"
-"                "
 
 #: ui/templates/registration/login.html:17
 msgid "email address"
-msgstr "عنوان البريد الإلكتروني"
+msgstr ""
 
 #: ui/templates/registration/login.html:19
 msgid "Password"
-msgstr "كلمة المرور"
+msgstr ""
 
 #: ui/templates/registration/login.html:21
 msgid "your password"
-msgstr "كلمة المرور الخاصة بك"
+msgstr ""
 
 #: ui/templates/registration/login.html:32
 msgid "Login with Azure"
-msgstr "تسجيل الدخول باستخدام Azure"
+msgstr ""
 
 #: ui/templates/unfold/helpers/header_back_button.html:5
 #: ui/templates/unfold/helpers/header_back_button.html:10
 msgid "Go back"
-msgstr "العودة"
+msgstr ""
 
 #: ui/templates/unfold/helpers/site_branding.html:3
 #: ui/templates/unfold/helpers/site_branding.html:5
-#, fuzzy
-#| msgid "Django administration"
 msgid "Administration"
-msgstr "الإدارة"
+msgstr ""
 
 #: ui/templates/unfold/helpers/site_icon.html:10
 #: ui/templates/unfold/helpers/site_icon.html:11
@@ -509,34 +470,8 @@ msgstr "الإدارة"
 #: ui/templates/unfold/helpers/site_logo.html:5
 #: ui/templates/unfold/helpers/site_logo.html:7
 msgid "Home"
-msgstr "الرئيسية"
+msgstr ""
 
 #: ui/templates/unfold/helpers/userlinks.html:12
 msgid "Open Issue"
-msgstr "فتح مشكلة"
-
-#~ msgid "HOPE"
-#~ msgstr "HOPE"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Too many attempts from your device. Please try again after {expiry_time}."
-#~ msgstr ""
-#~ "الاستخدام غير المصرح به أو إساءة استخدام أو إهدار ممتلكات أو أموال "
-#~ "اليونيسفToo many attempts from your device. Please try again after "
-#~ "{expiry_time}."
-
-#~ msgid "Too many attempts from your device. Please try again later."
-#~ msgstr "Too many attempts from your device. Please try again later."
-
-#~ msgid "Spanish"
-#~ msgstr "الإسبانية"
-
-#~ msgid "French"
-#~ msgstr "الفرنسية"
-
-#~ msgid "English"
-#~ msgstr "الإنجليزية"
-
-#~ msgid "Arabic"
-#~ msgstr "العربية"
+msgstr ""

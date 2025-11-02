@@ -1,18 +1,20 @@
 {% extends "layout.html" %}
 {% load static i18n %}
 {% block header %}
-    <div class="navbar bg-base-100 shadow-sm m-0 p-0">
-    </div>
 {% endblock header %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center">
-        <div class="flex flex-col justify-center items-center">
-        </div>
-        <div class="flex flex-col justify-center items-center">
-            <img class="rounded-md" src="{% static "images/hope_banner.png" %}" alt="logo" />
+    <div class="flex flex-col justify-center items-center pt-10">
+        <div class="banner">
+            <img class="m-auto w-1/2" src="{% static "images/hope_transparent.png" %}" alt="logo" />
+            <div class="app-name">
+                Beneficiary Portal
+            </div>
+            <div class="app-local-name no-eng">
+                {% trans "Beneficiary Portal" %}
+            </div>
         </div>
         <div class="mx-auto mb-10">
-            Enter using...
+            {% trans "Enter using..." %}
         </div>
         <div class="mx-auto mb-10">
             <a class="btn btn-primary" href="{% url "ui:flow:start-registration" %}">{% trans "Registration Number" %}</a>

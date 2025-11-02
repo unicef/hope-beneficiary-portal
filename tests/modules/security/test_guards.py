@@ -28,4 +28,4 @@ def test_cookie_guard_lockout(rf):
         guard.record_attempt()
     assert guard.is_locked_out()
     message = guard.get_lockout_message()
-    assert "Too many attempts from your device" in message
+    assert "Too many attempts" in message
