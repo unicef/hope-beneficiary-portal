@@ -34,7 +34,7 @@ clean: ## clean development tree
 
 i18n:  ## update translation files
 	cd src/hope_portal && uv run manage.py makemessages --locale es --locale fr --locale ar --locale pt --ignore '~*'
-	uv run manage.py compilemessages -v 0
+	uv run manage.py compilemessages
 
 
 reset_migrations:  ## reset database migrations. WARNING!!: Use only until first deployment

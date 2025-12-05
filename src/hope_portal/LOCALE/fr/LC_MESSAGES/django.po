@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 13:38+0000\n"
+"POT-Creation-Date: 2025-11-05 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -344,7 +344,7 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: ui/templates/includes/footer.html:12
+#: ui/templates/includes/footer.html:13
 #, fuzzy, python-format
 #| msgid "Copyright © %(year)s - All right reserved by UNICEF"
 msgid "Copyright © %(year)s All right reserved by UNICEF"
@@ -363,15 +363,15 @@ msgstr ""
 msgid "Sorry cannot find your data"
 msgstr ""
 
-#: ui/templates/pages/flow/info.html:23
+#: ui/templates/pages/flow/info.html:37
 msgid "Program"
 msgstr ""
 
-#: ui/templates/pages/flow/info.html:59
+#: ui/templates/pages/flow/info.html:73
 msgid "Done"
 msgstr ""
 
-#: ui/templates/pages/flow/info.html:63
+#: ui/templates/pages/flow/info.html:77
 msgid "Create account"
 msgstr ""
 
@@ -405,27 +405,27 @@ msgstr ""
 msgid "Please provide Registration number provided at registration time."
 msgstr ""
 
-#: ui/templates/pages/index.html:10
-msgid "Beneficiary Portal"
-msgstr "Portail des bénéficiaires"
-
 #: ui/templates/pages/index.html:13
-msgid "Enter using..."
-msgstr "Entrez en utilisant..."
-
-#: ui/templates/pages/index.html:16
-msgid "Registration Number"
-msgstr "Numéro d'immatriculation"
+msgid "Beneficiary Portal"
+msgstr ""
 
 #: ui/templates/pages/index.html:17
+msgid "Enter using..."
+msgstr ""
+
+#: ui/templates/pages/index.html:20
+msgid "Registration Number"
+msgstr ""
+
+#: ui/templates/pages/index.html:21
 msgid "SMS"
 msgstr ""
 
-#: ui/templates/pages/index.html:18
+#: ui/templates/pages/index.html:22
 msgid "Email"
 msgstr ""
 
-#: ui/templates/pages/index.html:19 ui/templates/registration/login.html:12
+#: ui/templates/pages/index.html:23 ui/templates/registration/login.html:12
 #: ui/templates/registration/login.html:23
 msgid "Login"
 msgstr ""
@@ -443,20 +443,18 @@ msgid ""
 "For security reasons, access from your device has been temporarily "
 "restricted. Please try again later."
 msgstr ""
-"Pour des raisons de sécurité, l'accès depuis votre appareil a été temporairement restreint. Veuillez réessayer plus tard."
-"Veuillez réessayer plus tard."
 
 #: ui/templates/registration/login.html:17
 msgid "email address"
-msgstr "adresse email"
+msgstr ""
 
 #: ui/templates/registration/login.html:19
 msgid "Password"
-msgstr "Mot de passe"
+msgstr ""
 
 #: ui/templates/registration/login.html:21
 msgid "your password"
-msgstr "votre mot de passe"
+msgstr ""
 
 #: ui/templates/registration/login.html:32
 msgid "Login with Azure"

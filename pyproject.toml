@@ -83,7 +83,6 @@ dev = [
   "ruff",
   "seleniumbase",
   "tox>=4.2",
-  "transifex-python",
 ]
 
 docs = [
@@ -107,7 +106,8 @@ docs = [
   "mkdocs-simple-hooks>=0.1.5",
   "mkdocstrings[python]>=0.24.1",
   "mkdocstrings-python",
-  "pymdown-extensions>=10.7.1",
+  "pymdown-extensions>=10.16.1",
+  "watchdog>=6",
 ]
 
 type-check = [

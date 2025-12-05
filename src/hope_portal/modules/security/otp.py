@@ -1,13 +1,23 @@
-import random
+import secrets
+import string
 
 from django.conf import settings
+from django.core import signing
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from twilio.rest import Client
 
 
 def generate_otp(length: int = 6) -> str:
-    return "".join([str(random.randint(0, 9)) for _ in range(length)])  # noqa S311
+    otp = "".join(secrets.choice(string.digits) for _ in range(length))
+    return signing.dumps(otp, salt="otp", compress=True)
+
+
+def validate_otp(token: str) -> str | None:
+    try:
+        return signing.loads(token, salt="otp", max_age=settings.OTP_VALIDITY_MINUTES / 60)
+    except signing.BadSignature:
+        return None
 
 
 def send_otp_sms(to_phone_number: str, otp: str) -> bool:

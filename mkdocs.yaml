@@ -19,11 +19,19 @@ exclude_docs: |
 markdown_extensions:
   - admonition
   - pymdownx.magiclink
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+
 
 theme:
   name: "material"
@@ -36,6 +44,8 @@ theme:
     - content.action.edit
     - content.code.annotate
     - content.code.copy
+    - content.code.select
+    - content.tabs.link
     - content.tooltips
     - header.autohidex
     - navigation.footer
@@ -73,8 +83,12 @@ plugins:
       scripts:
         - docs/_scripts/copy_logos.py
         - docs/_scripts/get_settings.py
+
 watch:
-  - src/
+  - docs/src
+  - docs/_theme
+  - docs/_scripts
+  - mkdocs.yaml
 
 hooks:
   - docs/_hooks/hooks.py

@@ -17,24 +17,11 @@ If the user answer to all the questions it would be redirected to a page with he
 There is a safety guard that allows each registration number to be attempt only a limited number of times per day.
 
 
+## Translations
+
+You can contribute to the Portal translation at https://app.transifex.com/unicef-hope/hope-beneficiary-portal/dashboard/
+
+
 ## Contributing
 
-### Requirements
-
-- [uv](https://docs.astral.sh/uv/)
-- [direnv](https://direnv.net/)
-
-### Checkout and configure development environment
-
-```shell
-
-    git checkout https://github.com/unicef/hope-beneficiary-portal.git
-    cd hope-beneficiary-portal
-    uv venv .venv
-    uv sync
-
-    ./manage.py env --develop > .envrc  # create initial development configuration
-    direnv allow .  # enable enviroment
-    createdb hope_portal  # create postgres database on localhost
-
-```
+Check https://unicef.github.io/hope-beneficiary-portal/contributing/

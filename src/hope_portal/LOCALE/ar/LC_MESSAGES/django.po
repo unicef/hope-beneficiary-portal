@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 13:38+0000\n"
+"POT-Creation-Date: 2025-11-05 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -355,7 +355,7 @@ msgstr "اتصل"
 msgid "Admin"
 msgstr "مسؤل"
 
-#: ui/templates/includes/footer.html:12
+#: ui/templates/includes/footer.html:13
 #, fuzzy, python-format
 #| msgid "Copyright © %(year)s - All right reserved by UNICEF"
 msgid "Copyright © %(year)s All right reserved by UNICEF"
@@ -374,17 +374,17 @@ msgstr "خلف"
 msgid "Sorry cannot find your data"
 msgstr "عذرا، لا يمكن العثور على بياناتك"
 
-#: ui/templates/pages/flow/info.html:23
+#: ui/templates/pages/flow/info.html:37
 #, fuzzy
 #| msgid "Programs"
 msgid "Program"
 msgstr "برنامج"
 
-#: ui/templates/pages/flow/info.html:59
+#: ui/templates/pages/flow/info.html:73
 msgid "Done"
 msgstr "تم"
 
-#: ui/templates/pages/flow/info.html:63
+#: ui/templates/pages/flow/info.html:77
 msgid "Create account"
 msgstr "إنشاء حساب"
 
@@ -424,27 +424,27 @@ msgstr ""
 msgid "Please provide Registration number provided at registration time."
 msgstr "يرجى تقديم رقم التسجيل المقدم في وقت التسجيل."
 
-#: ui/templates/pages/index.html:10
+#: ui/templates/pages/index.html:13
 msgid "Beneficiary Portal"
 msgstr "بوابة المستفيدين"
 
-#: ui/templates/pages/index.html:13
+#: ui/templates/pages/index.html:17
 msgid "Enter using..."
 msgstr "أدخل باستخدام..."
 
-#: ui/templates/pages/index.html:16
+#: ui/templates/pages/index.html:20
 msgid "Registration Number"
 msgstr "رقم التسجيل"
 
-#: ui/templates/pages/index.html:17
+#: ui/templates/pages/index.html:21
 msgid "SMS"
 msgstr "رسالة قصيرة"
 
-#: ui/templates/pages/index.html:18
+#: ui/templates/pages/index.html:22
 msgid "Email"
 msgstr "بريد إلكتروني"
 
-#: ui/templates/pages/index.html:19 ui/templates/registration/login.html:12
+#: ui/templates/pages/index.html:23 ui/templates/registration/login.html:12
 #: ui/templates/registration/login.html:23
 msgid "Login"
 msgstr "تسجيل الدخول"

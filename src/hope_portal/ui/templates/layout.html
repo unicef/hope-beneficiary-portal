@@ -5,11 +5,11 @@
         <meta name="lang"  content="en" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>HOPE Portal</title>
-        <script src="{% static 'js/js.cookie.min.js' %}"></script>
-        <script src="{% static 'js/theme.min.js' %}"></script>
+        {#        <script src="{% static 'js/js.cookie.min.js' %}"></script>#}
+        {#        <script src="{% static 'js/theme.min.js' %}"></script>#}
         {% tailwind_css %}
         {% issues_tags %}
-        {{ media }}
+        {{ site_media }}
         {% block extra_head %}
         {% endblock extra_head %}
     </head>

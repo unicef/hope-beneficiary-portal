@@ -223,7 +223,7 @@ TEMPLATES = [
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
                 "hope_portal.ui.context_processors.app",
-                "hope_portal.ui.context_processors.theme_processor",
+                "hope_portal.ui.context_processors.theme",
             ],
         },
     },
@@ -328,7 +328,26 @@ LOGIN_URL = "login"
 
 # Location of root django.contrib.admin URL
 ADMIN_URL = r"^admin/"
-
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": env("LOGGING_LEVEL"),
+            "propagate": False,
+        }
+    },
+}
 GDAL_LIBRARY_PATH = env("GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = env("GEOS_LIBRARY_PATH")
 

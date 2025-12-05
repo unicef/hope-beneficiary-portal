@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 13:38+0000\n"
+"POT-Creation-Date: 2025-11-05 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -344,7 +344,7 @@ msgstr "Contacto"
 msgid "Admin"
 msgstr "Administración"
 
-#: ui/templates/includes/footer.html:12
+#: ui/templates/includes/footer.html:13
 #, fuzzy, python-format
 #| msgid "Copyright © %(year)s - All right reserved by UNICEF"
 msgid "Copyright © %(year)s All right reserved by UNICEF"
@@ -363,17 +363,17 @@ msgstr "Atrás"
 msgid "Sorry cannot find your data"
 msgstr "Lo sentimos, no podemos encontrar sus datos"
 
-#: ui/templates/pages/flow/info.html:23
+#: ui/templates/pages/flow/info.html:37
 #, fuzzy
 #| msgid "Programs"
 msgid "Program"
 msgstr "Programas"
 
-#: ui/templates/pages/flow/info.html:59
+#: ui/templates/pages/flow/info.html:73
 msgid "Done"
 msgstr "Hecho"
 
-#: ui/templates/pages/flow/info.html:63
+#: ui/templates/pages/flow/info.html:77
 msgid "Create account"
 msgstr "Crear cuenta"
 
@@ -416,27 +416,27 @@ msgstr ""
 "Por favor, proporcione el número de registro que se le dio al momento de "
 "registrarse."
 
-#: ui/templates/pages/index.html:10
+#: ui/templates/pages/index.html:13
 msgid "Beneficiary Portal"
 msgstr "Portal del beneficiario"
 
-#: ui/templates/pages/index.html:13
+#: ui/templates/pages/index.html:17
 msgid "Enter using..."
 msgstr "Entrar usando..."
 
-#: ui/templates/pages/index.html:16
+#: ui/templates/pages/index.html:20
 msgid "Registration Number"
 msgstr "Número de Registro"
 
-#: ui/templates/pages/index.html:17
+#: ui/templates/pages/index.html:21
 msgid "SMS"
 msgstr "SMS"
 
-#: ui/templates/pages/index.html:18
+#: ui/templates/pages/index.html:22
 msgid "Email"
 msgstr "Correo Electrónico"
 
-#: ui/templates/pages/index.html:19 ui/templates/registration/login.html:12
+#: ui/templates/pages/index.html:23 ui/templates/registration/login.html:12
 #: ui/templates/registration/login.html:23
 msgid "Login"
 msgstr "Iniciar Sesión"

@@ -1,5 +1,5 @@
 import abc
-import random
+import secrets
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
@@ -28,6 +28,14 @@ class Extractor(abc.ABC):
     def get_question(self) -> QuestionData: ...
 
 
+def pick_random(value: str) -> int:
+    for __ in range(len(value) * 2):
+        idx = secrets.randbelow(len(value))
+        if value[idx].strip():
+            return idx
+    return -1
+
+
 class LetterExtractor(Extractor):
     QUESTION = "What is the {ordinal} letter of '{label}'?"
     HINT = ""
@@ -40,7 +48,7 @@ class LetterExtractor(Extractor):
 
     def _select_random_letter(self) -> None:
         if self.value:
-            self.selected_index = random.randint(0, len(self.value) - 1)  # noqa: S311
+            self.selected_index = pick_random(self.value)
             self.selected_letter = self.value[self.selected_index]
         else:
             self.selected_index = -1
@@ -82,7 +90,7 @@ class DateExtractor(Extractor):
     def _select_random_part(self) -> None:
         if self.value:
             parts = ["day", "month", "year"]
-            self.selected_part = random.choice(parts)  # noqa: S311
+            self.selected_part = secrets.choice(parts)  # noqa: S311
             if self.selected_part == "day":
                 self.selected_value = str(self.value.day)
             elif self.selected_part == "month":

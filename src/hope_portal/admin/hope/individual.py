@@ -8,7 +8,7 @@ from ._base import BaseHopeAdmin
 
 @admin.register(Individual)
 class IndividualAdmin(BaseHopeAdmin):
-    list_display = ("unicef_id", "household")
+    list_display = ("unicef_id", "household", "phone_no")
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet[Individual]:
         return super().get_queryset(request).select_related("household")
