@@ -4,8 +4,10 @@ from django.conf import settings
 from django.forms import BaseFormSet
 from django.http import HttpRequest, HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
+from flags.decorators import flag_check
 from flags.state import flag_enabled
 
 from hope_portal.modules.hope.models import Household
@@ -14,6 +16,7 @@ from hope_portal.ui.forms.flow import QuestionForm, QuestionFormSet
 from hope_portal.ui.views.flow.crypt import sign, unsign_household
 
 
+@method_decorator(flag_check("FLOW_ASK", True), name="dispatch")
 class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
     template_name = "pages/flow/ask.html"
     inspector: Inspector
