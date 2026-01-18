@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, Any
 
 from django.apps import AppConfig
@@ -5,10 +6,11 @@ from django.conf import settings
 from django.contrib.auth.signals import user_logged_in
 from django.db.models import Model
 
-from hope_portal.modules.hope.helpers import retrieve_hope_user
-
 if TYPE_CHECKING:
     from hope_portal.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class Config(AppConfig):
@@ -26,6 +28,8 @@ def on_login(sender: type[Model], user: "User", request: Any = None, **kwargs: A
 
 
 def _fetch_hope_user_data(user: "User", request: Any = None) -> None:
+    from hope_portal.modules.hope.helpers import retrieve_hope_user
+
     try:
         hope_user = retrieve_hope_user(user)
 
@@ -40,8 +44,8 @@ def _fetch_hope_user_data(user: "User", request: Any = None) -> None:
                 "last_name": hope_user.last_name,
             }
 
-    except Exception:
-        pass
+    except Exception:  # noqa: BLE001
+        logger.error("Error fetching hope user data", exc_info=True)
 
 
 user_logged_in.connect(on_login)
