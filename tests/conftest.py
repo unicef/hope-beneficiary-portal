@@ -6,7 +6,6 @@ from pathlib import Path
 from faker import Faker
 
 import pytest
-from constance.test import override_config
 
 faker = Faker()
 
