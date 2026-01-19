@@ -3,6 +3,9 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+from constance.test import override_config
+
 from faker import Faker
 
 faker = Faker()
@@ -59,3 +62,18 @@ def pytest_configure(config):
     settings.CSRF_COOKIE_SECURE = False
     settings.SESSION_COOKIE_SECURE = False
     settings.CACHE_PREFIX = str(time.time())
+
+
+@pytest.fixture(autouse=True)
+def enable_flow_flags():
+    # Ensure flow-related features are on during tests without changing defaults.
+    with override_config(
+        FLOW_START_REGISTRATION=True,
+        FLOW_START_SMS=True,
+        FLOW_START_EMAIL=True,
+        FLOW_START_AUTH=True,
+        FLOW_ACCOUNT_CREATE=True,
+        FLOW_ASK=True,
+        FLOW_INFO=True,
+    ):
+        yield
