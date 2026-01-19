@@ -80,15 +80,7 @@ def enable_flow_flags():
             "FLOW_INFO": [("boolean", True)],
         }
     )
-    with override_config(
-        FLOW_START_REGISTRATION=True,
-        FLOW_START_SMS=True,
-        FLOW_START_EMAIL=True,
-        FLOW_START_AUTH=True,
-        FLOW_ACCOUNT_CREATE=True,
-        FLOW_ASK=True,
-        FLOW_INFO=True,
-    ):
-        yield
+
+    yield
 
     settings.FLAGS = original_flags
