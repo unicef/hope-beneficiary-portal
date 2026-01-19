@@ -28,7 +28,7 @@ def on_login(sender: type[Model], user: "User", request: Any = None, **kwargs: A
 
 
 def _fetch_hope_user_data(user: "User", request: Any = None) -> None:
-    from hope_portal.modules.hope.helpers import retrieve_hope_user
+    from hope_portal.modules.hope.helpers import retrieve_hope_user  # noqa: PLC0415
 
     try:
         hope_user = retrieve_hope_user(user)

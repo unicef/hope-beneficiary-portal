@@ -17,13 +17,13 @@ def handler_sentry(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpRespo
 
 
 def handler410(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-    response = render(request, "hope_portal/errors/410.html", {"code": 410, "title": "Gone"})
-    response.status_code = 400
+    response = render(request, "errors/410.html", {"code": 410, "title": "Gone"})
+    response.status_code = 410
     return response
 
 
 def handler400(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-    response = render(request, "hope_portal/errors/400.html", {"code": 400, "title": "Bad Request"})
+    response = render(request, "errors/400.html", {"code": 400, "title": "Bad Request"})
     response.status_code = 400
     return response
 
@@ -43,13 +43,13 @@ def handler403(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
 
     if get_attr(exc, "view.permissions", []):
         data["permissions"] = repr_list(exc.view.permissions)  # type: ignore[union-attr]
-    return render(request, "hope_portal/errors/403.html", data)
+    return render(request, "errors/403.html", data)
 
 
 def handler404(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
     response = render(
         request,
-        "hope_portal/errors/404.html",
+        "errors/404.html",
         {"code": 404, "title": "Page not found"},
     )
     response.status_code = 404
@@ -59,7 +59,7 @@ def handler404(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
 def handler500(request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
     response = render(
         request,
-        "hope_portal/errors/500.html",
+        "errors/500.html",
         {"code": 500, "title": "Server Error", "message": "You've encountered an error, oh noes!"},
     )
     response.status_code = 500
