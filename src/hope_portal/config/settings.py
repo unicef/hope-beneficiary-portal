@@ -158,6 +158,11 @@ DATABASE_APPS_MAPPING: dict[str, str] = {
     "hope": "hope_ro",
 }
 
+HOPE_API_BASE_URL = env("HOPE_API_BASE_URL")
+HOPE_API_BUSINESS_AREA_SLUG = env("HOPE_API_BUSINESS_AREA_SLUG")
+HOPE_API_TOKEN = env("HOPE_API_TOKEN")
+HOPE_API_TIMEOUT = env("HOPE_API_TIMEOUT")
+
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
 # Local time zone for this installation. Choices can be found here:

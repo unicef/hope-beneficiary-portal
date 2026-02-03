@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser
 from django.db import connections
 
 from hope_portal.modules.hope.models import HopeUser
@@ -11,7 +11,7 @@ def _hope_conn_alias() -> str:
     return "default"
 
 
-def retrieve_hope_user(user: User | None = None) -> HopeUser | None:
+def retrieve_hope_user(user: AbstractBaseUser | None = None) -> HopeUser | None:
     if not user:
         return None
 
