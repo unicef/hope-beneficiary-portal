@@ -1,18 +1,17 @@
-import json
 import logging
+from requests import Session
 from typing import TYPE_CHECKING, Any, cast
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 
 from django.apps import AppConfig
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.signals import user_logged_in
 from django.db.models import Model
 
 if TYPE_CHECKING:
     from hope_portal.models import User
     from hope_portal.modules.hope.models import HopeUser
+    from django.contrib.auth.models import AbstractBaseUser
 
 
 logger = logging.getLogger(__name__)
@@ -31,30 +30,21 @@ class HopeAPIClient:
         self.business_area_slug = business_area_slug
         self.timeout = timeout
 
-    def create_beneficiary_ticket(self, description: str) -> None:
-        payload = {"description": description}
-        url = (
-            f"{self.base_url.rstrip('/')}/api/"
-            f"{self.business_area_slug}/beneficiary-tickets/"
-        )
-        self._post_json(url, payload)
-
-    def _post_json(self, url: str, payload: dict[str, Any]) -> None:
-        body = json.dumps(payload).encode("utf-8")
-        request = Request(
-            url,
-            data=body,
-            headers={
+        self._session = Session()
+        self._session.headers.update(
+            {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
                 "Authorization": f"Token {self.token}",
-            },
-            method="POST",
+            }
         )
 
+    def _post(self, endpoint: str, payload: dict[str, Any]) -> None:
+        url = f"{self.base_url.rstrip('/')}/api/{self.business_area_slug}/{endpoint}"
         try:
-            with urlopen(request, timeout=self.timeout) as response:
-                response.read()
+            response = self._session.post(url, json=payload, timeout=self.timeout)
+            response.raise_for_status()
+            return response.json()
         except HTTPError as exc:
             logger.warning(
                 "Failed to create beneficiary ticket",
@@ -65,6 +55,10 @@ class HopeAPIClient:
             logger.warning("Failed to reach HOPE API", exc_info=True)
         except Exception:  # noqa: BLE001
             logger.warning("Unexpected error creating beneficiary ticket", exc_info=True)
+
+    def create_beneficiary_ticket(self, description: str) -> None:
+        payload = {"description": description}
+        self._post("beneficiary-tickets/", payload)
 
 
 class Config(AppConfig):
@@ -86,7 +80,7 @@ def _fetch_hope_user_data(user: "User", request: Any = None) -> "HopeUser | None
     from hope_portal.modules.hope.helpers import retrieve_hope_user  # noqa: PLC0415
 
     try:
-        hope_user = retrieve_hope_user(cast(AbstractBaseUser, user))
+        hope_user = retrieve_hope_user(cast("AbstractBaseUser", user))
 
         if hope_user and request and hasattr(request, "session"):
             # Store hope user data in session for later use
