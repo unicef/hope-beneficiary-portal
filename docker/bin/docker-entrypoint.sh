@@ -4,7 +4,9 @@
 export MEDIA_ROOT="${MEDIA_ROOT:-/var/run/app/media}"
 export STATIC_ROOT="${STATIC_ROOT:-/var/run/app/static}"
 export UWSGI_PROCESSES="${UWSGI_PROCESSES:-"4"}"
-export DJANGO_SETTINGS_MODULE="hope_documents.config.settings"
+export DJANGO_SETTINGS_MODULE="hope_portal.config.settings"
+
+mkdir -p /var/run ${MEDIA_ROOT} ${STATIC_ROOT}
 
 chown -R hope:unicef /var
 
@@ -19,7 +21,7 @@ case "$1" in
       set -- tini -- "$@"
 	    set -- uwsgi --http :8000 \
 	          -H /venv \
-	          --module hope_documents.config.wsgi \
+	          --module hope_portal.config.wsgi \
 	          --mimefile=/conf/mime.types \
 	          --uid hope \
 	          --gid unicef \
@@ -32,16 +34,16 @@ case "$1" in
       ;;
     worker)
       set -- tini -- "$@"
-      set -- gosu hope:unicef celery -A hope_documents.config.celery worker --statedb /var/worker --concurrency=4 -E --loglevel=ERROR
+      set -- gosu hope:unicef celery -A hope_portal.config.celery worker --statedb /var/worker --concurrency=4 -E --loglevel=ERROR
       ;;
     beat)
       set -- tini -- "$@"
-      set -- gosu hope:unicef celery -A hope_documents.config.celery beat --loglevel=ERROR --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      set -- gosu hope:unicef celery -A hope_portal.config.celery beat --loglevel=ERROR --scheduler django_celery_beat.schedulers:DatabaseScheduler
       ;;
     flower)
       export DATABASE_URL="sqlite://:memory:"
       set -- tini -- "$@"
-      set -- gosu hope:unicef celery -A hope_documents.config.celery flower
+      set -- gosu hope:unicef celery -A hope_portal.config.celery flower
       ;;
 esac
 

@@ -4,25 +4,28 @@ x-env: &env
     - ADMIN_PASSWORD=password
     - ALLOWED_HOSTS=*
     - CACHE_DEFAULT=redis://redis:6379/0
-    - CELERY_BROKER_URL=redis://host.docker.internal:6379/0
+    - CELERY_BROKER_URL=redis://host.docker.internal:6379/2
     - CSRF_COOKIE_SECURE=False
     - CSRF_TRUSTED_ORIGINS=http://localhost:8000
-    - DATABASE_URL=postgres://postgres:password@db:5432/hope_documents
+    - DATABASE_URL=postgres://postgres:password@db:5432/hope_portal
     - DEBUG=1
     - DJANGO_ADMIN_URL=admin/
-    - DJANGO_SETTINGS_MODULE=hope_documents.config.settings
+    - DJANGO_SETTINGS_MODULE=hope_portal.config.settings
     - FERNET_KEY=123
     - LOGGING_LEVEL=DEBUG
-    - POSTGRES_DB=auroora
-    - POSTGRES_HOST_AUTH_METHOD=trust
+    - POSTGRES_DB=hope_portal
     - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=password
+    - REDIS_CACHE_URL=redis://host.docker.internal:6379/0
+    - REDIS_LOCK_URL=redis://host.docker.internal:6379/1
+    - REDIS_TSDB_URL=redis://host.docker.internal:6379/2
     - SECRET_KEY=super-secret-key-just-for-testing
     - SESSION_COOKIE_DOMAIN=http://localhost:8000
     - SOCIAL_AUTH_REDIRECT_IS_HTTPS=False
 
 services:
   app:
-    image: unicef/hope_documents:local
+    image: unicef/hope_portal:local
     <<: [ *env ]
     ports:
       - 8000:8000
@@ -34,16 +37,20 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   db:
     image: postgres:16
     <<: [ *env ]
     restart: always
     platform: linux/amd64
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "auroora" ]
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "hope_portal" ]
       start_period: 5s
       start_interval: 1s
       interval: 5s
@@ -55,3 +62,6 @@ services:
     platform: linux/amd64
     <<: [ *env ]
     restart: always
+
+volumes:
+  postgres_data:

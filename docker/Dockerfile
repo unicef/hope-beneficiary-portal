@@ -11,6 +11,14 @@ RUN set -x \
     libmagic1 \
     libxml2 \
     libldap-2.5-0 \
+    libglib2.0-0 \
+    libglib2.0-bin \
+    libglib2.0-data \
+    libgl1 \
+    libxcb1 \
+    libx11-6 \
+    python3-gdal \
+    gdal-bin \
   " \
   && buildDeps=" \
 wget \
@@ -81,7 +89,7 @@ ENV PATH=/venv/bin:/usr/local/bin/:/usr/bin:/bin:/usr/sbin \
     VERSION=$VERSION \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    DJANGO_SETTINGS_MODULE="hope_documents.config.settings" \
+    DJANGO_SETTINGS_MODULE="hope_portal.config.settings" \
     STATIC_URL="/static/" \
     PYTHONPATH="" \
     GIT_SHA=$GIT_SHA \
@@ -96,10 +104,10 @@ CMD ["run"]
 
 LABEL org.opencontainers.image.authors="hope@unicef.org"
 LABEL org.opencontainers.image.created="$BUILD_DATE"
-LABEL org.opencontainers.image.description="Hope Payment Gateway"
+LABEL org.opencontainers.image.description="HOPE Beneficiary Portal"
 LABEL org.opencontainers.image.licenses="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/${SOURCE_COMMIT:-master}/LICENSE"
 LABEL org.opencontainers.image.revision=$GIT_SHA
-LABEL org.opencontainers.image.source="https://github.com/unicef/hope-documents/tree/${GIT_SHA:-develop}/"
-LABEL org.opencontainers.image.title="Hope Payment Gateway"
+LABEL org.opencontainers.image.source="https://github.com/unicef/hope-beneficiry-portal/tree/${GIT_SHA:-develop}/"
+LABEL org.opencontainers.image.title="HOPE Beneficiary Portal"
 LABEL org.opencontainers.image.version="$VERSION"
 LABEL org.opencontainers.image.vendor="UNICEF"

@@ -169,7 +169,7 @@ UNFOLD = {
         },
         {
             "models": [
-                "hope_live.user",
+                "hope_portal.user",
             ],
             "items": [
                 {
