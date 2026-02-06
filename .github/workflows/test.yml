@@ -6,8 +6,6 @@ on:
     branches: [ "develop" ]
     tags-ignore: [ "**" ]
   pull_request:
-#  schedule:
-#    - cron: "0 8 * * *"
 
 jobs:
   changes:
@@ -20,10 +18,10 @@ jobs:
       run_tests: ${{ steps.changes.outputs.run_tests }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - id: changes
         name: Check for file changes
-        uses: dorny/paths-filter@0bc4621a3135347011ad047f9ecf449bf72ce2bd # v3.0.0
+        uses: dorny/paths-filter@v3
         with:
           base: ${{ github.ref }}
           token: ${{ github.token }}
@@ -35,18 +33,18 @@ jobs:
     runs-on: ubuntu-latest
     services:
       db:
-        image: postgres:14
+        image: postgres:15
         env:
-          POSTGRES_DATABASE: country_workspace
+          POSTGRES_DB: country_workspace
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_USERNAME: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
       redis:
         image: redis:7
         ports:
@@ -59,11 +57,16 @@ jobs:
       DOCKER_DEFAULT_PLATFORM: linux/amd64
       DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/country_workspace
-      CELERY_BROKER_URL: redis://localhost:6379/1
-      CACHE_URL: redis://localhost:16379/2
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CACHE_URL: redis://redis:6379/2
       DOCKER_BUILDKIT: 1
+      STREAMING_BROKER_URL: "rabbit://guest:guest@localhost:5672?exchange=hope_live"
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg: [ "tests" ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -90,11 +93,11 @@ jobs:
       - name: Setup test suite
         run: tox run -vv --notest --skip-missing-interpreters false -e tests
 
-      - name: Run test suite
+      - name: Run test suite tests
         run: tox -e tests
 
       - name: Archive selenium results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: selenium-log-report
@@ -102,7 +105,7 @@ jobs:
           retention-days: 5
 
       - name: Upload pytest test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pytest-results-tests
           path: junit.xml

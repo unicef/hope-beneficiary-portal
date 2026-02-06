@@ -7,7 +7,7 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yaml'
-      - './github/workflows/docs.yml'
+      - '.github/workflows/docs.yml'
   pull_request:
     branches:
       - develop
@@ -17,7 +17,7 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yaml'
-      - './github/workflows/docs.yml'
+      - '.github/workflows/docs.yml'
 
 #  schedule:
 #    - cron: '37 23 * * 2'
@@ -42,7 +42,7 @@ jobs:
       docs: ${{ steps.changed_files.outputs.docs }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - id: changed_files
         name: Check for file changes
         uses: dorny/paths-filter@v3
@@ -51,15 +51,15 @@ jobs:
           token: ${{ github.token }}
           filters: .github/file-filters.yml
   generate:
-    name: generate
+    name: Generate
     if: needs.changes.outputs.docs == 'true'
     needs: changes
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src/
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - run: pip install tox
@@ -67,14 +67,14 @@ jobs:
         run: tox -e docs -- -d docs-output
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./docs-output
 
   # Deployment job
   deploy:
     needs: generate
-#    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
