@@ -16,7 +16,7 @@ def _add_session(request):
 @pytest.mark.django_db
 def test_on_login_creates_ticket_when_configured(rf, settings, monkeypatch):
     settings.HOPE_API_BASE_URL = "https://hope.example.org"
-    settings.HOPE_API_BUSINESS_AREA_SLUG = "ba-slug"
+    settings.HOPE_API_BUSINESS_AREA_SLUGS = ["ba-slug", "ba-slug-2"]
     settings.HOPE_API_TOKEN = "token"
     settings.HOPE_API_TIMEOUT = 5
 
@@ -30,10 +30,10 @@ def test_on_login_creates_ticket_when_configured(rf, settings, monkeypatch):
     request = rf.get("/", HTTP_USER_AGENT="test-agent")
     _add_session(request)
 
-    captured = {}
+    captured = []
 
-    def _capture_create(self, description):
-        captured["description"] = description
+    def _capture_create(self, business_area_slug, description):
+        captured.append((business_area_slug, description))
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -41,15 +41,17 @@ def test_on_login_creates_ticket_when_configured(rf, settings, monkeypatch):
 
     assert request.session["hope_user_id"] == str(hope_user.id)
     assert request.session["hope_user_data"]["email"] == user.email
-    assert "Beneficiary portal login for user@example.org" in captured["description"]
-    assert f"hope_user_id={hope_user.id}" in captured["description"]
-    assert "user_agent=test-agent" in captured["description"]
+    assert {slug for slug, _ in captured} == {"ba-slug", "ba-slug-2"}
+    for _, description in captured:
+        assert "Beneficiary portal login for user@example.org" in description
+        assert f"hope_user_id={hope_user.id}" in description
+        assert "user_agent=test-agent" in description
 
 
 @pytest.mark.django_db
 def test_on_login_skips_ticket_without_hope_user(rf, settings, monkeypatch):
     settings.HOPE_API_BASE_URL = "https://hope.example.org"
-    settings.HOPE_API_BUSINESS_AREA_SLUG = "ba-slug"
+    settings.HOPE_API_BUSINESS_AREA_SLUGS = ["ba-slug"]
     settings.HOPE_API_TOKEN = "token"
     settings.HOPE_API_TIMEOUT = 5
 
@@ -57,7 +59,7 @@ def test_on_login_skips_ticket_without_hope_user(rf, settings, monkeypatch):
     request = rf.get("/")
     _add_session(request)
 
-    def _fail_create(self, description):
+    def _fail_create(self, business_area_slug, description):
         raise AssertionError("Ticket creation should not be called")
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _fail_create)

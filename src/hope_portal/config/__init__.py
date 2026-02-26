@@ -95,12 +95,12 @@ DEFAULTS = {
         False,
         "The base URL for the HOPE API, e.g. https://hope.example.org.",
     ),
-    "HOPE_API_BUSINESS_AREA_SLUG": (
-        str,
-        "",
-        "",
+    "HOPE_API_BUSINESS_AREA_SLUGS": (
+        list,
+        [],
+        [],
         False,
-        "The business area slug used when creating beneficiary tickets via the HOPE API.",
+        "Business area slugs used for beneficiary ticket creation via the HOPE API.",
     ),
     "HOPE_API_TOKEN": (
         str,

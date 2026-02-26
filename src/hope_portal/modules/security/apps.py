@@ -1,7 +1,7 @@
 import logging
 from requests import Session
 from typing import TYPE_CHECKING, Any, cast
-from urllib.error import HTTPError, URLError
+from requests.exceptions import HTTPError, RequestException
 
 from django.apps import AppConfig
 from django.conf import settings
@@ -22,12 +22,10 @@ class HopeAPIClient:
         self,
         base_url: str,
         token: str,
-        business_area_slug: str,
         timeout: int,
     ) -> None:
         self.base_url = base_url
         self.token = token
-        self.business_area_slug = business_area_slug
         self.timeout = timeout
 
         self._session = Session()
@@ -40,25 +38,24 @@ class HopeAPIClient:
         )
 
     def _post(self, endpoint: str, payload: dict[str, Any]) -> None:
-        url = f"{self.base_url.rstrip('/')}/api/{self.business_area_slug}/{endpoint}"
+        url = f"{self.base_url.rstrip('/')}/api/{endpoint}"
         try:
             response = self._session.post(url, json=payload, timeout=self.timeout)
             response.raise_for_status()
-            return response.json()
         except HTTPError as exc:
             logger.warning(
                 "Failed to create beneficiary ticket",
-                extra={"status": exc.code, "reason": exc.reason},
+                extra={"status": exc.response.status_code if exc.response else None},
                 exc_info=True,
             )
-        except URLError:
+        except RequestException:
             logger.warning("Failed to reach HOPE API", exc_info=True)
         except Exception:  # noqa: BLE001
             logger.warning("Unexpected error creating beneficiary ticket", exc_info=True)
 
-    def create_beneficiary_ticket(self, description: str) -> None:
+    def create_beneficiary_ticket(self, business_area_slug: str, description: str) -> None:
         payload = {"description": description}
-        self._post("beneficiary-tickets/", payload)
+        self._post(f"{business_area_slug}/beneficiary-tickets/", payload)
 
 
 class Config(AppConfig):
@@ -108,7 +105,8 @@ def _create_beneficiary_ticket(user: "User", hope_user: "HopeUser | None", reque
         return
     if not settings.HOPE_API_TOKEN:
         return
-    if not settings.HOPE_API_BUSINESS_AREA_SLUG:
+    business_area_slugs = _business_area_slugs()
+    if not business_area_slugs:
         return
 
     identifier = user.email or user.username or str(user.pk)
@@ -123,10 +121,15 @@ def _create_beneficiary_ticket(user: "User", hope_user: "HopeUser | None", reque
     client = HopeAPIClient(
         base_url=settings.HOPE_API_BASE_URL,
         token=settings.HOPE_API_TOKEN,
-        business_area_slug=settings.HOPE_API_BUSINESS_AREA_SLUG,
         timeout=settings.HOPE_API_TIMEOUT,
     )
-    client.create_beneficiary_ticket(description)
+    for business_area_slug in business_area_slugs:
+        client.create_beneficiary_ticket(business_area_slug=business_area_slug, description=description)
+
+
+def _business_area_slugs() -> list[str]:
+    slugs = [slug.strip() for slug in settings.HOPE_API_BUSINESS_AREA_SLUGS if slug and slug.strip()]
+    return list(dict.fromkeys(slugs))
 
 
 user_logged_in.connect(on_login)
