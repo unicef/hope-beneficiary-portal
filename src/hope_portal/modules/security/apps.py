@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class Config(AppConfig):
     name = "hope_portal.modules.security"
     verbose_name = "Security"
