@@ -1,4 +1,31 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
+    <div class="flex flex-col justify-center items-center">
+        <div class="m-auto w-1/2 border-2 dark:border-gray-200 border-b-gray-900 rounded-2xl items-center p-5 my-10">
+            <h2 class="text-lg mb-4">{% trans "Create ticket" %}</h2>
+            <form method="post" action=".">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="text-red-500 mb-3">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+                <div class="mb-3">
+                    {{ form.business_area_slug.label_tag }}
+                    {{ form.business_area_slug }}
+                    {{ form.business_area_slug.errors }}
+                </div>
+                <div class="mb-3">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                    {{ form.description.errors }}
+                </div>
+                <div class="m-auto text-center">
+                    <input type="submit" class="btn btn-primary" value="{% trans "Create" %}" />
+                    <a class="btn btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Cancel" %}</a>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock page %}

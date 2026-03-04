@@ -109,3 +109,19 @@ class QuestionBaseFormSet(forms.BaseFormSet[QuestionForm]):
 
 
 QuestionFormSet = forms.formset_factory(QuestionForm, formset=QuestionBaseFormSet, extra=0)
+
+
+class TicketCreateForm(BaseForm):
+    business_area_slug = forms.ChoiceField(
+        choices=(),
+        widget=forms.Select(attrs={"class": "input w-full"}),
+    )
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "input w-full", "rows": 4}),
+        max_length=2000,
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        choices = kwargs.pop("business_area_choices", ())
+        super().__init__(*args, **kwargs)
+        self.fields["business_area_slug"].choices = choices
