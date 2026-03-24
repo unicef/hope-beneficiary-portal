@@ -15,7 +15,6 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
     "hope_portal.modules.social.pipeline.save_to_group",
-    "hope_portal.modules.social.pipeline.process_hope_user",
 )
 SOCIAL_AUTH_AZUREAD_B2C_OAUTH2_USER_FIELDS = [
     "email",
