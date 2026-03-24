@@ -13,7 +13,6 @@ urlpatterns = [
     path("api/rest/", SpectacularAPIView.as_view(), name="schema"),
     path("api/rest/swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/rest/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-
     path("api/", include("hope_portal.api.urls"), name="api"),
     path("favicon.ico", serve, kwargs={"document_root": settings.STATIC_ROOT, "path": "favicon.ico"}),
     path("admin/", site.urls),
