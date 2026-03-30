@@ -198,6 +198,13 @@ DEFAULTS = {
     ),
     "SECRET_KEY": (str, "", "", True, "The secret key for the application."),
     "SENTRY_DSN": (str, "", "", False, "The DSN for the Sentry project."),
+    "SENTRY_ENVIRONMENT": (
+        str,
+        "",
+        "",
+        False,
+        "The Sentry release environment tag (e.g. dev, stg, trn, prd).",
+    ),
     "SESSION_COOKIE_SECURE": (
         bool,
         True,
