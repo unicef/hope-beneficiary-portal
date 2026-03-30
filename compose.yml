@@ -13,7 +13,7 @@ x-env: &env
     - DJANGO_SETTINGS_MODULE=hope_portal.config.settings
     - FERNET_KEY=123
     - LOGGING_LEVEL=DEBUG
-    - POSTGRES_DB=auroora
+    - POSTGRES_DB=hope_portal
     - POSTGRES_HOST_AUTH_METHOD=trust
     - POSTGRES_USER=postgres
     - SECRET_KEY=super-secret-key-just-for-testing
