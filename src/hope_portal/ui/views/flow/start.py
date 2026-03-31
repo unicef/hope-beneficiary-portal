@@ -6,7 +6,9 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView
+from flags.decorators import flag_check
 
 from hope_portal.exception import FlowLockoutError
 from hope_portal.models.beneficiary import Beneficiary
@@ -19,6 +21,7 @@ if TYPE_CHECKING:
     from hope_portal.modules.hope.models import Household
 
 
+@method_decorator(flag_check("FLOW_START_REGISTRATION", True), name="dispatch")
 class StartView(FormView[StartForm]):
     form_class = StartForm
     template_name = "pages/flow/start_reg.html"
@@ -33,6 +36,7 @@ class StartView(FormView[StartForm]):
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
+@method_decorator(flag_check("FLOW_START_SMS", True), name="dispatch")
 class SMSView(FormView[SMSForm]):
     form_class = SMSForm
     template_name = "pages/flow/start_sms.html"
@@ -53,6 +57,7 @@ class SMSView(FormView[SMSForm]):
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
+@method_decorator(flag_check("FLOW_START_EMAIL", True), name="dispatch")
 class EmailView(FormView[EmailForm]):
     form_class = EmailForm
     template_name = "pages/flow/start_email.html"
@@ -71,6 +76,7 @@ class EmailView(FormView[EmailForm]):
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
+@method_decorator(flag_check("FLOW_START_AUTH", True), name="dispatch")
 class AuthView(FormView[AuthForm]):
     form_class = AuthForm
     template_name = "pages/flow/start_auth.html"

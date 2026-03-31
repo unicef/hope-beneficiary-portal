@@ -18,7 +18,7 @@ def test_get_attr():
 
 
 def test_is_simple():
-    return is_simple(pytest)
+    assert is_simple(pytest) is False
 
 
 @pytest.mark.parametrize(
