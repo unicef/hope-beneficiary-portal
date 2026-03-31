@@ -30,3 +30,14 @@ This command runs migrations, creates extra permissions, and removes stale conte
 -   `--no-static`: Do not run collectstatic.
 -   `--admin-email`: Admin email.
 -   `--admin-password`: Admin password.
+
+## db_align
+
+This command aligns unmanaged HOPE models with the current HOPE database schema by regenerating `modules/hope/models/_inspect.py`.
+
+### Arguments
+
+-   `table`: Optional list of tables to introspect. If omitted, all configured HOPE tables are introspected.
+-   `--database`: Database alias to introspect. Defaults to `hope_ro`.
+-   `--schema`: Schema to introspect. Defaults to `public`.
+-   `--output-file`: Destination filename under `modules/hope/models/`. Defaults to `_inspect.py`.
