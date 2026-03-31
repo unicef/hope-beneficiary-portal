@@ -5,6 +5,8 @@ from pathlib import Path
 
 from faker import Faker
 
+import pytest
+
 faker = Faker()
 
 
@@ -59,3 +61,25 @@ def pytest_configure(config):
     settings.CSRF_COOKIE_SECURE = False
     settings.SESSION_COOKIE_SECURE = False
     settings.CACHE_PREFIX = str(time.time())
+
+
+@pytest.fixture(autouse=True)
+def enable_flow_flags():
+    from django.conf import settings
+
+    original_flags = dict(getattr(settings, "FLAGS", {}))
+    settings.FLAGS.update(
+        {
+            "FLOW_START_REGISTRATION": [("boolean", True)],
+            "FLOW_START_SMS": [("boolean", True)],
+            "FLOW_START_EMAIL": [("boolean", True)],
+            "FLOW_START_AUTH": [("boolean", True)],
+            "FLOW_ACCOUNT_CREATE": [("boolean", True)],
+            "FLOW_ASK": [("boolean", True)],
+            "FLOW_INFO": [("boolean", True)],
+        }
+    )
+
+    yield
+
+    settings.FLAGS = original_flags

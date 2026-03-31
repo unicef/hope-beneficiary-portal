@@ -49,6 +49,7 @@ def collect_household_infos(hh: Household) -> dict[str, list[HHInfo]]:
     return ret
 
 
+@method_decorator(flag_check("FLOW_INFO", True), name="dispatch")
 class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
     template_name = "pages/flow/info.html"
 
