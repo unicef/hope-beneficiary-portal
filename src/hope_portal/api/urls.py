@@ -1,4 +1,3 @@
-
 from .router import Router
 
 app_name = "api"
