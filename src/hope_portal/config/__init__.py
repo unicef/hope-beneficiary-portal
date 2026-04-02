@@ -42,6 +42,9 @@ DEFAULTS = {
         False,
         "If true, Anymail will print the API requests to the console. Do not use in production.",
     ),
+    "AZURE_CLIENT_ID": (str, "", "", "", ""),
+    "AZURE_CLIENT_SECRET": (str, "", "", "", ""),
+    "AZURE_TENANT_ID": (str, "", "", "", ""),
     "CELERY_BROKER_URL": (
         str,
         "redis://localhost:6379/2",
