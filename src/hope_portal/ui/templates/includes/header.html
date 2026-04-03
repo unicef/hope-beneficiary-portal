@@ -1,6 +1,6 @@
 {% load static feature_flags %}
-<header class="navbar bg-base-100 shadow-sm m-0 p-0">
-    <div class="navbar-start bg-primary-100 mx-5">
+<header class="navbar text-white shadow-sm m-0 p-0">
+    <div class="navbar-start">
         <a href="/">
             <img class="w-32" src="{% static "images/hope_logo_transparent.png" %}" alt="logo" />
         </a>
@@ -8,7 +8,7 @@
     <div class="navbar-end">
         {% flag_enabled "SHOW_OPEN_ISSUE" as show_open_issue %}
         {% if show_open_issue %}
-            <a id="issue-opener" class="btn btn-warning text-gray-900 ml-2 px-1">
+            <a id="issue-opener" class="btn btn-ghost text-primary-content border border-primary-content/30 ml-2 px-1">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      fill="none"
                      viewBox="0 0 24 24"
