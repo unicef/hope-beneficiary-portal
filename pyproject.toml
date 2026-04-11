@@ -40,7 +40,7 @@ dependencies = [
   "django-smart-env",
   "django-streaming",
   "django-stubs[compatible-mypy]",
-  "django-tailwind>=4.2",
+  "django-tailwind>=4.4.2",
   "django-unfold",
   "djangorestframework",
   "drf-spectacular",
