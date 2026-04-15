@@ -2,9 +2,9 @@
     {% for part in parts %}
         {% if part.link %}
             <a href="{{ part.link }}" class="align-middle inline-block leading-5x tracking-tight">
-        {% else %}
-            <span class="align-middle inline-block leading-5x tracking-tight">
-        {% endif %}
+            {% else %}
+                <span class="align-middle inline-block leading-5x tracking-tight">
+                {% endif %}
                 {{ part.title|capfirst }}
                 {% if part.link %}
                 </a>
