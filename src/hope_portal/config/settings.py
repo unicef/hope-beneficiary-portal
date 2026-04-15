@@ -329,7 +329,7 @@ STORAGES = {
 # Custom user app defaults
 # Select the correct user model
 LOGIN_REDIRECT_URL = "/"
-LOGIN_URL = "login"
+LOGIN_URL = "ui:login"
 
 # Location of root django.contrib.admin URL
 ADMIN_URL = r"^admin/"
