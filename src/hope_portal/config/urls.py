@@ -16,7 +16,7 @@ urlpatterns = [
     path("api/", include("hope_portal.api.urls"), name="api"),
     path("favicon.ico", serve, kwargs={"document_root": settings.STATIC_ROOT, "path": "favicon.ico"}),
     path("admin/", site.urls),
-    path("social/", include("social_django.urls", namespace="social")),
+    path("social/", include("social_django.urls", namespace="unicef_security")),
     path("issues/", include("issues.urls")),
     path("i18n/", include("django.conf.urls.i18n")),
     path("adminactions/", include("adminactions.urls")),

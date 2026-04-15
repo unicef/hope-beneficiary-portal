@@ -29,7 +29,7 @@
     {% if config.LOGIN_SSO %}
         <div class="flex flex-col justify-center items-center my-10">
             <div class="m-auto">
-                <a class="btn btn-primary" href="{% url "social:begin" "azuread-tenant-oauth2" %}">{% trans "Login with Azure" %}</a>
+                <a class="btn btn-primary" href="{% url "unicef_security:begin" "azuread-tenant-oauth2" %}">{% trans "Login with Azure" %}</a>
             </div>
         </div>
     {% endif %}
