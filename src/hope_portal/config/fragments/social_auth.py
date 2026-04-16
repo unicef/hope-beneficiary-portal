@@ -15,6 +15,7 @@ SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = [
 ]
 
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_URL_NAMESPACE = "social"
 SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.auth_allowed",
