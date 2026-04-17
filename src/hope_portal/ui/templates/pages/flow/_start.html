@@ -1,17 +1,24 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center">
-        <div class="m-auto w-1/2 border-2 dark:border-gray-200 border-b-gray-900 rounded-2xl  items-center p-5 my-10">
-            {% block message %}
-            {% endblock message %}
-            <form method="POST" action="." id="reg-form" autocomplete="off">
+    <div class="flex flex-col justify-center items-center px-4">
+        <div class="mx-auto w-full max-w-2xl border dark:border-gray-200 border-gray-300 rounded-2xl bg-white/90 dark:bg-slate-900 p-5 my-8 shadow-sm">
+            <div class="pt-5 pb-4 px-2">
+                <h2 class="text-xl font-semibold mb-2">
+                    {% block title %}{% trans "Identity check" %}{% endblock title %}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                    {% block message %}
+                    {% endblock message %}
+                </p>
+            </div>
+            <form method="POST" action="." id="reg-form" autocomplete="off" class="mt-4 px-2">
                 {% csrf_token %}
                 {{ formset.management_form }}
-                <fieldset class="form-group">
+                <div class="form-group w-full">
                     {{ form }}
-                </fieldset>
-                <div class="m-auto text-center">
+                </div>
+                <div class="m-auto text-center mt-6 mb-2 flex gap-3 justify-center">
                     <input type="submit" class="btn btn-primary" value="{% trans "Validate" %}" />
                     <a class="btn btn-primary" href="{% url "ui:index" %}">{% trans "Back" %}</a>
                 </div>

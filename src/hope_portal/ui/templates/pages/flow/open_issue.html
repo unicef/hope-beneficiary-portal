@@ -1,29 +1,29 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center">
-        <div class="m-auto w-1/2 border-2 dark:border-gray-200 border-b-gray-900 rounded-2xl items-center p-5 my-10">
-            <h2 class="text-lg mb-4">
-                {% trans "Create ticket" %}
-            </h2>
-            <form method="post" action=".">
+    <div class="flex flex-col justify-center items-center px-4">
+        <div class="mx-auto w-full max-w-2xl border dark:border-gray-200 border-gray-300 rounded-2xl bg-white/90 dark:bg-slate-900 p-5 my-8 shadow-sm">
+            <div class="pt-5 pb-4 px-2">
+                <h2 class="text-xl font-semibold mb-2">
+                    {% trans "Create ticket" %}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                    {% blocktranslate %}Describe your issue and we will create a support ticket for the household's program business area.{% endblocktranslate %}
+                </p>
+            </div>
+            <form method="post" action="." class="mt-4 px-2">
                 {% csrf_token %}
                 {% if form.non_field_errors %}
-                    <div class="text-red-500 mb-3">
+                    <div class="text-red-500 mb-3 text-sm">
                         {{ form.non_field_errors }}
                     </div>
                 {% endif %}
-                <div class="mb-3">
-                    {{ form.business_area_slug.label_tag }}
-                    {{ form.business_area_slug }}
-                    {{ form.business_area_slug.errors }}
-                </div>
-                <div class="mb-3">
-                    {{ form.description.label_tag }}
+                <div class="mb-4">
+                    <div class="mb-2 font-medium text-base-content">{{ form.description.label_tag }}</div>
                     {{ form.description }}
-                    {{ form.description.errors }}
+                    <div class="text-red-500 text-sm">{{ form.description.errors }}</div>
                 </div>
-                <div class="m-auto text-center">
+                <div class="m-auto text-center mt-6 mb-2 flex gap-3 justify-center">
                     <input type="submit" class="btn btn-primary" value="{% trans "Create" %}" />
                     <a class="btn btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Cancel" %}</a>
                 </div>

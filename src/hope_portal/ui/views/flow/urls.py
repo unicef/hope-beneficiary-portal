@@ -5,7 +5,7 @@ from .account import AccountCreate
 from .ask import AskView
 from .info import InfoView, InspectView
 from .issues import IssueView
-from .start import AuthView, EmailView, NotAvailable, SMSView, StartView
+from .start import AuthView, EmailView, NotAvailable, OTPVerifyView, SMSView, StartView
 
 app_name = "flow"
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path("start/registration/", StartView.as_view(), name="start-registration"),
     path("start/sms/", SMSView.as_view(), name="start-sms"),
     path("start/email/", EmailView.as_view(), name="start-email"),
+    path("start/verify/<str:channel>/<str:signed_data>/", OTPVerifyView.as_view(), name="verify-otp"),
     path("start/auth/", AuthView.as_view(), name="start-auth"),
     path("account/create/<str:signed_data>/", AccountCreate.as_view(), name="account-create"),
     path("ask/<str:signed_data>/", AskView.as_view(), name="ask"),

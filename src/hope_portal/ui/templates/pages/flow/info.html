@@ -1,81 +1,74 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center">
-        Welcome {{ household.head_of_household.given_name }} ({{ household.head_of_household.detail_id }})
+    <div class="max-w-6xl mx-auto px-4 py-8 space-y-4">
+        <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm p-5">
+            <h2 class="text-xl font-semibold mb-1">
+                {% blocktranslate with given_name=household.head_of_household.given_name %}Welcome {{ given_name }}{% endblocktranslate %}
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+                {% trans "Household ID" %}: {{ household.head_of_household.detail_id }}
+            </p>
+        </div>
     </div>
-    <div class="flex flex-col">
+    <div class="max-w-6xl mx-auto px-4 pb-6 space-y-4">
         {% for program, entries in hhs.items %}
-            <div class="font-size-big">
-                {{ program }} - {{ unicef_id }}
+            <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm p-5">
+                <h3 class="text-lg font-semibold mb-3">
+                    {{ program }} - {{ unicef_id }}
+                </h3>
+                <div class="overflow-y-auto">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th>{% trans "UNICEF ID" %}</th>
+                                <th>{% trans "Head of household" %}</th>
+                                <th>{% trans "Payments" %}</th>
+                                <th>{% trans "Tickets" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hh in entries %}
+                                <tr>
+                                    <td class="whitespace-nowrap">{{ hh.unicef_id }}</td>
+                                    <td>{{ hh.head }}</td>
+                                    <td>
+                                        <ul class="list-disc pl-5 space-y-2">
+                                            {% for payment in hh.payments %}
+                                                <li>{{ payment.parent_split__payment_plan__start_date }} - {{ payment.status }}</li>
+                                            {% empty %}
+                                                <li class="text-gray-500">{% trans "No payments found." %}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <ul class="list-disc pl-5 space-y-2">
+                                            {% for ticket in hh.tickets %}
+                                                <li class="leading-normal">
+                                                    <span class="font-semibold">{{ ticket.grievanceticket.get_issue_type_display }}</span>
+                                                    -
+                                                    <span>{{ ticket.grievanceticket.get_status_display }}</span>
+                                                </li>
+                                            {% empty %}
+                                                <li class="text-gray-500">{% trans "No tickets found." %}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="inline-block">
-                <div class="inline-flex">
-                    {{ program }}
-                </div>
-                <div class="inline-flex">
-                    2
-                </div>
-                <div class="inline-flex">
-                    3
-                </div>
-            </div>
-            <div class="inline-block">
-                <div class="inline-flex">
-                    1
-                </div>
-                <div class="inline-flex">
-                    2
-                </div>
-                <div class="inline-flex">
-                    3
-                </div>
-            </div>
-            <table class="w-100 m-5 p-5">
-                <tr class="pt-5">
-                    <th class="text-left" colspan="4">
-                        <span class="text-lg">{% trans "Program" %}</span>: {{ program }}
-                    </th>
-                </tr>
-                {% for hh in entries %}
-                    <tr>
-                        <td class="w-1/6">
-                            {{ hh.unicef_id }}
-                        </td>
-                        <td class="w-1/4 text-left">
-                            {{ hh.head }}
-                        </td>
-                        <td class="w-1/3">
-                            <ul class="list-disc">
-                                {% for payment in hh.payments %}
-                                    <li>
-                                        {{ payment.parent_split__payment_plan__start_date }} - {{ payment.status }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </td>
-                        <td class="w-1/4">
-                            <ul class="list-disc">
-                                {% for ticket in hh.tickets %}
-                                    <li class="flex">
-                                        <span class="w-60 inline-block font-bold">{{ ticket.grievanceticket.get_issue_type_display }}</span>
-                                        <span class="w-20 inline-block font-bold">{{ ticket.grievanceticket.get_status_display }}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
         {% endfor %}
     </div>
-    <div class="m-auto text-center my-10">
-        <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
+    <div class="m-auto text-center my-8 flex gap-3 justify-center">
+        <a class="btn btn-outline" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
         {% if signed_data %}
             <a class="btn btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open issue" %}</a>
         {% endif %}
         {% if signed_data %}
-            <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
+            <form action="{% url "ui:flow:account-create" signed_data %}" method="post" class="inline-block">
                 {% csrf_token %}
                 <input type="submit" class="btn btn-primary" value="{% trans "Create account" %}" />
             </form>

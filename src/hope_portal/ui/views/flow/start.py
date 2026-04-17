@@ -1,24 +1,24 @@
-from typing import TYPE_CHECKING
+import logging
 
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView
 from flags.decorators import flag_check
 
-from hope_portal.exception import FlowLockoutError
+from hope_portal.exception import FlowLockoutError, FlowTimeoutError
 from hope_portal.models.beneficiary import Beneficiary
-from hope_portal.modules.hope.models import Individual
-from hope_portal.modules.security.otp import generate_otp, send_otp_sms, store_otp
-from hope_portal.ui.forms.flow import AuthForm, EmailForm, SMSForm, StartForm
-from hope_portal.ui.views.flow.crypt import sign_household
+from hope_portal.modules.hope.models import Household, Individual
+from hope_portal.modules.security.otp import generate_otp, send_otp_sms, store_otp, verify_otp
+from hope_portal.ui.forms.flow import AuthForm, EmailForm, OTPForm, SMSForm, StartForm
+from hope_portal.ui.views.flow.crypt import sign, sign_household, unsign
 
-if TYPE_CHECKING:
-    from hope_portal.modules.hope.models import Household
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(flag_check("FLOW_START_REGISTRATION", True), name="dispatch")
@@ -46,10 +46,15 @@ class SMSView(FormView[SMSForm]):
             url = reverse("ui:flow:sms-sent")
             phone_number = form.cleaned_data["number"]
             try:
-                Individual.objects.get(phone_no=phone_number)
+                individual = Individual.objects.get(phone_no=phone_number)
                 otp = generate_otp()
-                store_otp(phone_number, otp)
+                store_otp(f"sms:{phone_number}", otp)
                 send_otp_sms(phone_number, otp)
+                key = sign(
+                    self.request,
+                    {"id": str(individual.household_id), "identifier": phone_number, "channel": "sms"},
+                )
+                url = reverse("ui:flow:verify-otp", kwargs={"channel": "sms", "signed_data": key})
             except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
                 pass
             return HttpResponseRedirect(url)
@@ -67,13 +72,58 @@ class EmailView(FormView[EmailForm]):
             url = reverse("ui:flow:email-sent")
             email = form.cleaned_data["email"]
             try:
-                Individual.objects.get(email=email)
-                send_mail("subject", "message", from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[email])
+                individual = Individual.objects.get(email=email)
+                otp = generate_otp()
+                store_otp(f"email:{email}", otp)
+                send_mail(
+                    "Your verification code",
+                    f"Your OTP is: {otp}. It is valid for {settings.OTP_VALIDITY_MINUTES} minutes.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=True,
+                )
+                key = sign(
+                    self.request,
+                    {"id": str(individual.household_id), "identifier": email, "channel": "email"},
+                )
+                url = reverse("ui:flow:verify-otp", kwargs={"channel": "email", "signed_data": key})
             except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
                 pass
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
+
+
+class OTPVerifyView(FormView[OTPForm]):
+    form_class = OTPForm
+    template_name = "pages/flow/start_otp.html"
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        kwargs["channel"] = self.kwargs["channel"]
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form: forms.Form) -> HttpResponse:
+        channel = self.kwargs["channel"]
+        try:
+            data = unsign(
+                self.request,
+                self.kwargs["signed_data"],
+                max_age=settings.OTP_VALIDITY_MINUTES * 60,
+            )
+            if data.get("channel") != channel:
+                raise FlowTimeoutError()
+            identifier = data.get("identifier", "")
+            if not verify_otp(f"{channel}:{identifier}", form.cleaned_data["otp"]):
+                form.add_error("otp", "Invalid code")
+                return self.form_invalid(form)
+            hh = Household.objects.get(pk=data["id"])
+            return HttpResponseRedirect(
+                reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, hh)})
+            )
+        except (FlowTimeoutError, Household.DoesNotExist):
+            logger.warning("OTP verification failed: expired or invalid token", extra={"channel": channel})
+            form.add_error("otp", "Verification expired. Request a new code.")
+            return self.form_invalid(form)
 
 
 @method_decorator(flag_check("FLOW_START_AUTH", True), name="dispatch")

@@ -5,7 +5,6 @@
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 # DO NOT rename the models, AND don't rename db_table values or field names.
-import django.contrib.postgres.fields
 from django.contrib.gis.db import models
 from ._base import HopeModel, get_hope_storage
 

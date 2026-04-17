@@ -3,8 +3,9 @@
 {% block header %}
 {% endblock header %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center pt-10">
-        <div class="banner">
+    <div class="flex flex-col justify-center items-center px-4 py-10">
+        <div class="w-full max-w-4xl rounded-2xl border border-base-300 bg-base-100 shadow-lg p-6 sm:p-8">
+            <div class="banner w-full max-w-2xl mx-auto">
             <img class="m-auto w-1/2" src="{% static "images/hope_transparent.png" %}" alt="logo" />
             <div class="app-name">
                 Beneficiary Portal
@@ -13,14 +14,15 @@
                 {% trans "Beneficiary Portal" %}
             </div>
         </div>
-        <div class="mx-auto mb-10">
-            {% trans "Enter using..." %}
-        </div>
-        <div class="mx-auto mb-10">
-            <a class="btn btn-primary" href="{% url "ui:flow:start-registration" %}">{% trans "Registration Number" %}</a>
-            <a class="btn btn-primary" href="{% url "ui:flow:start-sms" %}">{% trans "SMS" %}</a>
-            <a class="btn btn-primary" href="{% url "ui:flow:start-email" %}">{% trans "Email" %}</a>
-            <a class="btn btn-primary" href="{% url "ui:flow:start-auth" %}">{% trans "Login" %}</a>
+            <p class="text-center text-base mt-8 mb-4 text-gray-600 dark:text-gray-300">
+                {% trans "Choose one method to continue" %}
+            </p>
+            <div class="grid gap-3 sm:grid-cols-2 max-w-2xl mx-auto">
+                <a class="btn btn-primary w-full" href="{% url "ui:flow:start-registration" %}">{% trans "Registration Number" %}</a>
+                <a class="btn btn-primary w-full" href="{% url "ui:flow:start-sms" %}">{% trans "SMS" %}</a>
+                <a class="btn btn-primary w-full" href="{% url "ui:flow:start-email" %}">{% trans "Email" %}</a>
+                <a class="btn btn-outline w-full" href="{% url "ui:flow:start-auth" %}">{% trans "Login" %}</a>
+            </div>
         </div>
     </div>
 {% endblock page %}

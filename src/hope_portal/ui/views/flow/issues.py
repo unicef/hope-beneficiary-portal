@@ -21,14 +21,12 @@ class IssueView(FormView[TicketCreateForm]):
         self.household = unsign_household(request, self.kwargs["signed_data"])
         return super().dispatch(request, *args, **kwargs)
 
-    def get_form_kwargs(self) -> dict[str, Any]:
-        kwargs = super().get_form_kwargs()
-        kwargs["business_area_choices"] = self._business_area_choices()
-        return kwargs
-
     def form_valid(self, form: TicketCreateForm) -> HttpResponse:
         if not settings.HOPE_API_BASE_URL or not settings.HOPE_API_TOKEN:
             form.add_error(None, "Ticket service is not configured.")
+            return self.form_invalid(form)
+        if not (business_area_slug := self._first_business_area_slug()):
+            form.add_error(None, "No business area available for this household.")
             return self.form_invalid(form)
 
         client = HopeAPIClient(
@@ -37,7 +35,7 @@ class IssueView(FormView[TicketCreateForm]):
             timeout=settings.HOPE_API_TIMEOUT,
         )
         client.create_beneficiary_ticket(
-            business_area_slug=form.cleaned_data["business_area_slug"],
+            business_area_slug=business_area_slug,
             description=form.cleaned_data["description"],
         )
         return redirect(self.get_success_url())
@@ -49,7 +47,7 @@ class IssueView(FormView[TicketCreateForm]):
         kwargs["signed_data"] = self.kwargs["signed_data"]
         return super().get_context_data(**kwargs)
 
-    def _business_area_choices(self) -> list[tuple[str, str]]:
+    def _first_business_area_slug(self) -> str | None:
         rows = (
             Household.objects.select_related("program__business_area")
             .filter(
@@ -60,4 +58,7 @@ class IssueView(FormView[TicketCreateForm]):
             .values_list("program__business_area__slug", "program__business_area__name")
             .distinct()
         )
-        return [(slug, name or slug) for slug, name in rows if slug]
+        for slug, _name in rows:
+            if slug:
+                return slug
+        return None

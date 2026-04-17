@@ -13,7 +13,7 @@
         {% block extra_head %}
         {% endblock extra_head %}
     </head>
-    <body class="lang-{{ LANGUAGE_CODE }}"
+    <body class="lang-{{ LANGUAGE_CODE }} min-h-screen bg-base-200 text-base-content antialiased"
           data-timeout="{{ LOGOUT_TIMEOUT_MS|default:300000 }}"
           data-logout-url="{% url 'ui:logout' %}">
         {% block header %}

@@ -1,12 +1,16 @@
-<fieldset class="form-group">
-    <legend>
+<div class="form-group mb-4 p-2 rounded-lg bg-base-200">
+    <div class="mb-2 font-medium text-base-content">
         {{ field.label_tag }}
-    </legend>
-    {{ field.errors }}
-    {{ field }}
+    </div>
+    <div class="mb-2">
+        {{ field.errors }}
+    </div>
+    <div class="mt-2">
+        {{ field }}
+    </div>
     {% if field.help_text %}
         <div class="helptext" {% if field.auto_id %}id="{{ field.auto_id }}_helptext"{% endif %}>
             {{ field.help_text|safe }}
         </div>
     {% endif %}
-</fieldset>
+</div>
