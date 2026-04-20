@@ -1,6 +1,8 @@
 {% extends "pages/flow/_start.html" %}
 {% load i18n %}
-{% block title %}{% trans "Verify by email" %}{% endblock title %}
+{% block title %}
+    {% trans "Verify by email" %}
+{% endblock title %}
 {% block message %}
     {% blocktranslate %}Enter the email used during registration. We will send you a verification code.{% endblocktranslate %}
 {% endblock message %}

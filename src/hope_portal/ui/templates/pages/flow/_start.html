@@ -5,7 +5,9 @@
         <div class="mx-auto w-full max-w-2xl border dark:border-gray-200 border-gray-300 rounded-2xl bg-white/90 dark:bg-slate-900 p-5 my-8 shadow-sm">
             <div class="pt-5 pb-4 px-2">
                 <h2 class="text-xl font-semibold mb-2">
-                    {% block title %}{% trans "Identity check" %}{% endblock title %}
+                    {% block title %}
+                        {% trans "Identity check" %}
+                    {% endblock title %}
                 </h2>
                 <p class="text-sm text-gray-600 dark:text-gray-300">
                     {% block message %}

@@ -6,14 +6,14 @@
     <div class="flex flex-col justify-center items-center px-4 py-10">
         <div class="w-full max-w-4xl rounded-2xl border border-base-300 bg-base-100 shadow-lg p-6 sm:p-8">
             <div class="banner w-full max-w-2xl mx-auto">
-            <img class="m-auto w-1/2" src="{% static "images/hope_transparent.png" %}" alt="logo" />
-            <div class="app-name">
-                Beneficiary Portal
+                <img class="m-auto w-1/2" src="{% static "images/hope_transparent.png" %}" alt="logo" />
+                <div class="app-name">
+                    Beneficiary Portal
+                </div>
+                <div class="app-local-name no-eng">
+                    {% trans "Beneficiary Portal" %}
+                </div>
             </div>
-            <div class="app-local-name no-eng">
-                {% trans "Beneficiary Portal" %}
-            </div>
-        </div>
             <p class="text-center text-base mt-8 mb-4 text-gray-600 dark:text-gray-300">
                 {% trans "Choose one method to continue" %}
             </p>
