@@ -35,28 +35,56 @@ class BaseForm(forms.Form):
 
 class SMSForm(BaseForm):
     number = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "autocomplete": "off", "placeholder": " "}),
+        widget=forms.TextInput(
+            attrs={
+                "class": "input w-full",
+                "autofocus": True,
+                "autocomplete": "off",
+                "placeholder": " ",
+            }
+        ),
         validators=[validate_phonenumber],
     )
 
 
 class EmailForm(BaseForm):
     email = forms.EmailField(
-        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "autocomplete": "off", "placeholder": " "})
+        widget=forms.TextInput(
+            attrs={
+                "class": "input w-full",
+                "autofocus": True,
+                "autocomplete": "off",
+                "placeholder": " ",
+            }
+        ),
     )
 
 
 class AuthForm(BaseForm):
     username = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "autocomplete": "new-password", "placeholder": " "})
+        widget=forms.TextInput(
+            attrs={
+                "class": "input w-full",
+                "autofocus": True,
+                "autocomplete": "new-password",
+                "placeholder": " ",
+            }
+        ),
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "input w-full", "autocomplete": "new-password", "placeholder": " "})
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "input w-full",
+                "autocomplete": "new-password",
+                "placeholder": " ",
+            }
+        ),
     )
 
 
 class StartForm(BaseForm):
-    registration_number = forms.CharField(widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "placeholder": " "}))
+    registration_number = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "input w-full", "autofocus": True, "placeholder": " "}))
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.key = kwargs.pop("key", None)
@@ -80,7 +108,11 @@ class StartForm(BaseForm):
 
 class QuestionForm(forms.Form):
     question = forms.CharField(
-        label="Question", max_length=100, widget=forms.TextInput(attrs={"class": "input w-full", "autocomplete": "off", "placeholder": " "})
+        label="Question",
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={"class": "input w-full", "autocomplete": "off", "placeholder": " "}
+        ),
     )
     signed = forms.CharField(label="Signed", widget=forms.HiddenInput)
 
