@@ -21,12 +21,22 @@
                 <div class="floating-field">
                     {{ form.business_area_slug.errors }}
                     {{ form.business_area_slug }}
-                    <label>{{ form.business_area_slug.label }}{% if form.business_area_slug.field.required %} *{% endif %}</label>
+                    <label>
+                        {{ form.business_area_slug.label }}
+                        {% if form.business_area_slug.field.required %}
+                            *
+                        {% endif %}
+                    </label>
                 </div>
                 <div class="floating-field">
                     {{ form.description.errors }}
                     {{ form.description }}
-                    <label>{{ form.description.label }}{% if form.description.field.required %} *{% endif %}</label>
+                    <label>
+                        {{ form.description.label }}
+                        {% if form.description.field.required %}
+                            *
+                        {% endif %}
+                    </label>
                 </div>
                 <div class="flex justify-end gap-3 mt-6">
                     <a class="btn btn-outline btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Cancel" %}</a>
