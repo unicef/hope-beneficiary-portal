@@ -83,8 +83,9 @@ class AuthForm(BaseForm):
 
 
 class StartForm(BaseForm):
-    registration_number = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "input w-full", "autofocus": True, "placeholder": " "}))
+    registration_number = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "input w-full", "autofocus": True, "placeholder": " "})
+    )
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.key = kwargs.pop("key", None)
@@ -110,9 +111,7 @@ class QuestionForm(forms.Form):
     question = forms.CharField(
         label="Question",
         max_length=100,
-        widget=forms.TextInput(
-            attrs={"class": "input w-full", "autocomplete": "off", "placeholder": " "}
-        ),
+        widget=forms.TextInput(attrs={"class": "input w-full", "autocomplete": "off", "placeholder": " "}),
     )
     signed = forms.CharField(label="Signed", widget=forms.HiddenInput)
 
