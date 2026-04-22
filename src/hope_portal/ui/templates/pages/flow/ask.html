@@ -10,14 +10,14 @@
         </div>
     {% else %}
         <div class="flex flex-col justify-center items-center">
-            <div class="m-auto w-1/2 border-2 dark:border-gray-200 border-b-gray-900 rounded-2xl  items-center p-5 my-10">
+            <div class="m-auto w-full max-w-lg border border-base-300 rounded bg-base-200 shadow-sm items-center p-5 my-10 mx-4">
                 <form method="POST" action="." id="ask-form">
                     {% csrf_token %}
                     {{ formset.management_form }}
                     {% for form in formset %}
                         {{ form }}
                     {% endfor %}
-                    <div class="m-auto text-center">
+                    <div class="flex justify-end gap-3">
                         <input type="submit" class="btn btn-primary" value="{% trans "Validate" %}" />
                     </div>
                 </form>

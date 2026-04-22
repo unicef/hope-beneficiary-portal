@@ -30,15 +30,8 @@ UNFOLD = {
     "SITE_FAVICONS": [
         {
             "rel": "icon",
-            "sizes": "32x32",
             "type": "image/x-icon",
-            "href": lambda request: static("images/hope_logo.png"),
-        },
-        {
-            "rel": "icon",
-            "sizes": "64x64",
-            "type": "image/x-icon",
-            "href": lambda request: static("images/hope_logo.png"),
+            "href": lambda request: static("images/favicon.ico"),
         },
     ],
     "SITE_SYMBOL": "speed",  # symbol from icon set
