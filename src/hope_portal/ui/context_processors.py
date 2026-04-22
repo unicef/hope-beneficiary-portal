@@ -1,12 +1,8 @@
-import os
-from datetime import datetime
 from typing import Any
 
 from django import forms
 from django.conf import settings
 from django.http import HttpRequest
-
-from .. import VERSION
 
 
 class SiteMedia(forms.Media):
@@ -15,18 +11,6 @@ class SiteMedia(forms.Media):
     def __init__(self) -> None:
         extra = "" if settings.DEBUG else ".min"
         super().__init__(None, None, [*[f % extra for f in self.js_files]])
-
-
-def app(request: HttpRequest) -> dict[str, Any]:
-    return {
-        "year": datetime.now().year,
-        "app": {
-            "version": VERSION,
-            "build_date": os.environ.get("BUILD_DATE", ""),
-            "commit": os.environ.get("GIT_SHA", "-"),
-            "branch": os.environ.get("BRANCH", "-"),
-        },
-    }
 
 
 def theme(request: HttpRequest) -> dict[str, Any]:
