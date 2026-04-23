@@ -1,0 +1,52 @@
+<div id="django-issues-form-message-container">
+    <div class="django-issues-message">
+    </div>
+</div>
+<form id="django-issues-form" method="post">
+    <div id="django-issues-form-error-container">
+        <div class="django-issues-message">
+        </div>
+    </div>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="issues-field floating-field">
+        {{ form.type.errors }}
+        {{ form.type }}
+        <label for="{{ form.type.id_for_label }}">
+            {{ form.type.label }}
+        </label>
+    </div>
+    <div class="issues-field floating-field">
+        {{ form.title.errors }}
+        {{ form.title }}
+        <label for="{{ form.title.id_for_label }}">
+            {{ form.title.label }}
+        </label>
+    </div>
+    <div class="issues-field floating-field">
+        {{ form.description.errors }}
+        {{ form.description }}
+        <label for="{{ form.description.id_for_label }}">
+            {{ form.description.label }}
+        </label>
+    </div>
+    <div class="issues-field issues-checkbox">
+        {{ form.add_screenshot }}
+        <label for="{{ form.add_screenshot.id_for_label }}">
+            {{ form.add_screenshot.label }}
+        </label>
+        {{ form.add_screenshot.errors }}
+    </div>
+    <div id="django-issues-screenshot-preview-container">
+        <img id="django-issues-screenshot-preview-img" alt="screenshot preview" src="" />
+    </div>
+    <div class="issues-actions">
+        <button type="button" id="django-issues-cancel" onclick="document.getElementById('django-issues-modal-overlay').remove()">
+            Cancel
+        </button>
+        <button type="submit">
+            Submit
+        </button>
+    </div>
+    {{ form.screenshot }}
+</form>

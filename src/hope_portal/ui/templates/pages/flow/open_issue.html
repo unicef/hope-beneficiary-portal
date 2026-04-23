@@ -1,35 +1,36 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center px-4">
-        <div class="mx-auto w-full max-w-2xl border dark:border-gray-200 border-gray-300 rounded-2xl bg-white/90 dark:bg-slate-900 p-5 my-8 shadow-sm">
-            <div class="pt-5 pb-4 px-2">
-                <h2 class="text-xl font-semibold mb-2">
+    <div class="flex flex-col justify-center items-center flex-1 px-4">
+        <div class="w-full max-w-lg bg-base-200 rounded shadow-sm my-10">
+            <div class="bg-primary text-primary-content px-6 py-4 rounded-t">
+                <h2 class="text-xl font-medium">
                     {% trans "Create ticket" %}
                 </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300">
-                    {% blocktranslate %}Describe your issue and we will create a support ticket for the household's program business area.{% endblocktranslate %}
+                <p class="text-sm opacity-80 mt-1">
+                    {% trans "Describe your issue and we will create a support ticket for the household's program business area." %}
                 </p>
             </div>
-            <form method="post" action="." class="mt-4 px-2">
+            <form method="post" action="." class="p-6">
                 {% csrf_token %}
                 {% if form.non_field_errors %}
-                    <div class="text-red-500 mb-3 text-sm">
+                    <div class="bg-error/10 text-error border border-error/20 rounded p-3 mb-4 text-sm">
                         {{ form.non_field_errors }}
                     </div>
                 {% endif %}
-                <div class="mb-4">
-                    <div class="mb-2 font-medium text-base-content">
-                        {{ form.description.label_tag }}
-                    </div>
+                <div class="floating-field">
+                    {{ form.description.errors }}
                     {{ form.description }}
-                    <div class="text-red-500 text-sm">
-                        {{ form.description.errors }}
-                    </div>
+                    <label>
+                        {{ form.description.label }}
+                        {% if form.description.field.required %}
+                            *
+                        {% endif %}
+                    </label>
                 </div>
-                <div class="m-auto text-center mt-6 mb-2 flex gap-3 justify-center">
+                <div class="flex justify-end gap-3 mt-6">
+                    <a class="btn btn-outline btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Cancel" %}</a>
                     <input type="submit" class="btn btn-primary" value="{% trans "Create" %}" />
-                    <a class="btn btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>

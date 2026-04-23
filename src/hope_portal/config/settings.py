@@ -227,7 +227,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
-                "hope_portal.ui.context_processors.app",
+                "unicef_security.context_processors.current_state",
                 "hope_portal.ui.context_processors.theme",
             ],
         },

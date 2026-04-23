@@ -1,73 +1,59 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
-    <div class="max-w-6xl mx-auto px-4 py-8 space-y-4">
-        <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm p-5">
-            <h2 class="text-xl font-semibold mb-1">
-                {% blocktranslate with given_name=household.head_of_household.given_name %}Welcome {{ given_name }}{% endblocktranslate %}
-            </h2>
-            <p class="text-sm text-gray-600 dark:text-gray-300">
-                {% trans "Household ID" %}: {{ household.head_of_household.detail_id }}
-            </p>
+    <div class="flex flex-col justify-center items-center px-4">
+        <div class="bg-base-200 rounded shadow-sm p-6 my-4 w-full max-w-4xl">
+            {% trans "Welcome" %} {{ household.head_of_household.given_name }} ({{ household.head_of_household.detail_id }})
         </div>
     </div>
-    <div class="max-w-6xl mx-auto px-4 pb-6 space-y-4">
+    <div class="flex flex-col px-4 max-w-4xl mx-auto">
         {% for program, entries in hhs.items %}
-            <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm p-5">
-                <h3 class="text-lg font-semibold mb-3">
-                    {{ program }} - {{ unicef_id }}
+            <div class="bg-base-200 rounded shadow-sm p-4 my-4">
+                <h3 class="text-lg font-medium mb-4">
+                    <span class="text-lg">{% trans "Program" %}</span>: {{ program }}
                 </h3>
-                <div class="overflow-y-auto">
-                    <table class="table w-full">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
                         <thead>
-                            <tr>
-                                <th>
-                                    {% trans "UNICEF ID" %}
+                            <tr class="bg-base-300">
+                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
+                                    ID
                                 </th>
-                                <th>
-                                    {% trans "Head of household" %}
+                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
+                                    {% trans "Head" %}
                                 </th>
-                                <th>
+                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
                                     {% trans "Payments" %}
                                 </th>
-                                <th>
+                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
                                     {% trans "Tickets" %}
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for hh in entries %}
-                                <tr>
-                                    <td class="whitespace-nowrap">
+                                <tr class="border-b border-base-300">
+                                    <td class="p-3">
                                         {{ hh.unicef_id }}
                                     </td>
-                                    <td>
+                                    <td class="p-3">
                                         {{ hh.head }}
                                     </td>
-                                    <td>
-                                        <ul class="list-disc pl-5 space-y-2">
+                                    <td class="p-3">
+                                        <ul class="list-disc ml-4">
                                             {% for payment in hh.payments %}
                                                 <li>
                                                     {{ payment.parent_split__payment_plan__start_date }} - {{ payment.status }}
                                                 </li>
-                                            {% empty %}
-                                                <li class="text-gray-500">
-                                                    {% trans "No payments found." %}
-                                                </li>
                                             {% endfor %}
                                         </ul>
                                     </td>
-                                    <td>
-                                        <ul class="list-disc pl-5 space-y-2">
+                                    <td class="p-3">
+                                        <ul class="list-disc ml-4">
                                             {% for ticket in hh.tickets %}
-                                                <li class="leading-normal">
-                                                    <span class="font-semibold">{{ ticket.grievanceticket.get_issue_type_display }}</span>
-                                                    -
-                                                    <span>{{ ticket.grievanceticket.get_status_display }}</span>
-                                                </li>
-                                            {% empty %}
-                                                <li class="text-gray-500">
-                                                    {% trans "No tickets found." %}
+                                                <li class="flex flex-wrap gap-2">
+                                                    <span class="font-medium">{{ ticket.grievanceticket.get_issue_type_display }}</span>
+                                                    <span class="font-medium">{{ ticket.grievanceticket.get_status_display }}</span>
                                                 </li>
                                             {% endfor %}
                                         </ul>
@@ -80,15 +66,15 @@
             </div>
         {% endfor %}
     </div>
-    <div class="m-auto text-center my-8 flex gap-3 justify-center">
-        <a class="btn btn-outline" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
+    <div class="flex flex-wrap justify-center gap-3 my-10 px-4">
+        <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
         {% if signed_data %}
-            <a class="btn btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open issue" %}</a>
+            <a class="btn btn-outline btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open issue" %}</a>
         {% endif %}
         {% if signed_data %}
-            <form action="{% url "ui:flow:account-create" signed_data %}" method="post" class="inline-block">
+            <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
                 {% csrf_token %}
-                <input type="submit" class="btn btn-primary" value="{% trans "Create account" %}" />
+                <input type="submit" class="btn btn-ghost btn-primary" value="{% trans "Create account" %}" />
             </form>
         {% endif %}
     </div>

@@ -3,26 +3,24 @@
 {% block header %}
 {% endblock header %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center px-4 py-10">
-        <div class="w-full max-w-4xl rounded-2xl border border-base-300 bg-base-100 shadow-lg p-6 sm:p-8">
-            <div class="banner w-full max-w-2xl mx-auto">
-                <img class="m-auto w-1/2" src="{% static "images/hope_transparent.png" %}" alt="logo" />
-                <div class="app-name">
-                    Beneficiary Portal
-                </div>
-                <div class="app-local-name no-eng">
-                    {% trans "Beneficiary Portal" %}
-                </div>
+    <div class="flex flex-col justify-center items-center pt-10 px-4 flex-1">
+        <div class="banner">
+            <img class="m-auto w-1/2" src="{% static "images/hope_transparent.png" %}" alt="logo" />
+            <div class="app-name">
+                Beneficiary Portal
             </div>
-            <p class="text-center text-base mt-8 mb-4 text-gray-600 dark:text-gray-300">
-                {% trans "Choose one method to continue" %}
-            </p>
-            <div class="grid gap-3 sm:grid-cols-2 max-w-2xl mx-auto">
-                <a class="btn btn-primary w-full" href="{% url "ui:flow:start-registration" %}">{% trans "Registration Number" %}</a>
-                <a class="btn btn-primary w-full" href="{% url "ui:flow:start-sms" %}">{% trans "SMS" %}</a>
-                <a class="btn btn-primary w-full" href="{% url "ui:flow:start-email" %}">{% trans "Email" %}</a>
-                <a class="btn btn-outline w-full" href="{% url "ui:flow:start-auth" %}">{% trans "Login" %}</a>
+            <div class="app-local-name no-eng">
+                {% trans "Beneficiary Portal" %}
             </div>
+        </div>
+        <div class="mx-auto mb-6 mt-6 text-lg">
+            {% trans "Enter using..." %}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg w-full mb-10">
+            <a class="btn btn-primary w-full" href="{% url "ui:flow:start-registration" %}">{% trans "Registration Number" %}</a>
+            <a class="btn btn-primary w-full" href="{% url "ui:flow:start-sms" %}">{% trans "SMS" %}</a>
+            <a class="btn btn-primary w-full" href="{% url "ui:flow:start-email" %}">{% trans "Email" %}</a>
+            <a class="btn btn-primary w-full" href="{% url "ui:flow:start-auth" %}">{% trans "Login" %}</a>
         </div>
     </div>
 {% endblock page %}

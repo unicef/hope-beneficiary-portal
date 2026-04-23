@@ -1,16 +1,19 @@
-<div class="form-group mb-4 p-2 rounded-lg bg-base-200">
-    <div class="mb-2 font-medium text-base-content">
-        {{ field.label_tag }}
-    </div>
-    <div class="mb-2">
+{% if not field.is_hidden %}
+    <div class="floating-field">
         {{ field.errors }}
-    </div>
-    <div class="mt-2">
         {{ field }}
+        <label>
+            {{ field.label }}
+            {% if field.field.required %}
+                *
+            {% endif %}
+        </label>
+        {% if field.help_text %}
+            <div class="helptext" {% if field.auto_id %}id="{{ field.auto_id }}_helptext"{% endif %}>
+                {{ field.help_text|safe }}
+            </div>
+        {% endif %}
     </div>
-    {% if field.help_text %}
-        <div class="helptext" {% if field.auto_id %}id="{{ field.auto_id }}_helptext"{% endif %}>
-            {{ field.help_text|safe }}
-        </div>
-    {% endif %}
-</div>
+{% else %}
+    {{ field }}
+{% endif %}
