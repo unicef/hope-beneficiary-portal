@@ -37,8 +37,13 @@ class IssueView(FormView[TicketCreateForm]):
         client.create_beneficiary_ticket(
             business_area_slug=business_area_slug,
             description=form.cleaned_data["description"],
+            program_id=self._household_program_id(),
         )
         return redirect(self.get_success_url())
+
+    def _household_program_id(self) -> str | None:
+        program_id = getattr(self.household, "program_id", None)
+        return str(program_id) if program_id else None
 
     def get_success_url(self) -> str:
         return reverse("ui:flow:info", kwargs={"signed_data": self.kwargs["signed_data"]})

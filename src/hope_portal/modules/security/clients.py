@@ -38,6 +38,13 @@ class HopeAPIClient:
         except Exception:  # noqa: BLE001
             logger.warning("Unexpected error creating beneficiary ticket", exc_info=True)
 
-    def create_beneficiary_ticket(self, business_area_slug: str, description: str) -> None:
-        payload = {"description": description}
+    def create_beneficiary_ticket(
+        self,
+        business_area_slug: str,
+        description: str,
+        program_id: str | None = None,
+    ) -> None:
+        payload: dict[str, Any] = {"description": description}
+        if program_id:
+            payload["program"] = program_id
         self._post(f"{business_area_slug}/beneficiary-tickets/", payload)

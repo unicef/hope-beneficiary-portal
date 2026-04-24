@@ -68,9 +68,10 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
 
     captured = {}
 
-    def _capture_create(self, business_area_slug, description):
+    def _capture_create(self, business_area_slug, description, program_id=None):
         captured["business_area_slug"] = business_area_slug
         captured["description"] = description
+        captured["program_id"] = program_id
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -80,6 +81,7 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
     assert issue_res.status_code == 302
     assert captured["business_area_slug"] == household.program.business_area.slug
     assert captured["description"] == "Manual issue description"
+    assert captured["program_id"] == str(household.program_id)
 
 
 @pytest.mark.django_db
@@ -92,7 +94,7 @@ def test_flow_open_issue_requires_ticket_service_config(django_app, household, s
     issue_link = info_res.pyquery("a:contains('Open issue')").attr("href")
     assert issue_link
 
-    def _fail_create(self, business_area_slug, description):
+    def _fail_create(self, business_area_slug, description, program_id=None):
         raise AssertionError("Ticket creation should not be called")
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _fail_create)
@@ -139,7 +141,7 @@ def test_flow_open_issue_requires_available_business_area(django_app, household,
     issue_link = info_res.pyquery("a:contains('Open issue')").attr("href")
     assert issue_link
 
-    def _fail_create(self, business_area_slug, description):
+    def _fail_create(self, business_area_slug, description, program_id=None):
         raise AssertionError("Ticket creation should not be called when no business area is available")
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _fail_create)
