@@ -2,22 +2,13 @@ import secrets
 import string
 
 from django.conf import settings
-from django.core import signing
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from twilio.rest import Client
 
 
 def generate_otp(length: int = 6) -> str:
-    otp = "".join(secrets.choice(string.digits) for _ in range(length))
-    return signing.dumps(otp, salt="otp", compress=True)
-
-
-def validate_otp(token: str) -> str | None:
-    try:
-        return signing.loads(token, salt="otp", max_age=settings.OTP_VALIDITY_MINUTES / 60)
-    except signing.BadSignature:
-        return None
+    return "".join(secrets.choice(string.digits) for _ in range(length))
 
 
 def send_otp_sms(to_phone_number: str, otp: str) -> bool:
@@ -32,13 +23,13 @@ def send_otp_sms(to_phone_number: str, otp: str) -> bool:
     return True
 
 
-def store_otp(phone_number: str, otp: str) -> None:
-    cache_key = f"otp_{phone_number}"
+def store_otp(identifier: str, otp: str) -> None:
+    cache_key = f"otp_{identifier}"
     cache.set(cache_key, otp, settings.OTP_VALIDITY_MINUTES * 60)
 
 
-def verify_otp(phone_number: str, otp_attempt: str) -> bool:
-    cache_key = f"otp_{phone_number}"
+def verify_otp(identifier: str, otp_attempt: str) -> bool:
+    cache_key = f"otp_{identifier}"
     stored_otp = cache.get(cache_key)
     if stored_otp and stored_otp == otp_attempt:
         cache.delete(cache_key)  # OTP is one-time use

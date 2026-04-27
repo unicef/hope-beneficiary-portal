@@ -1,7 +1,10 @@
 {% extends "pages/flow/_start.html" %}
 {% load i18n %}
+{% block title %}
+    {% trans "Account recovery" %}
+{% endblock title %}
 {% block message %}
     {% blocktranslate %}
-        After a successful identification, you can ask for your username and password.
+        After successful identification, you can request your username and password.
 {% endblocktranslate %}
 {% endblock message %}

@@ -1,0 +1,12 @@
+{% extends "pages/flow/_start.html" %}
+{% load i18n %}
+{% block title %}
+    {% trans "Enter verification code" %}
+{% endblock title %}
+{% block message %}
+    {% if channel == "sms" %}
+        {% blocktranslate %}Enter the verification code sent to your phone number.{% endblocktranslate %}
+    {% else %}
+        {% blocktranslate %}Enter the verification code sent to your email.{% endblocktranslate %}
+    {% endif %}
+{% endblock message %}

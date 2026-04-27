@@ -60,6 +60,21 @@ class EmailForm(BaseForm):
     )
 
 
+class OTPForm(BaseForm):
+    otp = forms.CharField(
+        min_length=6,
+        max_length=6,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input w-full",
+                "autofocus": True,
+                "autocomplete": "one-time-code",
+                "inputmode": "numeric",
+            }
+        ),
+    )
+
+
 class AuthForm(BaseForm):
     username = forms.CharField(
         widget=forms.TextInput(
@@ -143,16 +158,14 @@ QuestionFormSet = forms.formset_factory(QuestionForm, formset=QuestionBaseFormSe
 
 
 class TicketCreateForm(BaseForm):
-    business_area_slug = forms.ChoiceField(
-        choices=(),
-        widget=forms.Select(attrs={"class": "input w-full", "placeholder": " "}),
-    )
     description = forms.CharField(
-        widget=forms.Textarea(attrs={"class": "input w-full", "rows": 4, "placeholder": " "}),
+        widget=forms.Textarea(
+            attrs={
+                "class": "input w-full",
+                "rows": 4,
+                "placeholder": "Describe your issue...",
+                "autofocus": True,
+            }
+        ),
         max_length=2000,
     )
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        choices = kwargs.pop("business_area_choices", ())
-        super().__init__(*args, **kwargs)
-        self.fields["business_area_slug"].choices = choices

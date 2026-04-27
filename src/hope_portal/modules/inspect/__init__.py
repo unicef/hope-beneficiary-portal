@@ -6,18 +6,32 @@ from constance import config
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
-from hope_portal.modules.hope.models import Household, Individual
-from hope_portal.modules.inspect.extractors import DateExtractor, LetterExtractor, PhoneNumberExtractor, QuestionData
+from hope_portal.modules.hope.models import Account, Household, Individual
+from hope_portal.modules.inspect.extractors import (
+    DateExtractor,
+    Extractor,
+    IbanExtractor,
+    LetterExtractor,
+    PhoneNumberExtractor,
+    QuestionData,
+)
 
 logger = logging.getLogger(__name__)
 
 HEAD = 100
 PRIMARY_COLLECTOR = 200
+HOUSEHOLD = 300
 
 DOB = 1
 GIVEN_NAME = 2
 LAST_NAME = 3
 PHONE = 4
+IBAN = 5
+MIDDLE_NAME = 6
+PHONE_ALT = 7
+FIRST_REG = 8
+
+ADMIN2 = 10
 
 HEAD_DOB = HEAD + DOB
 HEAD_GIVEN_NAME = HEAD + GIVEN_NAME
@@ -29,11 +43,27 @@ PRIMARY_COLLECTOR_GIVEN_NAME = PRIMARY_COLLECTOR + GIVEN_NAME
 PRIMARY_COLLECTOR_LAST_NAME = PRIMARY_COLLECTOR + LAST_NAME
 PRIMARY_COLLECTOR_PHONE = PRIMARY_COLLECTOR + PHONE
 
+IBAN_ACCOUNT_TYPE_KEYS = ("bank", "iban")
+
 
 class Inspector:
     def __init__(self, hh: Household) -> None:
         self.household = hh
         self.infos = self.collect_information()
+
+    def _get_individual_iban(self, person: Individual) -> str | None:
+        account = (
+            Account.objects.filter(
+                individual=person,
+                active=True,
+                account_type__key__in=IBAN_ACCOUNT_TYPE_KEYS,
+            )
+            .exclude(number__isnull=True)
+            .exclude(number__exact="")
+            .order_by("-updated_at")
+            .first()
+        )
+        return account.number if account else None
 
     def _collect_person_data(self, person: Individual, offset: int) -> dict[int, Any]:
         infos: dict[int, Any] = {}
@@ -41,10 +71,25 @@ class Inspector:
             infos[offset + DOB] = person.birth_date
         if person.given_name:
             infos[offset + GIVEN_NAME] = person.given_name
+        if person.middle_name:
+            infos[offset + MIDDLE_NAME] = person.middle_name
         if person.family_name:
             infos[offset + LAST_NAME] = person.family_name
         if person.phone_no:
             infos[offset + PHONE] = person.phone_no[1:]
+        if person.phone_no_alternative:
+            infos[offset + PHONE_ALT] = person.phone_no_alternative[1:]
+        if person.first_registration_date:
+            infos[offset + FIRST_REG] = person.first_registration_date
+        if iban := self._get_individual_iban(person):
+            infos[offset + IBAN] = iban
+        return infos
+
+    def _collect_household_data(self) -> dict[int, Any]:
+        infos: dict[int, Any] = {}
+        admin2 = getattr(self.household, "admin2", None)
+        if admin2 and getattr(admin2, "name", None):
+            infos[HOUSEHOLD + ADMIN2] = admin2.name
         return infos
 
     def collect_information(self) -> dict[int, Any]:
@@ -56,26 +101,45 @@ class Inspector:
                 infos.update(self._collect_person_data(head, HEAD))
             if pc := self.household.primary_collector:  # type: ignore[attr-defined]
                 infos.update(self._collect_person_data(pc, PRIMARY_COLLECTOR))
+            infos.update(self._collect_household_data())
             cache.set(f"infos:{self.household.detail_id}", infos, timeout=config.CACHE_QUESTIONS_TIMEOUT)
         return infos
 
+    _PERSON_FIELDS: tuple[tuple[int, str, type[Extractor]], ...] = (
+        (DOB, "{label} Birth date", DateExtractor),
+        (GIVEN_NAME, "{label} Given name", LetterExtractor),
+        (MIDDLE_NAME, "{label} Middle name", LetterExtractor),
+        (LAST_NAME, "{label} Last name", LetterExtractor),
+        (PHONE, "{label} Phone number", PhoneNumberExtractor),
+        (PHONE_ALT, "{label} Alternative phone number", PhoneNumberExtractor),
+        (FIRST_REG, "{label} First registration date", DateExtractor),
+        (IBAN, "{label} IBAN / account number", IbanExtractor),
+    )
+
+    _PERSON_ROLES: tuple[tuple[int, str], ...] = (
+        (HEAD, "Head of Household"),
+        (PRIMARY_COLLECTOR, "Primary Collector"),
+    )
+
+    def _collect_per_person_questions(self, per_field: int) -> list[QuestionData]:
+        ret: list[QuestionData] = []
+        for offset, role_label in self._PERSON_ROLES:
+            role_label_tr = _(role_label)
+            for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
+                if value := self.infos.get(offset + field_key):
+                    label = _(label_tpl).format(label=role_label_tr)
+                    ret.extend(extractor_cls(label, value).get_questions(per_field))
+        return ret
+
+    def _collect_household_questions(self, per_field: int) -> list[QuestionData]:
+        ret: list[QuestionData] = []
+        if value := self.infos.get(HOUSEHOLD + ADMIN2):
+            ret.extend(LetterExtractor(_("Administrative area"), value).get_questions(per_field))
+        return ret
+
     def get_questions(self) -> list[QuestionData]:
-        ret = []
-        for target_idx, label in [(HEAD, _("Head of Household")), (PRIMARY_COLLECTOR, _("Primary Collector"))]:
-            if (target_idx + DOB) in self.infos:
-                ret.append(DateExtractor(_(f"{label} Birth date"), self.infos[(target_idx + DOB)]).get_question())
-            if (target_idx + GIVEN_NAME) in self.infos:
-                ret.append(
-                    LetterExtractor(_(f"{label} Given name"), self.infos[(target_idx + GIVEN_NAME)]).get_question()
-                )
-            if (target_idx + LAST_NAME) in self.infos:
-                ret.append(
-                    LetterExtractor(_(f"{label} Last name"), self.infos[(target_idx + LAST_NAME)]).get_question()
-                )
-            if (target_idx + PHONE) in self.infos:
-                ret.append(
-                    PhoneNumberExtractor(_(f"{label} Phone number"), self.infos[(target_idx + PHONE)]).get_question()
-                )
+        per_field = max(1, int(config.MAX_QUESTIONS_PER_FIELD))
+        ret = self._collect_per_person_questions(per_field) + self._collect_household_questions(per_field)
         if len(ret) < config.MIN_QUESTIONS:
             logger.debug(
                 f"Not available question ({len(ret)}) to proceed with identification. (min. {config.MIN_QUESTIONS})"
