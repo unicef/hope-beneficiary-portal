@@ -1,3 +1,4 @@
+import uuid
 from unittest import mock
 
 import pytest
@@ -81,7 +82,7 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
     assert issue_res.status_code == 302
     assert captured["business_area_slug"] == household.program.business_area.slug
     assert captured["description"] == "Manual issue description"
-    assert captured["program_id"] == str(household.program_id)
+    assert uuid.UUID(captured["program_id"]) == uuid.UUID(str(household.program_id))
 
 
 @pytest.mark.django_db
