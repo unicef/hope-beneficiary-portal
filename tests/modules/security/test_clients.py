@@ -29,7 +29,7 @@ def test_post_success_calls_requests_session_with_timeout():
     client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
 
     client._session.post.assert_called_once_with(
-        "https://hope.example.org/api/ba-slug/beneficiary-tickets/",
+        "https://hope.example.org/ba-slug/beneficiary-tickets/",
         json={"description": "desc"},
         timeout=7,
     )

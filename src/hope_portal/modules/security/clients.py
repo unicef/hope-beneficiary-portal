@@ -23,7 +23,7 @@ class HopeAPIClient:
         )
 
     def _post(self, endpoint: str, payload: dict[str, Any]) -> None:
-        url = f"{self.base_url.rstrip('/')}/api/{endpoint}"
+        url = f"{self.base_url.rstrip('/')}/{endpoint}"
         try:
             response = self._session.post(url, json=payload, timeout=self.timeout)
             response.raise_for_status()
