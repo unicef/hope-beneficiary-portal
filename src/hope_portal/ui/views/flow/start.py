@@ -87,6 +87,7 @@ class EmailView(FormView[EmailForm]):
                     self.request,
                     {"id": str(individual.household_id), "identifier": email, "channel": "email"},
                 )
+                logger.info("Email sent to", extra={"email": email})
                 url = reverse("ui:flow:verify-otp", kwargs={"channel": "email", "signed_data": key})
             except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
                 logger.warning("Individual not found for email", extra={"email": email})
