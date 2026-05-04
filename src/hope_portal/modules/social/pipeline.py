@@ -6,7 +6,7 @@ from social_core.backends.base import BaseAuth
 
 
 def save_to_group(backend: BaseAuth, user: User | None = None, **kwargs: Any) -> dict[str, Any]:
-    if user and config.NEW_USER_DEFAULT_GROUP:
-        grp = Group.objects.get(name=config.NEW_USER_DEFAULT_GROUP)
+    if user and (group_name := config.NEW_USER_DEFAULT_GROUP):
+        grp, _ = Group.objects.get_or_create(name=group_name)
         user.groups.add(grp)
     return {}
