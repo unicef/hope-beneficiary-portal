@@ -27,7 +27,7 @@ dependencies = [
   "django-admin-extra-buttons>=2.1.1",
   "django-adminactions>=2.4",
   "django-adminfilters>=2.6",
-  "django-anymail[mailjet]>=15.0",
+  "django-anymail[mailjet]>=15",
   "django-celery-boost>=0.6.2",
   "django-constance>=4.3.2",
   "django-cors-headers",
