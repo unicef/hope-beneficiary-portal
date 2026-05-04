@@ -59,7 +59,7 @@ class SMSView(FormView[SMSForm]):
                 logger.warning("Individual not found for phone number", extra={"phone_number": phone_number})
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
-            logger.warning("Flow lockout error", extra={"message": e})
+            logger.warning("Flow lockout error", extra={"message": str(e)})
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
@@ -92,7 +92,7 @@ class EmailView(FormView[EmailForm]):
                 logger.warning("Individual not found for email", extra={"email": email})
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
-            logger.warning("Flow lockout error", extra={"message": e})
+            logger.warning("Flow lockout error", extra={"message": str(e)})
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
