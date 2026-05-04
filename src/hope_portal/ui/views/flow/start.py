@@ -56,9 +56,10 @@ class SMSView(FormView[SMSForm]):
                 )
                 url = reverse("ui:flow:verify-otp", kwargs={"channel": "sms", "signed_data": key})
             except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
-                pass
+                logger.warning("Individual not found for phone number", extra={"phone_number": phone_number})
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
+            logger.warning("Flow lockout error", extra={"message": e})
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
@@ -88,9 +89,10 @@ class EmailView(FormView[EmailForm]):
                 )
                 url = reverse("ui:flow:verify-otp", kwargs={"channel": "email", "signed_data": key})
             except (Individual.DoesNotExist, Individual.MultipleObjectsReturned):
-                pass
+                logger.warning("Individual not found for email", extra={"email": email})
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
+            logger.warning("Flow lockout error", extra={"message": e})
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
 
