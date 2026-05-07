@@ -54,6 +54,7 @@ def test_flow_not_found(django_app, household):
 def test_flow_found(django_app, household):
     res = _go_to_info_page(django_app, household)
     assert b"Welcome" in res.content, res.showbrowser()
+    assert b"Household details" in res.content
 
 
 @pytest.mark.django_db

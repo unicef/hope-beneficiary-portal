@@ -62,6 +62,9 @@ class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         kwargs["detail_id"] = hh.detail_id
         kwargs["household"] = hh
         kwargs["signed_data"] = self.kwargs["signed_data"]
+        kwargs["linked_grievances_count"] = GrievanceticketPrograms.objects.filter(
+            grievanceticket__household_unicef_id=hh.unicef_id
+        ).count()
 
         return super().get_context_data(**kwargs)
 

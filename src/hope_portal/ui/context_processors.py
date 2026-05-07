@@ -16,4 +16,8 @@ class SiteMedia(forms.Media):
 def theme(request: HttpRequest) -> dict[str, Any]:
     mode = request.COOKIES.get("theme-mode", "light")
     size = request.COOKIES.get("theme-size", "font-size-normal")
-    return {"site_media": SiteMedia(), "theme": {"mode": mode, "size": size}}
+    return {
+        "site_media": SiteMedia(),
+        "theme": {"mode": mode, "size": size},
+        "LOGOUT_TIMEOUT_MS": settings.LOGOUT_TIMEOUT_MS,
+    }

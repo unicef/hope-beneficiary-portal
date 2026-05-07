@@ -162,6 +162,7 @@ DATABASE_APPS_MAPPING: dict[str, str] = {
 HOPE_API_BASE_URL = env("HOPE_API_BASE_URL")
 HOPE_API_TOKEN = env("HOPE_API_TOKEN")
 HOPE_API_TIMEOUT = env("HOPE_API_TIMEOUT")
+LOGOUT_TIMEOUT_MS = env("LOGOUT_TIMEOUT_MS")
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------

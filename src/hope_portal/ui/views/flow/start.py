@@ -141,6 +141,10 @@ class AuthView(FormView[AuthForm]):
             if ben.check_password(form.cleaned_data["password"]):
                 url = reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, ben.household)})
             return HttpResponseRedirect(url)
+        except Beneficiary.DoesNotExist:
+            logger.warning("Beneficiary not found", extra={"username": form.cleaned_data["username"]})
+            form.add_error("username", "Invalid username or password")
+            return self.form_invalid(form)
         except FlowLockoutError as e:
             return TemplateResponse(self.request, "pages/flow/locked_out.html", {"message": e})
 
