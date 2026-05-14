@@ -260,6 +260,7 @@ DEFAULTS = {
     "TWILIO_AUTH_TOKEN": (str, "", "", False, "The Twilio auth token."),
     "TWILIO_FROM_NUMBER": (str, "", "", False, "The Twilio from number."),
     "URL_PREFIX": (str, "", "", False, "The URL prefix for the application."),
+    "LOGOUT_TIMEOUT_MS": (int, 300000, 300000, False, "The timeout for the logout in milliseconds."),
 }
 
 env = SmartEnv(**DEFAULTS)

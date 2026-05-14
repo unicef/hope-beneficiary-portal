@@ -1,81 +1,454 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
+{% block header %}
+{% endblock header %}
+{% block footer %}
+{% endblock footer %}
+{% block extra_js %}
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const root = document.getElementById("hh-details");
+        const toggle = document.getElementById("hh-show-empty");
+        if (!root || !toggle) return;
+        const apply = () => {
+          root.classList.toggle("hide-empty", !toggle.checked);
+        };
+        toggle.addEventListener("change", apply);
+        apply();
+      });
+    </script>
+    <style>
+      /* Card */
+      .hh-card {
+        background: var(--color-base-200);
+        border: 1px solid var(--color-base-300);
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+      }
+
+      /* Section header (uses <details><summary>) */
+      .hh-section > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 0.875rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: 0.95rem;
+        user-select: none;
+      }
+      .hh-section > summary::-webkit-details-marker { display: none; }
+      .hh-section > summary::after {
+        content: "";
+        width: 0.5rem;
+        height: 0.5rem;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(-45deg);
+        transition: transform 150ms ease;
+        opacity: 0.7;
+      }
+      .hh-section[open] > summary::after { transform: rotate(45deg); }
+      .hh-section > .hh-section-body {
+        padding: 0.25rem 1rem 1rem;
+        border-top: 1px solid var(--color-base-300);
+      }
+
+      /* Field grid */
+      .hh-fields {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      @media (min-width: 640px) {
+        .hh-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.5rem; }
+      }
+      @media (min-width: 1024px) {
+        .hh-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      .hh-field {
+        display: flex;
+        flex-direction: column;
+        padding: 0.625rem 0;
+        border-bottom: 1px dashed var(--color-base-300);
+        gap: 0.125rem;
+      }
+      .hh-field:last-child { border-bottom: none; }
+      @media (min-width: 640px) {
+        .hh-field { border-bottom: none; padding: 0.5rem 0; }
+      }
+      .hh-field-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        opacity: 0.65;
+      }
+      .hh-field-value {
+        font-weight: 500;
+        word-break: break-word;
+        color: inherit;
+      }
+      .hh-field-value.is-empty { opacity: 0.45; font-weight: 400; }
+      #hh-details.hide-empty .hh-field.is-empty { display: none; }
+
+      /* Profile header */
+      .hh-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+      }
+      .hh-avatar {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 9999px;
+        background: var(--color-primary);
+        color: var(--color-primary-content);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.125rem;
+        flex-shrink: 0;
+      }
+      .hh-header-text { flex: 1 1 12rem; min-width: 0; }
+      .hh-header-text h1 { font-size: 1.25rem; font-weight: 600; line-height: 1.2; }
+      .hh-header-text p { font-size: 0.85rem; opacity: 0.7; margin-top: 0.125rem; }
+      .hh-stats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .hh-stat {
+        background: var(--color-base-100);
+        border: 1px solid var(--color-base-300);
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        min-width: 5rem;
+        text-align: center;
+      }
+      .hh-stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        opacity: 0.7;
+      }
+      .hh-stat-value { font-size: 1.5rem; font-weight: 600; line-height: 1.1; }
+
+      /* Section title row */
+      .hh-section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 1rem 0.25rem 0.5rem;
+      }
+      .hh-section-title h2 { font-size: 1rem; font-weight: 600; }
+
+      /* Pills */
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      .pill-yes { background: oklch(76% 0.17 65 / 0.2); color: oklch(35% 0.17 65); }
+      .pill-no  { background: var(--color-base-300); color: var(--color-base-content); opacity: 0.85; }
+      .pill-info { background: oklch(33% 0.128 257 / 0.15); color: oklch(33% 0.128 257); }
+    </style>
+{% endblock extra_js %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center px-4">
-        <div class="bg-base-200 rounded shadow-sm p-6 my-4 w-full max-w-4xl">
-            {% trans "Welcome" %} {{ household.head_of_household.given_name }} ({{ household.head_of_household.detail_id }})
-        </div>
-    </div>
-    <div class="flex flex-col px-4 max-w-4xl mx-auto">
-        {% for program, entries in hhs.items %}
-            <div class="bg-base-200 rounded shadow-sm p-4 my-4">
-                <h3 class="text-lg font-medium mb-4">
-                    <span class="text-lg">{% trans "Program" %}</span>: {{ program }}
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-base-300">
-                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
-                                    ID
-                                </th>
-                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
-                                    {% trans "Head" %}
-                                </th>
-                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
-                                    {% trans "Payments" %}
-                                </th>
-                                <th class="text-left p-3 text-sm font-medium uppercase tracking-wider">
-                                    {% trans "Tickets" %}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for hh in entries %}
-                                <tr class="border-b border-base-300">
-                                    <td class="p-3">
-                                        {{ hh.unicef_id }}
-                                    </td>
-                                    <td class="p-3">
-                                        {{ hh.head }}
-                                    </td>
-                                    <td class="p-3">
-                                        <ul class="list-disc ml-4">
-                                            {% for payment in hh.payments %}
-                                                <li>
-                                                    {{ payment.parent_split__payment_plan__start_date }} - {{ payment.status }}
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </td>
-                                    <td class="p-3">
-                                        <ul class="list-disc ml-4">
-                                            {% for ticket in hh.tickets %}
-                                                <li class="flex flex-wrap gap-2">
-                                                    <span class="font-medium">{{ ticket.grievanceticket.get_issue_type_display }}</span>
-                                                    <span class="font-medium">{{ ticket.grievanceticket.get_status_display }}</span>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="px-4 py-8 max-w-5xl mx-auto w-full">
+        {# Profile header #}
+        <div class="hh-card">
+            <div class="hh-header">
+                <div class="hh-avatar">
+                    {% with name=household.head_of_household.given_name|default:household.head_of_household.full_name %}
+                        {{ name|slice:":1"|upper|default:"?" }}
+                    {% endwith %}
+                </div>
+                <div class="hh-header-text">
+                    <h1>
+                        {% trans "Welcome" %}
+                        {{ household.head_of_household.given_name|default:household.head_of_household.full_name|default:"-" }}
+                    </h1>
+                    <p>
+                        <span class="font-mono">{{ household.unicef_id|default:"-" }}</span>
+                        {% if household.country.name %}
+                            <span class="opacity-50 mx-1">·</span>{{ household.country.name }}
+                        {% endif %}
+                        {% if household.residence_status %}
+                            <span class="opacity-50 mx-1">·</span>{{ household.residence_status }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="hh-stats">
+                    <div class="hh-stat">
+                        <div class="hh-stat-label">
+                            {% trans "Members" %}
+                        </div>
+                        <div class="hh-stat-value">
+                            {{ household.size|default:"0" }}
+                        </div>
+                    </div>
+                    <div class="hh-stat">
+                        <div class="hh-stat-label">
+                            {% trans "Programs" %}
+                        </div>
+                        <div class="hh-stat-value">
+                            {{ hhs|length }}
+                        </div>
+                    </div>
                 </div>
             </div>
-        {% endfor %}
-    </div>
-    <div class="flex flex-wrap justify-center gap-3 my-10 px-4">
-        <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
-        {% if signed_data %}
-            <a class="btn btn-outline btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open issue" %}</a>
+        </div>
+        {# Household details #}
+        <div id="hh-details">
+            <div class="hh-section-title">
+                <h2>
+                    {% trans "Household details" %}
+                </h2>
+                <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
+                    <input id="hh-show-empty" type="checkbox" class="checkbox checkbox-xs" />
+                    <span class="opacity-70">{% trans "Show empty fields" %}</span>
+                </label>
+            </div>
+            {# Identification #}
+            <details class="hh-card hh-section" open>
+                <summary>
+                    {% trans "Identification" %}
+                </summary>
+                <div class="hh-section-body">
+                    <div class="hh-fields">
+                        <div class="hh-field {% if not household.head_of_household.full_name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Head of household" %}</span>
+                            <span class="hh-field-value {% if not household.head_of_household.full_name %}is-empty{% endif %}">
+                                {{ household.head_of_household.full_name|default:"—" }}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if not household.unicef_id %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Household ID" %}</span>
+                            <span class="hh-field-value font-mono text-sm {% if not household.unicef_id %}is-empty{% endif %}">
+                                {{ household.unicef_id|default:"—" }}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if not household.unhcr_id %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "UNHCR case ID" %}</span>
+                            <span class="hh-field-value {% if not household.unhcr_id %}is-empty{% endif %}">
+                                {{ household.unhcr_id|default:"—" }}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if not household.facility.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Facility name" %}</span>
+                            <span class="hh-field-value {% if not household.facility.name %}is-empty{% endif %}">
+                                {{ household.facility.name|default:"—" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </details>
+            {# Composition #}
+            <details class="hh-card hh-section" open>
+                <summary>
+                    {% trans "Composition" %}
+                </summary>
+                <div class="hh-section-body">
+                    <div class="hh-fields">
+                        <div class="hh-field {% if household.size is None %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Household size" %}</span>
+                            <span class="hh-field-value {% if household.size is None %}is-empty{% endif %}">
+                                {{ household.size|default:"—" }}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if not household.residence_status %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Residence status" %}</span>
+                            <span class="hh-field-value {% if not household.residence_status %}is-empty{% endif %}">
+                                {{ household.residence_status|default:"—" }}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if household.fchild_hoh is None %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Female child headed" %}</span>
+                            <span class="hh-field-value">
+                                {% if household.fchild_hoh is None %}
+                                    <span class="is-empty">—</span>
+                                {% elif household.fchild_hoh %}
+                                    <span class="pill pill-yes">{% trans "Yes" %}</span>
+                                {% else %}
+                                    <span class="pill pill-no">{% trans "No" %}</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if household.child_hoh is None %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Child headed" %}</span>
+                            <span class="hh-field-value">
+                                {% if household.child_hoh is None %}
+                                    <span class="is-empty">—</span>
+                                {% elif household.child_hoh %}
+                                    <span class="pill pill-yes">{% trans "Yes" %}</span>
+                                {% else %}
+                                    <span class="pill pill-no">{% trans "No" %}</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="hh-field {% if household.returnee is None %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Returnee household" %}</span>
+                            <span class="hh-field-value">
+                                {% if household.returnee is None %}
+                                    <span class="is-empty">—</span>
+                                {% elif household.returnee %}
+                                    <span class="pill pill-info">{% trans "Yes" %}</span>
+                                {% else %}
+                                    <span class="pill pill-no">{% trans "No" %}</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </details>
+            {# Location #}
+            <details class="hh-card hh-section" open>
+                <summary>
+                    {% trans "Location" %}
+                </summary>
+                <div class="hh-section-body">
+                    <div class="hh-fields">
+                        <div class="hh-field {% if not household.country.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Country" %}</span>
+                            <span class="hh-field-value {% if not household.country.name %}is-empty{% endif %}">{{ household.country.name|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.country_origin.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Country of origin" %}</span>
+                            <span class="hh-field-value {% if not household.country_origin.name %}is-empty{% endif %}">{{ household.country_origin.name|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.address %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Address" %}</span>
+                            <span class="hh-field-value {% if not household.address %}is-empty{% endif %}">{{ household.address|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.village %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Village" %}</span>
+                            <span class="hh-field-value {% if not household.village %}is-empty{% endif %}">{{ household.village|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.zip_code %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "ZIP code" %}</span>
+                            <span class="hh-field-value {% if not household.zip_code %}is-empty{% endif %}">{{ household.zip_code|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.admin1.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Admin level 1" %}</span>
+                            <span class="hh-field-value {% if not household.admin1.name %}is-empty{% endif %}">{{ household.admin1.name|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.admin2.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Admin level 2" %}</span>
+                            <span class="hh-field-value {% if not household.admin2.name %}is-empty{% endif %}">{{ household.admin2.name|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.admin3.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Admin level 3" %}</span>
+                            <span class="hh-field-value {% if not household.admin3.name %}is-empty{% endif %}">{{ household.admin3.name|default:"—" }}</span>
+                        </div>
+                        <div class="hh-field {% if not household.admin4.name %}is-empty{% endif %}">
+                            <span class="hh-field-label">{% trans "Admin level 4" %}</span>
+                            <span class="hh-field-value {% if not household.admin4.name %}is-empty{% endif %}">{{ household.admin4.name|default:"—" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+        {# Programs & cases #}
+        {% if hhs %}
+            <div class="hh-section-title">
+                <h2>
+                    {% trans "Programs & cases" %}
+                </h2>
+            </div>
+            {% for program, entries in hhs.items %}
+                <details class="hh-card hh-section" open>
+                    <summary>
+                        <span class="flex items-center gap-2">
+                            {{ program }}
+                            <span class="pill pill-info">{{ entries|length }}</span>
+                        </span>
+                    </summary>
+                    <div class="hh-section-body">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="text-left opacity-70">
+                                        <th class="py-2 pr-3 font-medium">
+                                            ID
+                                        </th>
+                                        <th class="py-2 pr-3 font-medium">
+                                            {% trans "Head" %}
+                                        </th>
+                                        <th class="py-2 pr-3 font-medium">
+                                            {% trans "Payments" %}
+                                        </th>
+                                        <th class="py-2 font-medium">
+                                            {% trans "Tickets" %}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hh in entries %}
+                                        <tr class="border-t border-base-300 align-top">
+                                            <td class="py-2 pr-3 whitespace-nowrap font-mono text-xs">
+                                                {{ hh.unicef_id|default:"—" }}
+                                            </td>
+                                            <td class="py-2 pr-3">
+                                                {{ hh.head|default:"—" }}
+                                            </td>
+                                            <td class="py-2 pr-3">
+                                                {% if hh.payments %}
+                                                    <ul class="space-y-1">
+                                                        {% for payment in hh.payments %}
+                                                            <li class="flex flex-wrap items-center gap-2">
+                                                                <span class="text-xs opacity-70">{{ payment.parent_split__payment_plan__start_date|default:"—" }}</span>
+                                                                <span class="pill pill-info">{{ payment.status }}</span>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <span class="opacity-50">{% trans "None" %}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-2">
+                                                {% if hh.tickets %}
+                                                    <ul class="space-y-1">
+                                                        {% for ticket in hh.tickets %}
+                                                            <li class="flex flex-wrap items-center gap-2">
+                                                                <span class="text-xs">{{ ticket.grievanceticket.get_issue_type_display }}</span>
+                                                                <span class="pill pill-no">{{ ticket.grievanceticket.get_status_display }}</span>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <span class="opacity-50">{% trans "None" %}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            {% endfor %}
         {% endif %}
-        {% if signed_data %}
-            <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
-                {% csrf_token %}
-                <input type="submit" class="btn btn-ghost btn-primary" value="{% trans "Create account" %}" />
-            </form>
-        {% endif %}
+        {# Actions #}
+        <div class="flex flex-wrap justify-center gap-3 mt-6">
+            <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
+            {% if signed_data %}
+                <a class="btn btn-outline btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open issue" %}</a>
+            {% endif %}
+            {% if signed_data %}
+                <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-ghost btn-primary" value="{% trans "Create account" %}" />
+                </form>
+            {% endif %}
+        </div>
     </div>
 {% endblock page %}
