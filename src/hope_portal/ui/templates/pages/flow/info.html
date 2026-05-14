@@ -179,18 +179,30 @@
                     </h1>
                     <p>
                         <span class="font-mono">{{ household.unicef_id|default:"-" }}</span>
-                        {% if household.country.name %}<span class="opacity-50 mx-1">·</span>{{ household.country.name }}{% endif %}
-                        {% if household.residence_status %}<span class="opacity-50 mx-1">·</span>{{ household.residence_status }}{% endif %}
+                        {% if household.country.name %}
+                            <span class="opacity-50 mx-1">·</span>{{ household.country.name }}
+                        {% endif %}
+                        {% if household.residence_status %}
+                            <span class="opacity-50 mx-1">·</span>{{ household.residence_status }}
+                        {% endif %}
                     </p>
                 </div>
                 <div class="hh-stats">
                     <div class="hh-stat">
-                        <div class="hh-stat-label">{% trans "Members" %}</div>
-                        <div class="hh-stat-value">{{ household.size|default:"0" }}</div>
+                        <div class="hh-stat-label">
+                            {% trans "Members" %}
+                        </div>
+                        <div class="hh-stat-value">
+                            {{ household.size|default:"0" }}
+                        </div>
                     </div>
                     <div class="hh-stat">
-                        <div class="hh-stat-label">{% trans "Programs" %}</div>
-                        <div class="hh-stat-value">{{ hhs|length }}</div>
+                        <div class="hh-stat-label">
+                            {% trans "Programs" %}
+                        </div>
+                        <div class="hh-stat-value">
+                            {{ hhs|length }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -198,7 +210,9 @@
         {# Household details #}
         <div id="hh-details">
             <div class="hh-section-title">
-                <h2>{% trans "Household details" %}</h2>
+                <h2>
+                    {% trans "Household details" %}
+                </h2>
                 <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
                     <input id="hh-show-empty" type="checkbox" class="checkbox checkbox-xs" />
                     <span class="opacity-70">{% trans "Show empty fields" %}</span>
@@ -206,7 +220,9 @@
             </div>
             {# Identification #}
             <details class="hh-card hh-section" open>
-                <summary>{% trans "Identification" %}</summary>
+                <summary>
+                    {% trans "Identification" %}
+                </summary>
                 <div class="hh-section-body">
                     <div class="hh-fields">
                         <div class="hh-field {% if not household.head_of_household.full_name %}is-empty{% endif %}">
@@ -238,7 +254,9 @@
             </details>
             {# Composition #}
             <details class="hh-card hh-section" open>
-                <summary>{% trans "Composition" %}</summary>
+                <summary>
+                    {% trans "Composition" %}
+                </summary>
                 <div class="hh-section-body">
                     <div class="hh-fields">
                         <div class="hh-field {% if household.size is None %}is-empty{% endif %}">
@@ -294,7 +312,9 @@
             </details>
             {# Location #}
             <details class="hh-card hh-section" open>
-                <summary>{% trans "Location" %}</summary>
+                <summary>
+                    {% trans "Location" %}
+                </summary>
                 <div class="hh-section-body">
                     <div class="hh-fields">
                         <div class="hh-field {% if not household.country.name %}is-empty{% endif %}">
@@ -340,7 +360,9 @@
         {# Programs & cases #}
         {% if hhs %}
             <div class="hh-section-title">
-                <h2>{% trans "Programs & cases" %}</h2>
+                <h2>
+                    {% trans "Programs & cases" %}
+                </h2>
             </div>
             {% for program, entries in hhs.items %}
                 <details class="hh-card hh-section" open>
@@ -355,17 +377,29 @@
                             <table class="w-full text-sm">
                                 <thead>
                                     <tr class="text-left opacity-70">
-                                        <th class="py-2 pr-3 font-medium">ID</th>
-                                        <th class="py-2 pr-3 font-medium">{% trans "Head" %}</th>
-                                        <th class="py-2 pr-3 font-medium">{% trans "Payments" %}</th>
-                                        <th class="py-2 font-medium">{% trans "Tickets" %}</th>
+                                        <th class="py-2 pr-3 font-medium">
+                                            ID
+                                        </th>
+                                        <th class="py-2 pr-3 font-medium">
+                                            {% trans "Head" %}
+                                        </th>
+                                        <th class="py-2 pr-3 font-medium">
+                                            {% trans "Payments" %}
+                                        </th>
+                                        <th class="py-2 font-medium">
+                                            {% trans "Tickets" %}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for hh in entries %}
                                         <tr class="border-t border-base-300 align-top">
-                                            <td class="py-2 pr-3 whitespace-nowrap font-mono text-xs">{{ hh.unicef_id|default:"—" }}</td>
-                                            <td class="py-2 pr-3">{{ hh.head|default:"—" }}</td>
+                                            <td class="py-2 pr-3 whitespace-nowrap font-mono text-xs">
+                                                {{ hh.unicef_id|default:"—" }}
+                                            </td>
+                                            <td class="py-2 pr-3">
+                                                {{ hh.head|default:"—" }}
+                                            </td>
                                             <td class="py-2 pr-3">
                                                 {% if hh.payments %}
                                                     <ul class="space-y-1">
