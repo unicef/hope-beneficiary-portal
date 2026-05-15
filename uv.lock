@@ -1287,7 +1287,7 @@ type-check = [
 [package.metadata]
 requires-dist = [
     { name = "celery" },
-    { name = "django", specifier = ">=5.2.14,<5.3" },
+    { name = "django", specifier = ">=5.2.14,<6" },
     { name = "django-admin-extra-buttons", specifier = ">=2.1.1" },
     { name = "django-adminactions", specifier = ">=2.4" },
     { name = "django-adminfilters", specifier = ">=2.6" },
