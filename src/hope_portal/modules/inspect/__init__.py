@@ -1,5 +1,6 @@
 import logging
 import random
+from hashlib import sha256
 from typing import Any
 
 from constance import config
@@ -46,6 +47,16 @@ PRIMARY_COLLECTOR_PHONE = PRIMARY_COLLECTOR + PHONE
 IBAN_ACCOUNT_TYPE_KEYS = ("bank", "iban")
 
 
+def _normalize_str(value: Any) -> Any:
+    if isinstance(value, str):
+        value = value.strip()
+    return value
+
+
+def _has_question_value(value: Any) -> bool:
+    return bool(_normalize_str(value))
+
+
 class Inspector:
     def __init__(self, hh: Household) -> None:
         self.household = hh
@@ -69,32 +80,69 @@ class Inspector:
         infos: dict[int, Any] = {}
         if person.birth_date and not person.estimated_birth_date:
             infos[offset + DOB] = person.birth_date
-        if person.given_name:
-            infos[offset + GIVEN_NAME] = person.given_name
-        if person.middle_name:
-            infos[offset + MIDDLE_NAME] = person.middle_name
-        if person.family_name:
-            infos[offset + LAST_NAME] = person.family_name
-        if person.phone_no:
-            infos[offset + PHONE] = person.phone_no[1:]
-        if person.phone_no_alternative:
-            infos[offset + PHONE_ALT] = person.phone_no_alternative[1:]
+        if _has_question_value(person.given_name):
+            infos[offset + GIVEN_NAME] = _normalize_str(person.given_name)
+        if _has_question_value(person.middle_name):
+            infos[offset + MIDDLE_NAME] = _normalize_str(person.middle_name)
+        if _has_question_value(person.family_name):
+            infos[offset + LAST_NAME] = _normalize_str(person.family_name)
+        if _has_question_value(person.phone_no):
+            phone_no = _normalize_str(person.phone_no)
+            infos[offset + PHONE] = phone_no.removeprefix("+")
+        if _has_question_value(person.phone_no_alternative):
+            phone_no_alternative = _normalize_str(person.phone_no_alternative)
+            infos[offset + PHONE_ALT] = phone_no_alternative.removeprefix("+")
         if person.first_registration_date:
             infos[offset + FIRST_REG] = person.first_registration_date
         if iban := self._get_individual_iban(person):
-            infos[offset + IBAN] = iban
+            iban = _normalize_str(iban)
+            if iban:
+                infos[offset + IBAN] = iban
         return infos
 
     def _collect_household_data(self) -> dict[int, Any]:
         infos: dict[int, Any] = {}
         admin2 = getattr(self.household, "admin2", None)
-        if admin2 and getattr(admin2, "name", None):
-            infos[HOUSEHOLD + ADMIN2] = admin2.name
+        admin2_name = _normalize_str(getattr(admin2, "name", None))
+        if admin2 and admin2_name:
+            infos[HOUSEHOLD + ADMIN2] = admin2_name
         return infos
+
+    def _person_cache_parts(self, person: Individual | None) -> tuple[str, ...]:
+        if not person:
+            return ("",)
+        iban = _normalize_str(self._get_individual_iban(person)) or ""
+        return (
+            str(person.birth_date or ""),
+            str(bool(person.estimated_birth_date)),
+            str(_normalize_str(person.given_name) or ""),
+            str(_normalize_str(person.middle_name) or ""),
+            str(_normalize_str(person.family_name) or ""),
+            str(_normalize_str(person.phone_no) or ""),
+            str(_normalize_str(person.phone_no_alternative) or ""),
+            str(person.first_registration_date or ""),
+            str(iban),
+        )
+
+    def _cache_key(self) -> str:
+        head = self.household.head_of_household
+        primary_collector = self.household.primary_collector  # type: ignore[attr-defined]
+        admin2_name = _normalize_str(getattr(getattr(self.household, "admin2", None), "name", None)) or ""
+        cache_fingerprint = "\x1f".join(
+            (
+                str(self.household.detail_id),
+                *self._person_cache_parts(head),
+                *self._person_cache_parts(primary_collector),
+                str(admin2_name),
+            )
+        )
+        digest = sha256(cache_fingerprint.encode("utf-8")).hexdigest()
+        return f"infos:{self.household.detail_id}:{digest}"
 
     def collect_information(self) -> dict[int, Any]:
         infos: dict[int, Any]
-        infos = cache.get(f"infos:{self.household.detail_id}")
+        cache_key = self._cache_key()
+        infos = cache.get(cache_key)
         if not infos:
             infos = {}
             if head := self.household.head_of_household:
@@ -102,7 +150,7 @@ class Inspector:
             if pc := self.household.primary_collector:  # type: ignore[attr-defined]
                 infos.update(self._collect_person_data(pc, PRIMARY_COLLECTOR))
             infos.update(self._collect_household_data())
-            cache.set(f"infos:{self.household.detail_id}", infos, timeout=config.CACHE_QUESTIONS_TIMEOUT)
+            cache.set(cache_key, infos, timeout=config.CACHE_QUESTIONS_TIMEOUT)
         return infos
 
     _PERSON_FIELDS: tuple[tuple[int, str, type[Extractor]], ...] = (
@@ -126,14 +174,17 @@ class Inspector:
         for offset, role_label in self._PERSON_ROLES:
             role_label_tr = _(role_label)
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
-                if value := self.infos.get(offset + field_key):
-                    label = _(label_tpl).format(label=role_label_tr)
-                    ret.extend(extractor_cls(label, value).get_questions(per_field))
+                value = _normalize_str(self.infos.get(offset + field_key))
+                if not value:
+                    continue
+                label = _(label_tpl).format(label=role_label_tr)
+                ret.extend(extractor_cls(label, value).get_questions(per_field))
         return ret
 
     def _collect_household_questions(self, per_field: int) -> list[QuestionData]:
         ret: list[QuestionData] = []
-        if value := self.infos.get(HOUSEHOLD + ADMIN2):
+        value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
+        if value:
             ret.extend(LetterExtractor(_("Administrative area"), value).get_questions(per_field))
         return ret
 
