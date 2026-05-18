@@ -87,12 +87,10 @@ class Inspector:
             infos[offset + LAST_NAME] = _normalize_str(person.family_name)
         if _has_question_value(person.phone_no):
             phone_no = _normalize_str(person.phone_no)
-            infos[offset + PHONE] = phone_no[1:] if phone_no.startswith("+") else phone_no
+            infos[offset + PHONE] = phone_no.removeprefix("+")
         if _has_question_value(person.phone_no_alternative):
             phone_no_alternative = _normalize_str(person.phone_no_alternative)
-            infos[offset + PHONE_ALT] = (
-                phone_no_alternative[1:] if phone_no_alternative.startswith("+") else phone_no_alternative
-            )
+            infos[offset + PHONE_ALT] = phone_no_alternative.removeprefix("+")
         if person.first_registration_date:
             infos[offset + FIRST_REG] = person.first_registration_date
         if iban := self._get_individual_iban(person):
