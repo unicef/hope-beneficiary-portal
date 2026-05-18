@@ -1,5 +1,6 @@
 import logging
 import random
+from hashlib import sha256
 from typing import Any
 
 from constance import config
@@ -107,9 +108,41 @@ class Inspector:
             infos[HOUSEHOLD + ADMIN2] = admin2_name
         return infos
 
+    def _person_cache_parts(self, person: Individual | None) -> tuple[str, ...]:
+        if not person:
+            return ("",)
+        iban = _normalize_str(self._get_individual_iban(person)) or ""
+        return (
+            str(person.birth_date or ""),
+            str(bool(person.estimated_birth_date)),
+            str(_normalize_str(person.given_name) or ""),
+            str(_normalize_str(person.middle_name) or ""),
+            str(_normalize_str(person.family_name) or ""),
+            str(_normalize_str(person.phone_no) or ""),
+            str(_normalize_str(person.phone_no_alternative) or ""),
+            str(person.first_registration_date or ""),
+            str(iban),
+        )
+
+    def _cache_key(self) -> str:
+        head = self.household.head_of_household
+        primary_collector = self.household.primary_collector  # type: ignore[attr-defined]
+        admin2_name = _normalize_str(getattr(getattr(self.household, "admin2", None), "name", None)) or ""
+        cache_fingerprint = "\x1f".join(
+            (
+                str(self.household.detail_id),
+                *self._person_cache_parts(head),
+                *self._person_cache_parts(primary_collector),
+                str(admin2_name),
+            )
+        )
+        digest = sha256(cache_fingerprint.encode("utf-8")).hexdigest()
+        return f"infos:{self.household.detail_id}:{digest}"
+
     def collect_information(self) -> dict[int, Any]:
         infos: dict[int, Any]
-        infos = cache.get(f"infos:{self.household.detail_id}")
+        cache_key = self._cache_key()
+        infos = cache.get(cache_key)
         if not infos:
             infos = {}
             if head := self.household.head_of_household:
@@ -117,7 +150,7 @@ class Inspector:
             if pc := self.household.primary_collector:  # type: ignore[attr-defined]
                 infos.update(self._collect_person_data(pc, PRIMARY_COLLECTOR))
             infos.update(self._collect_household_data())
-            cache.set(f"infos:{self.household.detail_id}", infos, timeout=config.CACHE_QUESTIONS_TIMEOUT)
+            cache.set(cache_key, infos, timeout=config.CACHE_QUESTIONS_TIMEOUT)
         return infos
 
     _PERSON_FIELDS: tuple[tuple[int, str, type[Extractor]], ...] = (
