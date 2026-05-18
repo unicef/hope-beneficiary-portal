@@ -18,8 +18,9 @@ def test_collect_information_skips_blank_middle_name():
 @pytest.mark.django_db
 def test_collect_per_person_questions_skips_blank_cached_values():
     household = HouseholdFactory()
+    cache_key = Inspector(household)._cache_key()
+    cache.set(cache_key, {HEAD + MIDDLE_NAME: "   "}, timeout=60)
     inspector = Inspector(household)
-    cache.set(inspector._cache_key(), {HEAD + MIDDLE_NAME: "   "}, timeout=60)
 
     assert inspector._collect_per_person_questions(1) == []
 
