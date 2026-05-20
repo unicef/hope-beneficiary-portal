@@ -14,10 +14,10 @@ class HouseholdAdmin(BaseHopeAdmin):
     list_display = (
         "unicef_id",
         "head_of_household__full_name",
-        "detail_id",
+        "program_registration_id",
         "program",
     )
-    search_fields = ("unicef_id", "detail_id")
+    search_fields = ("unicef_id", "program_registration_id")
 
     list_filter = (
         ("program__business_area", LinkedAutoCompleteFilter.factory(parent=None)),

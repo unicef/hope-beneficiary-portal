@@ -112,7 +112,7 @@ class StartForm(BaseForm):
             if guard.is_locked_out():
                 raise FlowLockoutError(guard.get_lockout_message())
             if not (
-                hh := Household.objects.filter(detail_id=self.cleaned_data["registration_number"])
+                hh := Household.objects.filter(program_registration_id=self.cleaned_data["registration_number"])
                 .order_by("-created_at")
                 .first()
             ):

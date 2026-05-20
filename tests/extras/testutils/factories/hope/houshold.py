@@ -32,6 +32,7 @@ class HouseholdFactory(AutoRegisterModelFactory):
     size = factory.fuzzy.FuzzyInteger(3, 8)
     head_of_household = factory.SubFactory("testutils.factories.IndividualFactory")
     detail_id = factory.Sequence(lambda n: f"REG-{n}")
+    program_registration_id = factory.Sequence(lambda n: f"REG-{n}")
     program = factory.SubFactory(ProgramFactory)
 
     class Meta:

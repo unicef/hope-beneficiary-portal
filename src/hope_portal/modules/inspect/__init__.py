@@ -130,14 +130,14 @@ class Inspector:
         admin2_name = _normalize_str(getattr(getattr(self.household, "admin2", None), "name", None)) or ""
         cache_fingerprint = "\x1f".join(
             (
-                str(self.household.detail_id),
+                str(self.household.program_registration_id),
                 *self._person_cache_parts(head),
                 *self._person_cache_parts(primary_collector),
                 str(admin2_name),
             )
         )
         digest = sha256(cache_fingerprint.encode("utf-8")).hexdigest()
-        return f"infos:{self.household.detail_id}:{digest}"
+        return f"infos:{self.household.program_registration_id}:{digest}"
 
     def collect_information(self) -> dict[int, Any]:
         infos: dict[int, Any]
