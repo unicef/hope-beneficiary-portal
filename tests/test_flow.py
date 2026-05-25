@@ -22,7 +22,7 @@ def household():
 def _go_to_info_page(django_app, household):
     url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
-    res.forms["reg-form"]["registration_number"] = household.detail_id
+    res.forms["reg-form"]["registration_number"] = household.program_registration_id
     res = res.forms["reg-form"].submit().follow()
     with mock.patch("hope_portal.ui.forms.flow.QuestionForm.check_value", return_value=True):
         res.forms["ask-form"]["form-0-question"] = "--"
@@ -38,7 +38,7 @@ def test_flow_not_found(django_app, household):
     RegistrationAttemptGuard.clear()
     url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
-    res.forms["reg-form"]["registration_number"] = household.detail_id
+    res.forms["reg-form"]["registration_number"] = household.program_registration_id
     res = res.forms["reg-form"].submit().follow()
     res = res.forms["ask-form"].submit()
     assert res.status_code == 200

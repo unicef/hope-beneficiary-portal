@@ -18,7 +18,7 @@ class HHInfo:
     head: str
     program: str
     unicef_id: str
-    detail_id: str
+    program_registration_id: str
     tickets: QuerySet[GrievanceticketPrograms]
     payments: QuerySet[Payment, Any]
 
@@ -34,7 +34,7 @@ def collect_household_infos(hh: Household) -> dict[str, list[HHInfo]]:
                 unicef_id=entry.unicef_id,  # type: ignore[arg-type]
                 head=entry.head_of_household.full_name,  # type: ignore[arg-type, union-attr]
                 program=entry.program.name,  # type: ignore[arg-type, union-attr]
-                detail_id=str(entry.detail_id),
+                program_registration_id=str(entry.program_registration_id),
                 payments=Payment.objects.select_related(
                     "delivery_type", "financial_service_provider", "parent_split__payment_plan"
                 )
@@ -59,7 +59,7 @@ class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         hh = Household.objects.get(id=data["id"])
         hhs = collect_household_infos(hh)
         kwargs["hhs"] = dict(hhs)
-        kwargs["detail_id"] = hh.detail_id
+        kwargs["program_registration_id"] = hh.program_registration_id
         kwargs["household"] = hh
         kwargs["signed_data"] = self.kwargs["signed_data"]
         kwargs["linked_grievances_count"] = GrievanceticketPrograms.objects.filter(
@@ -77,6 +77,6 @@ class InspectView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         if hh := Household.objects.filter(unicef_id=self.kwargs["uniced_id"]).first():
             hhs = collect_household_infos(hh)
             kwargs["hhs"] = dict(hhs)
-            kwargs["detail_id"] = hh.detail_id
+            kwargs["program_registration_id"] = hh.program_registration_id
             kwargs["household"] = hh
         return super().get_context_data(**kwargs)
