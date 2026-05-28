@@ -25,8 +25,8 @@ case "$1" in
 	          --mimefile=/conf/mime.types \
 	          --uid hope \
 	          --gid unicef \
-            --buffer-size 8192 \
-            --http-buffer-size 8192 \
+            --buffer-size 65535 \
+            --http-buffer-size 65535 \
 	          $MAPPING
 	    ;;
     upgrade)
