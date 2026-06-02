@@ -1,10 +1,42 @@
-# Hope Beneficiary Portal
+# HOPE Beneficiary Portal
 
 ## About
 
-HOPE Beneficiary Portal is beneficiary oriented application that and beneficiaries to collect retrieve the data that the system knows about them.
+HOPE Beneficiary Portal lets beneficiaries securely access the information the system stores about their household and program participation.
 
-The system ask the registration number of the beneficiary and after provided the user is asked to answer some question about the in found house.
-If the user answer to all the questions it would be redirected to a page with he will find all the information about his payment and data that the system knows about him.
+After identity verification, the beneficiary can:
 
-There is a safety guard that allows each registration number to be attempt only a limited number of times per day.
+- View household profile and demographic details.
+- View linked programs, payment statuses, and grievance tickets.
+- Open a new issue (ticket) from the portal.
+- Create/recover portal account credentials.
+
+The portal includes anti-abuse protections: login attempts are rate-limited and repeated failed verification attempts can trigger temporary lockouts.
+
+## Login methods (4 ways)
+
+On the home page, users can enter through four supported methods:
+
+### 1) Registration Number
+
+- User provides the registration number received during enrollment.
+- The system asks verification questions.
+- After successful verification, the user is redirected to household/program/payment information.
+
+### 2) SMS verification
+
+- User provides the mobile number used during registration.
+- The portal sends a one-time password (OTP) by SMS.
+- After OTP verification, the user can access their household information and actions.
+
+### 3) Email verification
+
+- User provides the email used during registration.
+- The portal sends a one-time password (OTP) by email.
+- After OTP verification, the user can access their household information and actions.
+
+### 4) Account login (username/password)
+
+- User signs in with previously created beneficiary credentials.
+- On success, the user is redirected directly to their household information view.
+- From there, the user can review program/payment details and open an issue.
