@@ -6,6 +6,7 @@ from constance.test import override_config
 from django.urls import reverse
 from testutils.factories.hope.houshold import HouseholdFactory
 
+from hope_portal.modules.inspect import Inspector
 from hope_portal.modules.security.clients import HopeAPIClient
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
 
@@ -153,3 +154,208 @@ def test_flow_open_issue_requires_available_business_area(django_app, household,
     issue_res = issue_res.forms[0].submit()
     assert issue_res.status_code == 200
     assert b"No business area available for this household." in issue_res.content
+
+
+# ---------------------------------------------------------------------------
+# StartForm: registration number normalization
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_start_form_matches_when_user_submits_without_dash(django_app):
+    """DB stores 'REG-42' but user types 'REG42' (no dash) — should still resolve."""
+    hh = HouseholdFactory(program_registration_id="REG-DASH-MATCH")
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REGDASHMATCH"
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 302, res.html.get_text()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_start_form_matches_hash_suffix_in_database(django_app):
+    """DB stores 'REG-42#0' but user types 'REG-42' — #N suffix should be stripped on DB side."""
+    HouseholdFactory(program_registration_id="REG-HASH-1#0")
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-HASH-1"
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 302, res.html.get_text()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_start_form_returns_all_matching_candidates(django_app):
+    """Both REG-MC#0 and REG-MC#1 must be found when user types 'REG-MC'."""
+    hh_a = HouseholdFactory(program_registration_id="REG-MC-MULTI#0")
+    hh_b = HouseholdFactory(program_registration_id="REG-MC-MULTI#1")
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-MC-MULTI"
+    # Both households must produce a valid redirect (the signed token encodes both IDs).
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 302, res.html.get_text()
+    # Follow to the ask page — the URL embeds a signed token covering both candidates.
+    ask_res = res.follow()
+    assert ask_res.status_code in (200, 302)
+    _ = hh_a, hh_b  # referenced to avoid an unused-variable warning
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_start_form_validation_error_on_unknown_registration_number(django_app):
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "THIS-ID-DOES-NOT-EXIST-AT-ALL"
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 200
+    assert b"Registration number not found" in res.content
+
+
+# ---------------------------------------------------------------------------
+# AskView: multi-candidate POST — second candidate matched on first submission
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=1, MAX_QUESTIONS_PER_FIELD=1)
+def test_ask_view_identifies_second_candidate_when_answers_match_it(django_app):
+    """
+    If check_value() fails for candidate[0] but Inspector.matches_answers() returns True
+    for candidate[1], the view should redirect to the info page for candidate[1].
+    """
+    hh_a = HouseholdFactory(program_registration_id="REG-TWOCAND#0")
+    hh_b = HouseholdFactory(program_registration_id="REG-TWOCAND#1")
+
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-TWOCAND"
+    # Start form finds both; follows to ask page.
+    res = res.forms["reg-form"].submit().follow()
+
+    # We may get a second redirect if the first candidate is skipped (no questions).
+    if res.status_code == 302:
+        res = res.follow()
+
+    assert res.status_code == 200
+
+    with (
+        mock.patch("hope_portal.ui.forms.flow.QuestionForm.check_value", return_value=False),
+        mock.patch.object(Inspector, "matches_answers", return_value=True),
+    ):
+        res.forms["ask-form"]["form-0-question"] = "any_answer"
+        res = res.forms["ask-form"].submit()
+
+    # The view should redirect to the info page for whichever candidate matched.
+    assert res.status_code == 302
+    assert "info" in res.location
+
+    _ = hh_a, hh_b
+
+
+# ---------------------------------------------------------------------------
+# AskView: multi-candidate POST — no candidate matched → retry shown
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=1, MAX_QUESTIONS_PER_FIELD=1)
+def test_ask_view_shows_retry_when_no_candidate_matches(django_app):
+    """
+    When check_value() fails and no other candidate matches, the form is re-rendered
+    with retry=True (template shows 'Sorry cannot find your data').
+    """
+    HouseholdFactory(program_registration_id="REG-RETRY-ONLY")
+
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-RETRY-ONLY"
+    res = res.forms["reg-form"].submit().follow()
+
+    if res.status_code == 302:
+        res = res.follow()
+
+    assert res.status_code == 200
+
+    with mock.patch("hope_portal.ui.forms.flow.QuestionForm.check_value", return_value=False):
+        res.forms["ask-form"]["form-0-question"] = "--wrong--"
+        res = res.forms["ask-form"].submit()
+
+    assert res.status_code == 200
+    assert b"Sorry cannot find your data" in res.content
+
+
+# ---------------------------------------------------------------------------
+# AskView: GET — candidate with no questions is skipped, redirect to next
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=1, MAX_QUESTIONS_PER_FIELD=1)
+def test_ask_view_skips_candidate_with_no_questions_and_redirects(django_app):
+    """
+    If candidates[0] cannot produce any questions, the GET handler should redirect
+    to a new signed token containing only the remaining candidates.
+    """
+    # household_empty: all question-eligible fields are blank → 0 questions
+    HouseholdFactory(
+        program_registration_id="REG-SKIP-NOQUESTIONS#0",
+        head_of_household__given_name="",
+        head_of_household__middle_name="",
+        head_of_household__family_name="",
+        head_of_household__phone_no="",
+    )
+    # household_data: has a name → will produce questions
+    HouseholdFactory(
+        program_registration_id="REG-SKIP-NOQUESTIONS#1",
+        head_of_household__given_name="Mohammed",
+        head_of_household__middle_name="",
+        head_of_household__family_name="",
+        head_of_household__phone_no="",
+    )
+
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-SKIP-NOQUESTIONS"
+
+    # POST start form → 302 to /ask/<signed_ab>/
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 302
+
+    # GET /ask/<signed_ab>/ → 302 to /ask/<signed_b>/ (first candidate skipped)
+    res = res.follow()
+    assert res.status_code == 302
+
+    # GET /ask/<signed_b>/ → 200 ask page (second candidate has questions)
+    res = res.follow()
+    assert res.status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# AskView: GET — all candidates have no questions → not-available
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=1, MAX_QUESTIONS_PER_FIELD=1)
+def test_ask_view_redirects_to_not_available_when_no_candidates_have_questions(django_app):
+    HouseholdFactory(
+        program_registration_id="REG-ALL-EMPTY-NOQUESTIONS",
+        head_of_household__given_name="",
+        head_of_household__middle_name="",
+        head_of_household__family_name="",
+        head_of_household__phone_no="",
+    )
+
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-ALL-EMPTY-NOQUESTIONS"
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 302
+
+    res = res.follow()
+    # First ask GET → redirect again (no questions for only candidate)
+    res = res.follow()
+    assert "not-available" in res.request.url

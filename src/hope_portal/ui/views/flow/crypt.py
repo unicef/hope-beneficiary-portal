@@ -37,3 +37,17 @@ def unsign_household(request: HttpRequest, key: str) -> Household:
         return Household.objects.get(pk=value["id"])
     except (signing.BadSignature, Household.DoesNotExist):
         raise FlowTimeoutError() from None
+
+
+def sign_candidates(request: HttpRequest, households: list[Household]) -> str:
+    return sign(request, {"ids": [str(hh.id) for hh in households]})
+
+
+def unsign_candidates(request: HttpRequest, key: str) -> list[Household]:
+    try:
+        value = unsign(request, key)
+        ids: list[str] = value["ids"]
+        by_id = {str(hh.id): hh for hh in Household.objects.filter(pk__in=ids)}
+        return [by_id[pk] for pk in ids if pk in by_id]
+    except (signing.BadSignature, KeyError):
+        raise FlowTimeoutError() from None
