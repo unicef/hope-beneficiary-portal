@@ -38,9 +38,10 @@ def test_phone_extractor_iter_all_questions_strips_leading_plus():
 
 
 def test_iban_extractor_iter_all_questions_strips_spaces():
+    # "PL 61 1090" → spaces removed → "PL611090" (8 chars)
     extractor = IbanExtractor("IBAN", "PL 61 1090")
     questions = extractor.iter_all_questions()
-    assert len(questions) == 9
+    assert len(questions) == 8
     assert all(q.answer != " " for q in questions)
 
 
