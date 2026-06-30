@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 
 from hope_portal.modules.inspect.extractors import (
     DateExtractor,

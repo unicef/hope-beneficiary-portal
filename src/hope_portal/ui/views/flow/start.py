@@ -139,7 +139,9 @@ class AuthView(FormView[AuthForm]):
             url = reverse("ui:index")
             beneficiary = Beneficiary.objects.get(username=form.cleaned_data["username"])
             if beneficiary.check_password(form.cleaned_data["password"]):
-                url = reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, beneficiary.household)})
+                url = reverse(
+                    "ui:flow:info", kwargs={"signed_data": sign_household(self.request, beneficiary.household)}
+                )
             return HttpResponseRedirect(url)
         except Beneficiary.DoesNotExist:
             logger.warning("Beneficiary not found", extra={"username": form.cleaned_data["username"]})

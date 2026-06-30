@@ -1,5 +1,5 @@
 from typing import Any
-
+import logging
 from django.conf import settings
 from django.forms import BaseFormSet
 from django.http import HttpRequest, HttpResponse, HttpResponseBase, HttpResponseRedirect
@@ -14,6 +14,8 @@ from hope_portal.modules.hope.models import Household
 from hope_portal.modules.inspect import Inspector, QuestionData
 from hope_portal.ui.forms.flow import QuestionForm, QuestionFormSet
 from hope_portal.ui.views.flow.crypt import sign, sign_candidates, unsign_candidates
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(flag_check("FLOW_ASK", True), name="dispatch")
@@ -66,8 +68,8 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
             try:
                 label, _ = form.unsign(form.cleaned_data["signed"])
                 asked.append((label, form.cleaned_data["question"]))
-            except Exception:
-                pass
+            except Exception:  # noqa: BLE001
+                logger.error("Failed to extract asked answers", exc_info=True)
         return asked
 
     def get_formset(self) -> BaseFormSet[QuestionForm]:

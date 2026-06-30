@@ -168,10 +168,7 @@ def test_get_questions_includes_discriminating_question_for_two_candidates():
     questions = Inspector(household_a).get_questions(other_candidates=[household_b])
 
     answer_map_b = Inspector(household_b).build_answer_map()
-    assert any(
-        answer_map_b.get(question.question, "").lower() != question.answer.lower()
-        for question in questions
-    )
+    assert any(answer_map_b.get(question.question, "").lower() != question.answer.lower() for question in questions)
 
 
 @pytest.mark.django_db
@@ -189,8 +186,7 @@ def test_get_discriminating_question_set_covers_all_pairs():
     for other in others:
         answer_map = Inspector(other).build_answer_map()
         assert any(
-            answer_map.get(question.question, "").lower() != question.answer.lower()
-            for question in questions
+            answer_map.get(question.question, "").lower() != question.answer.lower() for question in questions
         ), f"{other.head_of_household.given_name!r} is not discriminated by the question set"
 
 

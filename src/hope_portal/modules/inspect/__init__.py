@@ -291,6 +291,5 @@ class Inspector:
     def matches_answers(self, asked: list[tuple[str, str]]) -> bool:
         answer_map = self.build_answer_map()
         return all(
-            answer_map.get(question_text, "").lower() == user_answer.lower()
-            for question_text, user_answer in asked
+            answer_map.get(question_text, "").lower() == user_answer.lower() for question_text, user_answer in asked
         )

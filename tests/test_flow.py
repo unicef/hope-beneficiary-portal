@@ -165,7 +165,7 @@ def test_flow_open_issue_requires_available_business_area(django_app, household,
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_start_form_matches_when_user_submits_without_dash(django_app):
     """DB stores 'REG-42' but user types 'REG42' (no dash) — should still resolve."""
-    hh = HouseholdFactory(program_registration_id="REG-DASH-MATCH")
+    HouseholdFactory(program_registration_id="REG-DASH-MATCH")
     url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
     res.forms["reg-form"]["registration_number"] = "REGDASHMATCH"
@@ -189,8 +189,8 @@ def test_start_form_matches_hash_suffix_in_database(django_app):
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_start_form_returns_all_matching_candidates(django_app):
     """Both REG-MC#0 and REG-MC#1 must be found when user types 'REG-MC'."""
-    hh_a = HouseholdFactory(program_registration_id="REG-MC-MULTI#0")
-    hh_b = HouseholdFactory(program_registration_id="REG-MC-MULTI#1")
+    HouseholdFactory(program_registration_id="REG-MC-MULTI#0")
+    HouseholdFactory(program_registration_id="REG-MC-MULTI#1")
     url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
     res.forms["reg-form"]["registration_number"] = "REG-MC-MULTI"
@@ -199,8 +199,7 @@ def test_start_form_returns_all_matching_candidates(django_app):
     assert res.status_code == 302, res.html.get_text()
     # Follow to the ask page — the URL embeds a signed token covering both candidates.
     ask_res = res.follow()
-    assert ask_res.status_code in (200, 302)
-    _ = hh_a, hh_b  # referenced to avoid an unused-variable warning
+    assert ask_res.status_code in (200, 302)  # referenced to avoid an unused-variable warning
 
 
 @pytest.mark.django_db
@@ -226,8 +225,8 @@ def test_ask_view_identifies_second_candidate_when_answers_match_it(django_app):
     If check_value() fails for candidate[0] but Inspector.matches_answers() returns True
     for candidate[1], the view should redirect to the info page for candidate[1].
     """
-    hh_a = HouseholdFactory(program_registration_id="REG-TWOCAND#0")
-    hh_b = HouseholdFactory(program_registration_id="REG-TWOCAND#1")
+    HouseholdFactory(program_registration_id="REG-TWOCAND#0")
+    HouseholdFactory(program_registration_id="REG-TWOCAND#1")
 
     url = reverse("ui:flow:start-registration")
     res = django_app.get(url)
@@ -251,8 +250,6 @@ def test_ask_view_identifies_second_candidate_when_answers_match_it(django_app):
     # The view should redirect to the info page for whichever candidate matched.
     assert res.status_code == 302
     assert "info" in res.location
-
-    _ = hh_a, hh_b
 
 
 # ---------------------------------------------------------------------------
