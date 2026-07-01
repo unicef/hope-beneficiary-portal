@@ -1,58 +1,98 @@
 from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from hope_portal.exception import FlowTimeoutError
+from hope_portal.modules.hope.models import Household
 from hope_portal.ui.views.flow.crypt import sign_candidates, unsign_candidates
-from testutils.factories.hope.houshold import HouseholdFactory
 
 
 @pytest.fixture
 def req(rf):
-    """A lightweight fake request with a stable session key."""
+    """Lightweight fake request carrying a stable session key."""
     request = rf.get("/")
     request.session = SimpleNamespace(session_key="test-session-key-crypt")
     return request
 
 
-@pytest.mark.django_db
+def _mock_household(pk: str) -> MagicMock:
+    hh = MagicMock()
+    hh.id = pk
+    hh.pk = pk
+    return hh
+
+
+def _mock_objects(filter_result: list) -> MagicMock:
+    mgr = MagicMock()
+    mgr.filter.return_value = filter_result
+    return mgr
+
+
+# ---------------------------------------------------------------------------
+# Round-trip: signing order is preserved regardless of queryset return order
+# ---------------------------------------------------------------------------
+
+
 def test_sign_unsign_candidates_round_trip_preserves_order(req):
-    households = [HouseholdFactory(), HouseholdFactory(), HouseholdFactory()]
-    signed = sign_candidates(req, households)
-    result = unsign_candidates(req, signed)
-    assert [str(h.pk) for h in result] == [str(h.pk) for h in households]
+    h1 = _mock_household("id-1")
+    h2 = _mock_household("id-2")
+    h3 = _mock_household("id-3")
+
+    signed = sign_candidates(req, [h1, h2, h3])
+
+    # Queryset returns in a different order — unsign must restore the original one.
+    with patch.object(Household, "objects", _mock_objects([h3, h1, h2])):
+        result = unsign_candidates(req, signed)
+
+    assert result == [h1, h2, h3]
 
 
-@pytest.mark.django_db
+# ---------------------------------------------------------------------------
+# Empty candidate list
+# ---------------------------------------------------------------------------
+
+
 def test_sign_unsign_candidates_empty_list(req):
+    # filter(pk__in=[]) is optimised to an empty queryset by Django — no DB hit.
     signed = sign_candidates(req, [])
-    assert unsign_candidates(req, signed) == []
+    with patch.object(Household, "objects", _mock_objects([])):
+        assert unsign_candidates(req, signed) == []
 
 
-@pytest.mark.django_db
-def test_unsign_candidates_skips_deleted_households(req):
-    surviving = HouseholdFactory()
-    deleted = HouseholdFactory()
-    # Sign with both IDs, then delete one from the DB.
-    signed = sign_candidates(req, [surviving, deleted])
-    deleted.delete()
-
-    result = unsign_candidates(req, signed)
-
-    assert len(result) == 1
-    assert str(result[0].pk) == str(surviving.pk)
+# ---------------------------------------------------------------------------
+# Households that no longer exist in the DB are silently skipped
+# ---------------------------------------------------------------------------
 
 
-@pytest.mark.django_db
+def test_unsign_candidates_skips_missing_households(req):
+    surviving = _mock_household("id-surviving")
+    signed = sign_candidates(req, [surviving, _mock_household("id-deleted")])
+
+    # Only the surviving household is returned by the queryset.
+    with patch.object(Household, "objects", _mock_objects([surviving])):
+        result = unsign_candidates(req, signed)
+
+    assert result == [surviving]
+
+
+# ---------------------------------------------------------------------------
+# Tampered token → FlowTimeoutError
+# ---------------------------------------------------------------------------
+
+
 def test_unsign_candidates_raises_flow_timeout_on_bad_signature(req):
     with pytest.raises(FlowTimeoutError):
         unsign_candidates(req, "this.is.not.a.valid.signed.token")
 
 
-@pytest.mark.django_db
+# ---------------------------------------------------------------------------
+# Different session key makes the token unreadable
+# ---------------------------------------------------------------------------
+
+
 def test_unsign_candidates_raises_flow_timeout_on_wrong_session_key(req, rf):
-    households = [HouseholdFactory()]
-    signed = sign_candidates(req, households)
+    signed = sign_candidates(req, [_mock_household("some-id")])
 
     other_req = rf.get("/")
     other_req.session = SimpleNamespace(session_key="completely-different-key")
