@@ -28,12 +28,14 @@ def collect_household_infos(hh: Household) -> dict[str, list[HHInfo]]:
     for entry in Household.objects.select_related("head_of_household", "program").filter(
         household_collection_id=hh.household_collection_id, unicef_id=hh.unicef_id
     ):
-        ret[entry.program.name].append(  # type: ignore[union-attr, index]
+        program_name = entry.program.name if entry.program else ""
+        head = entry.head_of_household.full_name if entry.head_of_household else ""
+        ret[program_name].append(
             HHInfo(
                 id=entry.id.hex,
                 unicef_id=entry.unicef_id,  # type: ignore[arg-type]
-                head=entry.head_of_household.full_name,  # type: ignore[arg-type, union-attr]
-                program=entry.program.name,  # type: ignore[arg-type, union-attr]
+                head=head,  # type: ignore[arg-type]
+                program=program_name,
                 program_registration_id=str(entry.program_registration_id),
                 payments=Payment.objects.select_related(
                     "delivery_type", "financial_service_provider", "parent_split__payment_plan"

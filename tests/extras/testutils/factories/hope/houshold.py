@@ -39,7 +39,7 @@ class HouseholdFactory(AutoRegisterModelFactory):
 
     @factory.post_generation
     def create_linked_item(self: Household, create, extracted, **kwargs):
-        if not create:
+        if not create or not self.head_of_household:
             return
         self.head_of_household.household = self
         self.head_of_household.save()
