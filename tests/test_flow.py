@@ -59,6 +59,21 @@ def test_flow_found(django_app, household):
 
 @pytest.mark.django_db
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_flow_info_handles_null_head_and_program_in_collection(django_app, household):
+    """A sibling household in the same collection with no head_of_household/program must not 500."""
+    HouseholdFactory(
+        household_collection_id=household.household_collection_id,
+        unicef_id=household.unicef_id,
+        head_of_household=None,
+        program=None,
+    )
+    res = _go_to_info_page(django_app, household)
+    assert res.status_code == 200, res.showbrowser()
+    assert b"Welcome" in res.content
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_open_issue_manual_create(django_app, household, settings, monkeypatch):
     settings.HOPE_API_BASE_URL = "https://hope.example.org"
     settings.HOPE_API_TOKEN = "token"
