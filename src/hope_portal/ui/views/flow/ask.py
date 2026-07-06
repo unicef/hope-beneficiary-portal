@@ -95,8 +95,7 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         signed_data = self.kwargs["signed_data"]
         if self.request.method == "GET":
             self.request.session[self._session_key()] = {
-                question_data.question: question_data.answer
-                for question_data in self.questions
+                question_data.question: question_data.answer for question_data in self.questions
             }
             formset = QuestionFormSet(
                 initial=[{} for _ in self.questions],
