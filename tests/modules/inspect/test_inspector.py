@@ -134,6 +134,13 @@ def test_matches_answers_false_for_unknown_question():
     assert not inspector.matches_answers([("A question that does not exist?", "anything")])
 
 
+@pytest.mark.django_db
+def test_matches_answers_empty_list_returns_false():
+    """An empty asked list must not be treated as 'all correct' — explicit guard against all([]) == True."""
+    household = _household_with_only_given_name("Arsen")
+    assert not Inspector(household).matches_answers([])
+
+
 # ---------------------------------------------------------------------------
 # get_questions — single candidate (no other_candidates)
 # ---------------------------------------------------------------------------

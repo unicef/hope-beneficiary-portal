@@ -3,12 +3,14 @@ from unittest import mock
 
 import pytest
 from constance.test import override_config
+from django.core import signing
 from django.urls import reverse
 from testutils.factories.hope.houshold import HouseholdFactory
 
 from hope_portal.modules.inspect import Inspector
 from hope_portal.modules.security.clients import HopeAPIClient
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
+from hope_portal.ui.forms.flow import QuestionForm
 
 
 @pytest.fixture
@@ -356,3 +358,83 @@ def test_ask_view_redirects_to_not_available_when_no_candidates_have_questions(d
     # First ask GET → redirect again (no questions for only candidate)
     res = res.follow()
     assert "not-available" in res.request.url
+
+
+# ---------------------------------------------------------------------------
+# QuestionForm: sign/unsign/check_value unit tests
+# ---------------------------------------------------------------------------
+
+
+def test_question_form_sign_unsign_round_trip():
+    """sign() embeds only the question text; unsign() returns it unchanged."""
+    form = QuestionForm()
+    question_text = "What is the first letter of your given name?"
+    signed = form.sign(question_text)
+    assert form.unsign(signed) == question_text
+
+
+def test_question_form_sign_does_not_embed_answer():
+    """The signed token must not contain the plain-text answer."""
+    form = QuestionForm()
+    answer = "SuperSecretAnswer"
+    signed = form.sign("Some question?")
+    assert answer not in signed
+
+
+def test_question_form_unsign_raises_on_tampered_value():
+    form = QuestionForm()
+    with pytest.raises(signing.BadSignature):
+        form.unsign("this.is.obviously.tampered")
+
+
+def test_question_form_check_value_correct_answer():
+    signed = QuestionForm().sign("Q?")
+    form = QuestionForm(data={"question": "A", "signed": signed})
+    assert form.is_valid()
+    assert form.check_value("A")
+    assert form.check_value("a")
+
+
+def test_question_form_check_value_wrong_answer():
+    signed = QuestionForm().sign("Q?")
+    form = QuestionForm(data={"question": "B", "signed": signed})
+    assert form.is_valid()
+    assert not form.check_value("A")
+
+
+def test_question_form_check_value_tampered_signed():
+    form = QuestionForm(data={"question": "A", "signed": "tampered.value.here"})
+    assert form.is_valid()
+    assert not form.check_value("A")
+
+
+# ---------------------------------------------------------------------------
+# AskView: POST with tampered signed field → reject immediately
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=1, MAX_QUESTIONS_PER_FIELD=1)
+def test_ask_post_rejects_tampered_signed_field(django_app):
+    """A POST whose signed field has been tampered must be redirected to not-available."""
+    HouseholdFactory(
+        program_registration_id="REG-TAMPER-TEST",
+        head_of_household__given_name="Arsen",
+        head_of_household__middle_name="",
+        head_of_household__family_name="",
+        head_of_household__phone_no="",
+    )
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-TAMPER-TEST"
+    res = res.forms["reg-form"].submit().follow()
+    if res.status_code == 302:
+        res = res.follow()
+    assert res.status_code == 200
+
+    res.forms["ask-form"].set("form-0-signed", "tampered.value.that.has.bad.signature", force=True)
+    res.forms["ask-form"]["form-0-question"] = "some_answer"
+    res = res.forms["ask-form"].submit()
+
+    assert res.status_code == 302
+    assert "not-available" in res.location

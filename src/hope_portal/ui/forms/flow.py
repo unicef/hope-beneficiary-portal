@@ -158,19 +158,21 @@ class QuestionForm(forms.Form):
         self.key = kwargs.pop("key", None)
         super().__init__(*args, **kwargs)
 
-    def sign(self, question_text: str, answer: str) -> str:
-        return signing.TimestampSigner().sign_object([question_text, answer])
+    def sign(self, question_text: str) -> str:
+        """Sign the question text for tamper-detection. The expected answer is kept server-side."""
+        return signing.TimestampSigner().sign_object(question_text)
 
-    def unsign(self, signed_value: str) -> tuple[str, str]:
+    def unsign(self, signed_value: str) -> str:
+        """Return the signed question text, raising BadSignature if tampered."""
         return signing.TimestampSigner().unsign_object(signed_value)
 
-    def check_value(self) -> bool:
-        signer = signing.TimestampSigner()
+    def check_value(self, expected_answer: str) -> bool:
+        """Verify the signed question is untampered, then compare the answer."""
         try:
-            data = signer.unsign_object(self.cleaned_data["signed"])
-            return str(data[1]).lower() == str(self.cleaned_data["question"]).lower()
+            signing.TimestampSigner().unsign_object(self.cleaned_data["signed"])
         except signing.BadSignature:
             return False
+        return str(expected_answer).lower() == str(self.cleaned_data["question"]).lower()
 
 
 class QuestionBaseFormSet(forms.BaseFormSet[QuestionForm]):

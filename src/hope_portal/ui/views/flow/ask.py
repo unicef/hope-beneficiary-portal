@@ -1,6 +1,8 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.conf import settings
+from django.core import signing
 from django.forms import BaseFormSet
 from django.http import HttpRequest, HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.urls import reverse
@@ -51,30 +53,51 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         if not formset.is_valid():
             return self.form_invalid(formset)
 
-        if all(form.check_value() for form in formset.forms):
-            return self.form_valid(formset)
+        expected_answers = self.request.session.get(self._session_key(), {})
+        if not expected_answers:
+            return HttpResponseRedirect(reverse("ui:flow:not-available"))
 
         asked = self._extract_asked_answers(formset)
+        if asked is None:
+            return HttpResponseRedirect(reverse("ui:flow:not-available"))
+
+        if all(
+            form.check_value(expected_answers.get(question_text, ""))
+            for form, (question_text, _) in zip(formset.forms, asked, strict=True)
+        ):
+            self.request.session.pop(self._session_key(), None)
+            return self.form_valid(formset)
+
         for candidate in self.candidates[1:]:
             if Inspector(candidate).matches_answers(asked):
                 self.household = candidate
+                self.request.session.pop(self._session_key(), None)
                 return self.form_valid(formset)
 
         return self.render_to_response(self.get_context_data(retry=True))
 
-    def _extract_asked_answers(self, formset: Any) -> list[tuple[str, str]]:
+    def _session_key(self) -> str:
+        return f"ask:{self.kwargs['signed_data']}"
+
+    def _extract_asked_answers(self, formset: Any) -> list[tuple[str, str]] | None:
+        """Return (question_text, user_answer) pairs, or None if any signed token is invalid."""
         asked = []
         for form in formset.forms:
             try:
-                label, _ = form.unsign(form.cleaned_data["signed"])
-                asked.append((label, form.cleaned_data["question"]))
-            except Exception:  # noqa: BLE001
-                logger.error("Failed to extract asked answers", exc_info=True)
+                question_text = form.unsign(form.cleaned_data["signed"])
+                asked.append((question_text, form.cleaned_data["question"]))
+            except signing.BadSignature:
+                logger.warning("Tampered signed question field — rejecting submission")
+                return None
         return asked
 
     def get_formset(self) -> BaseFormSet[QuestionForm]:
         signed_data = self.kwargs["signed_data"]
         if self.request.method == "GET":
+            self.request.session[self._session_key()] = {
+                question_data.question: question_data.answer
+                for question_data in self.questions
+            }
             formset = QuestionFormSet(
                 initial=[{} for _ in self.questions],
                 form_kwargs={"key": signed_data},
@@ -85,11 +108,14 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
                     form.fields["question"].help_text = f"{question_data.hint} ({question_data.answer})"
                 else:
                     form.fields["question"].help_text = question_data.hint
-                form.fields["signed"].initial = form.sign(question_data.question, question_data.answer)
+                form.fields["signed"].initial = form.sign(question_data.question)
         else:
             formset = QuestionFormSet(data=self.request.POST)
             for form in formset.forms:
-                label, _ = form.unsign(form.data[f"{form.prefix}-signed"])
+                try:
+                    label = form.unsign(form.data[f"{form.prefix}-signed"])
+                except signing.BadSignature:
+                    label = ""
                 form.fields["question"].label = label
         return formset
 
