@@ -4,6 +4,7 @@ from typing import Any
 
 from django.db.models import QuerySet
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
 from flags.decorators import flag_check
@@ -28,7 +29,7 @@ def collect_household_infos(hh: Household) -> dict[str, list[HHInfo]]:
     for entry in Household.objects.select_related("head_of_household", "program").filter(
         household_collection_id=hh.household_collection_id, unicef_id=hh.unicef_id
     ):
-        program_name = entry.program.name if entry.program else ""
+        program_name = entry.program.name if entry.program else _("Unknown program")
         head = entry.head_of_household.full_name if entry.head_of_household else ""
         ret[program_name].append(
             HHInfo(
