@@ -3,6 +3,7 @@ from typing import Any
 
 from django.conf import settings
 from django.core import signing
+from django.core.cache import cache
 from django.forms import BaseFormSet
 from django.http import HttpRequest, HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.urls import reverse
@@ -53,7 +54,7 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         if not formset.is_valid():
             return self.form_invalid(formset)
 
-        expected_answers = self.request.session.get(self._session_key(), {})
+        expected_answers: dict[str, str] = cache.get(self._answers_cache_key(), {})
         if not expected_answers:
             return HttpResponseRedirect(reverse("ui:flow:not-available"))
 
@@ -65,19 +66,19 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
             form.check_value(expected_answers.get(question_text, ""))
             for form, (question_text, _) in zip(formset.forms, asked, strict=True)
         ):
-            self.request.session.pop(self._session_key(), None)
+            cache.delete(self._answers_cache_key())
             return self.form_valid(formset)
 
         for candidate in self.candidates[1:]:
             if Inspector(candidate).matches_answers(asked):
                 self.household = candidate
-                self.request.session.pop(self._session_key(), None)
+                cache.delete(self._answers_cache_key())
                 return self.form_valid(formset)
 
         return self.render_to_response(self.get_context_data(retry=True))
 
-    def _session_key(self) -> str:
-        return f"ask:{self.kwargs['signed_data']}"
+    def _answers_cache_key(self) -> str:
+        return f"portal:ask:{self.kwargs['signed_data']}"
 
     def _extract_asked_answers(self, formset: Any) -> list[tuple[str, str]] | None:
         """Return (question_text, user_answer) pairs, or None if any signed token is invalid."""
@@ -94,9 +95,11 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
     def get_formset(self) -> BaseFormSet[QuestionForm]:
         signed_data = self.kwargs["signed_data"]
         if self.request.method == "GET":
-            self.request.session[self._session_key()] = {
-                question_data.question: question_data.answer for question_data in self.questions
-            }
+            cache.set(
+                self._answers_cache_key(),
+                {question_data.question: question_data.answer for question_data in self.questions},
+                timeout=3600,
+            )
             formset = QuestionFormSet(
                 initial=[{} for _ in self.questions],
                 form_kwargs={"key": signed_data},

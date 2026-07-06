@@ -432,9 +432,10 @@ def test_ask_post_rejects_tampered_signed_field(django_app):
         res = res.follow()
     assert res.status_code == 200
 
-    res.forms["ask-form"].set("form-0-signed", "tampered.value.that.has.bad.signature", force=True)
+    res.forms["ask-form"].fields["form-0-signed"][0].force_value("tampered.value.that.has.bad.signature")
     res.forms["ask-form"]["form-0-question"] = "some_answer"
     res = res.forms["ask-form"].submit()
 
     assert res.status_code == 302
-    assert "not-available" in res.location
+    res = res.follow()
+    assert "not-available" in res.request.url
