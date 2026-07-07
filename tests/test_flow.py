@@ -468,17 +468,13 @@ def test_ask_post_rejects_empty_formset(django_app):
         res = res.follow()
     assert res.status_code == 200
 
-    # Craft a POST that has zero question forms (TOTAL_FORMS=0).
-    ask_url = res.request.url
-    res = django_app.post(
-        ask_url,
-        params={
-            "form-TOTAL_FORMS": "0",
-            "form-INITIAL_FORMS": "0",
-            "form-MIN_NUM_FORMS": "0",
-            "form-MAX_NUM_FORMS": "1000",
-        },
-    )
+    # Submit the form with TOTAL_FORMS=0 so the formset contains no questions.
+    # Using form.submit() instead of django_app.post() ensures the CSRF token is
+    # included automatically by webtest.
+    form = res.forms["ask-form"]
+    form["form-TOTAL_FORMS"] = "0"
+    form["form-INITIAL_FORMS"] = "0"
+    res = form.submit()
     assert res.status_code == 302
     res = res.follow()
     assert "not-available" in res.request.url
