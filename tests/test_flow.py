@@ -439,3 +439,46 @@ def test_ask_post_rejects_tampered_signed_field(django_app):
     assert res.status_code == 302
     res = res.follow()
     assert "not-available" in res.request.url
+
+
+# ---------------------------------------------------------------------------
+# AskView: POST with zero forms (empty formset) → reject, not accept
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=1, MAX_QUESTIONS_PER_FIELD=1)
+def test_ask_post_rejects_empty_formset(django_app):
+    """
+    If the submitted formset contains zero forms, asked == [] which is falsy.
+    The view must reject immediately — all([]) must not silently grant access.
+    """
+    HouseholdFactory(
+        program_registration_id="REG-EMPTY-FORMSET",
+        head_of_household__given_name="Arsen",
+        head_of_household__middle_name="",
+        head_of_household__family_name="",
+        head_of_household__phone_no="",
+    )
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = "REG-EMPTY-FORMSET"
+    res = res.forms["reg-form"].submit().follow()
+    if res.status_code == 302:
+        res = res.follow()
+    assert res.status_code == 200
+
+    # Craft a POST that has zero question forms (TOTAL_FORMS=0).
+    ask_url = res.request.url
+    res = django_app.post(
+        ask_url,
+        params={
+            "form-TOTAL_FORMS": "0",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+        },
+    )
+    assert res.status_code == 302
+    res = res.follow()
+    assert "not-available" in res.request.url

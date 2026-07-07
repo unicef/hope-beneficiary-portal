@@ -59,7 +59,7 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
             return HttpResponseRedirect(reverse("ui:flow:not-available"))
 
         asked = self._extract_asked_answers(formset)
-        if asked is None:
+        if not asked:
             return HttpResponseRedirect(reverse("ui:flow:not-available"))
 
         if all(
