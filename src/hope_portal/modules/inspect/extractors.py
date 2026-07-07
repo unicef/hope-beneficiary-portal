@@ -78,6 +78,11 @@ class LetterExtractor(Extractor):
         picked = secrets.SystemRandom().sample(indices, count)
         return [self._build_question(idx) for idx in picked]
 
+    def iter_all_questions(self) -> list[QuestionData]:
+        if not self.value:
+            return []
+        return [self._build_question(idx) for idx in _valid_letter_indices(self.value)]
+
     def verify_answer(self, answer: str) -> bool:
         return answer.lower() == self.selected_letter.lower()
 
@@ -132,6 +137,12 @@ class DateExtractor(Extractor):
         count = max(1, min(n, len(self._PARTS)))
         picked = secrets.SystemRandom().sample(list(self._PARTS), count)
         return [self._build_question(part) for part in picked]
+
+    def iter_all_questions(self) -> list[QuestionData]:
+        """Return one question per date part (day/month/year) — no random sampling."""
+        if not self.value:
+            return []
+        return [self._build_question(part) for part in self._PARTS]
 
     def verify_answer(self, answer: str) -> bool:
         try:

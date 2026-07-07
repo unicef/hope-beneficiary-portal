@@ -15,7 +15,7 @@ from hope_portal.models.beneficiary import Beneficiary
 from hope_portal.modules.hope.models import Household, Individual
 from hope_portal.modules.security.otp import generate_otp, send_otp_sms, store_otp, verify_otp
 from hope_portal.ui.forms.flow import AuthForm, EmailForm, OTPForm, SMSForm, StartForm
-from hope_portal.ui.views.flow.crypt import sign, sign_household, unsign
+from hope_portal.ui.views.flow.crypt import sign, sign_candidates, sign_household, unsign
 
 
 logger = logging.getLogger(__name__)
@@ -28,8 +28,8 @@ class StartView(FormView[StartForm]):
 
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
-            hh: Household = form.cleaned_data["registration_number"]
-            key = sign_household(self.request, hh)
+            candidates: list[Household] = form.cleaned_data["registration_number"]
+            key = sign_candidates(self.request, candidates)
             url = reverse("ui:flow:ask", kwargs={"signed_data": key})
             return HttpResponseRedirect(url)
         except FlowLockoutError as e:
@@ -119,9 +119,9 @@ class OTPVerifyView(FormView[OTPForm]):
             if not verify_otp(f"{channel}:{identifier}", form.cleaned_data["otp"]):
                 form.add_error("otp", "Invalid code")
                 return self.form_invalid(form)
-            hh = Household.objects.get(pk=data["id"])
+            household = Household.objects.get(pk=data["id"])
             return HttpResponseRedirect(
-                reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, hh)})
+                reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, household)})
             )
         except (FlowTimeoutError, Household.DoesNotExist):
             logger.warning("OTP verification failed: expired or invalid token", extra={"channel": channel})
@@ -137,9 +137,11 @@ class AuthView(FormView[AuthForm]):
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
             url = reverse("ui:index")
-            ben = Beneficiary.objects.get(username=form.cleaned_data["username"])
-            if ben.check_password(form.cleaned_data["password"]):
-                url = reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, ben.household)})
+            beneficiary = Beneficiary.objects.get(username=form.cleaned_data["username"])
+            if beneficiary.check_password(form.cleaned_data["password"]):
+                url = reverse(
+                    "ui:flow:info", kwargs={"signed_data": sign_household(self.request, beneficiary.household)}
+                )
             return HttpResponseRedirect(url)
         except Beneficiary.DoesNotExist:
             logger.warning("Beneficiary not found", extra={"username": form.cleaned_data["username"]})

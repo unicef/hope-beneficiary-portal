@@ -58,8 +58,8 @@ def _has_question_value(value: Any) -> bool:
 
 
 class Inspector:
-    def __init__(self, hh: Household) -> None:
-        self.household = hh
+    def __init__(self, household: Household) -> None:
+        self.household = household
         self.infos = self.collect_information()
 
     def _get_individual_iban(self, person: Individual) -> str | None:
@@ -147,8 +147,8 @@ class Inspector:
             infos = {}
             if head := self.household.head_of_household:
                 infos.update(self._collect_person_data(head, HEAD))
-            if pc := self.household.primary_collector:  # type: ignore[attr-defined]
-                infos.update(self._collect_person_data(pc, PRIMARY_COLLECTOR))
+            if primary_collector := self.household.primary_collector:  # type: ignore[attr-defined]
+                infos.update(self._collect_person_data(primary_collector, PRIMARY_COLLECTOR))
             infos.update(self._collect_household_data())
             cache.set(cache_key, infos, timeout=config.CACHE_QUESTIONS_TIMEOUT)
         return infos
@@ -170,30 +170,128 @@ class Inspector:
     )
 
     def _collect_per_person_questions(self, per_field: int) -> list[QuestionData]:
-        ret: list[QuestionData] = []
+        questions: list[QuestionData] = []
         for offset, role_label in self._PERSON_ROLES:
-            role_label_tr = _(role_label)
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
                     continue
-                label = _(label_tpl).format(label=role_label_tr)
-                ret.extend(extractor_cls(label, value).get_questions(per_field))
-        return ret
+                label = _(label_tpl).format(label=_(role_label))
+                questions.extend(extractor_cls(label, value).get_questions(per_field))
+        return questions
 
     def _collect_household_questions(self, per_field: int) -> list[QuestionData]:
-        ret: list[QuestionData] = []
+        questions: list[QuestionData] = []
         value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
         if value:
-            ret.extend(LetterExtractor(_("Administrative area"), value).get_questions(per_field))
-        return ret
+            questions.extend(LetterExtractor(_("Administrative area"), value).get_questions(per_field))
+        return questions
 
-    def get_questions(self) -> list[QuestionData]:
+    def _collect_all_questions(self) -> list[QuestionData]:
+        questions: list[QuestionData] = []
+        for offset, role_label in self._PERSON_ROLES:
+            for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
+                value = _normalize_str(self.infos.get(offset + field_key))
+                if not value:
+                    continue
+                label = _(label_tpl).format(label=_(role_label))
+                questions.extend(extractor_cls(label, value).iter_all_questions())
+        value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
+        if value:
+            questions.extend(LetterExtractor(_("Administrative area"), value).iter_all_questions())
+        return questions
+
+    def get_questions(self, other_candidates: list["Household"] | None = None) -> list[QuestionData]:
         per_field = max(1, int(config.MAX_QUESTIONS_PER_FIELD))
-        ret = self._collect_per_person_questions(per_field) + self._collect_household_questions(per_field)
-        if len(ret) < config.MIN_QUESTIONS:
+        sampled = self._collect_per_person_questions(per_field) + self._collect_household_questions(per_field)
+        if len(sampled) < config.MIN_QUESTIONS:
             logger.debug(
-                f"Not available question ({len(ret)}) to proceed with identification. (min. {config.MIN_QUESTIONS})"
+                f"Not enough questions ({len(sampled)}) to proceed with identification. (min. {config.MIN_QUESTIONS})"
             )
             return []
-        return random.sample(ret, min(config.MAX_QUESTIONS, len(ret)))
+
+        max_questions = min(config.MAX_QUESTIONS, len(sampled))
+
+        if not other_candidates:
+            return random.sample(sampled, max_questions)
+
+        return self._get_discriminating_question_set(sampled, other_candidates, max_questions)
+
+    def _get_discriminating_question_set(
+        self,
+        sampled: list[QuestionData],
+        other_candidates: list["Household"],
+        max_questions: int,
+    ) -> list[QuestionData]:
+        other_answer_maps = [Inspector(candidate).build_answer_map() for candidate in other_candidates]
+
+        unique_questions: dict[str, QuestionData] = {
+            question.question: question for question in self._collect_all_questions()
+        }
+        question_coverage: dict[str, frozenset[int]] = {
+            text: frozenset(
+                index
+                for index, other_map in enumerate(other_answer_maps)
+                if other_map.get(text, "").lower() != question.answer.lower()
+            )
+            for text, question in unique_questions.items()
+        }
+
+        uncovered: set[int] = set(range(len(other_candidates)))
+        guaranteed: list[QuestionData] = []
+        used_texts: set[str] = set()
+
+        while uncovered and len(guaranteed) < max_questions:
+            best = max(
+                (question for question in unique_questions.values() if question.question not in used_texts),
+                key=lambda question: len(question_coverage[question.question] & uncovered),
+                default=None,
+            )
+            if best is None:
+                break
+            newly_covered = question_coverage[best.question] & uncovered
+            if not newly_covered:
+                break
+            guaranteed.append(best)
+            used_texts.add(best.question)
+            uncovered -= newly_covered
+
+        if uncovered:
+            logger.debug(
+                f"{len(uncovered)} candidate(s) indistinguishable by available questions; "
+                "falling back to post-submission matching."
+            )
+
+        remaining_pool = [question for question in sampled if question.question not in used_texts]
+        remaining = random.sample(remaining_pool, min(max_questions - len(guaranteed), len(remaining_pool)))
+
+        result = guaranteed + remaining
+        random.shuffle(result)
+        return result
+
+    def build_answer_map(self) -> dict[str, str]:
+        answer_map: dict[str, str] = {}
+        for offset, role_label in self._PERSON_ROLES:
+            for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
+                value = _normalize_str(self.infos.get(offset + field_key))
+                if not value:
+                    continue
+                label = _(label_tpl).format(label=_(role_label))
+                extractor = extractor_cls(label, value)
+                for question_data in extractor.iter_all_questions():
+                    answer_map[question_data.question] = question_data.answer
+
+        value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
+        if value:
+            for question_data in LetterExtractor(_("Administrative area"), value).iter_all_questions():
+                answer_map[question_data.question] = question_data.answer
+
+        return answer_map
+
+    def matches_answers(self, asked: list[tuple[str, str]]) -> bool:
+        if not asked:
+            return False
+        answer_map = self.build_answer_map()
+        return all(
+            answer_map.get(question_text, "").lower() == user_answer.lower() for question_text, user_answer in asked
+        )

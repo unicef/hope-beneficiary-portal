@@ -1,8 +1,11 @@
+import re
 from typing import TYPE_CHECKING, Any
 
 import phonenumbers
 from django import forms
 from django.core import signing
+from django.db.models import CharField, Func, Value
+from django.db.models.functions import Replace
 from django.forms.renderers import DjangoTemplates
 from phonenumbers import NumberParseException
 
@@ -12,6 +15,13 @@ from hope_portal.modules.security.guards import RegistrationAttemptGuard
 
 if TYPE_CHECKING:
     from phonenumbers.phonenumber import PhoneNumber
+
+
+class _RegexpReplace(Func):
+    """PostgreSQL REGEXP_REPLACE(source, pattern, replacement)."""
+
+    function = "REGEXP_REPLACE"
+    output_field = CharField()
 
 
 class QuestionRenderer(DjangoTemplates):
@@ -106,20 +116,33 @@ class StartForm(BaseForm):
         self.key = kwargs.pop("key", None)
         super().__init__(*args, **kwargs)
 
-    def clean_registration_number(self) -> Household:
-        try:
-            guard = RegistrationAttemptGuard(self.cleaned_data["registration_number"])
-            if guard.is_locked_out():
-                raise FlowLockoutError(guard.get_lockout_message())
-            if not (
-                hh := Household.objects.filter(program_registration_id=self.cleaned_data["registration_number"])
-                .order_by("-created_at")
-                .first()
-            ):
-                raise Household.DoesNotExist()
-            return hh
-        except Household.DoesNotExist:
-            raise forms.ValidationError("Registration number not found") from None
+    def clean_registration_number(self) -> list[Household]:
+        registration_number = self.cleaned_data["registration_number"]
+        guard = RegistrationAttemptGuard(registration_number)
+        if guard.is_locked_out():
+            raise FlowLockoutError(guard.get_lockout_message())
+
+        registration_number_normalized = re.sub(r"#\d+$", "", re.sub(r"[-\s]", "", registration_number.strip()))
+
+        program_registration_id_no_dashes = Replace(
+            Replace("program_registration_id", Value("-"), Value("")),
+            Value(" "),
+            Value(""),
+        )
+        program_registration_id_normalized = _RegexpReplace(
+            program_registration_id_no_dashes,
+            Value(r"#[0-9]+$"),
+            Value(""),
+        )
+
+        candidates = list(
+            Household.objects.annotate(_normalized_program_registration_id=program_registration_id_normalized)
+            .filter(_normalized_program_registration_id=registration_number_normalized)
+            .order_by("-created_at")
+        )
+        if not candidates:
+            raise forms.ValidationError("Registration number not found")
+        return candidates
 
 
 class QuestionForm(forms.Form):
@@ -135,19 +158,21 @@ class QuestionForm(forms.Form):
         self.key = kwargs.pop("key", None)
         super().__init__(*args, **kwargs)
 
-    def sign(self, k: str, v: str) -> str:
-        return signing.TimestampSigner().sign_object([k, v])
+    def sign(self, question_text: str) -> str:
+        """Sign the question text for tamper-detection. The expected answer is kept server-side."""
+        return signing.TimestampSigner().sign_object(question_text)
 
-    def unsign(self, key: str) -> tuple[str, str]:
-        return signing.TimestampSigner().unsign_object(key)
+    def unsign(self, signed_value: str) -> str:
+        """Return the signed question text, raising BadSignature if tampered."""
+        return signing.TimestampSigner().unsign_object(signed_value)
 
-    def check_value(self) -> bool:
-        signer = signing.TimestampSigner()
+    def check_value(self, expected_answer: str) -> bool:
+        """Verify the signed question is untampered, then compare the answer."""
         try:
-            data = signer.unsign_object(self.cleaned_data["signed"])
-            return str(data[1]).lower() == str(self.cleaned_data["question"]).lower()
+            signing.TimestampSigner().unsign_object(self.cleaned_data["signed"])
         except signing.BadSignature:
             return False
+        return str(expected_answer).lower() == str(self.cleaned_data["question"]).lower()
 
 
 class QuestionBaseFormSet(forms.BaseFormSet[QuestionForm]):
