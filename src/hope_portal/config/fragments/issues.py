@@ -1,7 +1,7 @@
 from .. import env
 
 ISSUES_API_TOKEN = env("ISSUES_API_TOKEN", default="")
-ISSUES_PROJECT = env("ISSUES_PROJECT", default="")
+ISSUES_PROJECT = env("ISSUES_PROJECT", default="unicef/hope-beneficiary-portal")
 ISSUES_CONFIGURED = bool(ISSUES_API_TOKEN and ISSUES_PROJECT)
 
 ISSUES = {
