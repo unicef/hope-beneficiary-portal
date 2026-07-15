@@ -3,6 +3,7 @@ import sys
 import time
 from pathlib import Path
 
+from constance.test import override_config
 from faker import Faker
 
 import pytest
@@ -83,3 +84,13 @@ def enable_flow_flags():
     yield
 
     settings.FLAGS = original_flags
+
+
+@pytest.fixture(autouse=True)
+def _default_name_questions_enabled_for_tests():
+    """VERIFICATION_ENABLE_NAME_QUESTIONS defaults to False in the app (see constance.py),
+    but most of the test suite uses given/middle/last name as its go-to field for generic
+    question-generation mechanics, predating that toggle. Keep that working by default here;
+    tests exercising the toggle itself override it explicitly with @override_config."""
+    with override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True):
+        yield

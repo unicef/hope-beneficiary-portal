@@ -20,4 +20,5 @@ def theme(request: HttpRequest) -> dict[str, Any]:
         "site_media": SiteMedia(),
         "theme": {"mode": mode, "size": size},
         "LOGOUT_TIMEOUT_MS": settings.LOGOUT_TIMEOUT_MS,
+        "ISSUES_CONFIGURED": settings.ISSUES_CONFIGURED,
     }

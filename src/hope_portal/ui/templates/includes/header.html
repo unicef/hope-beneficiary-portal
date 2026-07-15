@@ -7,7 +7,7 @@
     </div>
     <div class="navbar-end">
         {% flag_enabled "SHOW_OPEN_ISSUE" as show_open_issue %}
-        {% if show_open_issue %}
+        {% if show_open_issue and ISSUES_CONFIGURED %}
             <a id="issue-opener" class="btn btn-ghost text-primary-content border border-primary-content/30 ml-2 px-1">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      fill="none"

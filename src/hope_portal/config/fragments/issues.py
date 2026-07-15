@@ -1,9 +1,15 @@
+from .. import env
+
+ISSUES_API_TOKEN = env("ISSUES_API_TOKEN")
+ISSUES_PROJECT = env("ISSUES_PROJECT")
+ISSUES_CONFIGURED = bool(ISSUES_API_TOKEN and ISSUES_PROJECT)
+
 ISSUES = {
     "BACKEND": "issues.backends.github.Backend",
     "RENDERER": "html2canvas-pro",
     "OPTIONS": {
-        "API_TOKEN": "your_gitlab_private_access_token",
-        "PROJECT": "your_project_id_or_path",
+        "API_TOKEN": ISSUES_API_TOKEN,
+        "PROJECT": ISSUES_PROJECT,
     },
     "ANNOTATIONS": {
         "get_client_ip": "issues.utils.get_client_ip",

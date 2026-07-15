@@ -1,5 +1,6 @@
 import logging
 import random
+import re
 from hashlib import sha256
 from typing import Any
 
@@ -32,7 +33,12 @@ MIDDLE_NAME = 6
 PHONE_ALT = 7
 FIRST_REG = 8
 
-ADMIN2 = 10
+ADMIN1 = 10
+ADMIN2 = 11
+ADMIN3 = 12
+ADMIN4 = 13
+
+ADMIN_LEVEL_KEYS: dict[int, int] = {1: ADMIN1, 2: ADMIN2, 3: ADMIN3, 4: ADMIN4}
 
 HEAD_DOB = HEAD + DOB
 HEAD_GIVEN_NAME = HEAD + GIVEN_NAME
@@ -46,6 +52,11 @@ PRIMARY_COLLECTOR_PHONE = PRIMARY_COLLECTOR + PHONE
 
 IBAN_ACCOUNT_TYPE_KEYS = ("bank", "iban")
 
+# Given/middle/last name questions are gated behind VERIFICATION_ENABLE_NAME_QUESTIONS
+# (disabled by default) — many households only ever had a combined full name captured,
+# making these questions unreliable until that data quality issue is resolved.
+_NAME_FIELDS = frozenset({GIVEN_NAME, MIDDLE_NAME, LAST_NAME})
+
 
 def _normalize_str(value: Any) -> Any:
     if isinstance(value, str):
@@ -55,6 +66,13 @@ def _normalize_str(value: Any) -> Any:
 
 def _has_question_value(value: Any) -> bool:
     return bool(_normalize_str(value))
+
+
+_NON_DIGIT_RE = re.compile(r"\D")
+
+
+def _digits_only(value: str) -> str:
+    return _NON_DIGIT_RE.sub("", value)
 
 
 class Inspector:
@@ -87,11 +105,9 @@ class Inspector:
         if _has_question_value(person.family_name):
             infos[offset + LAST_NAME] = _normalize_str(person.family_name)
         if _has_question_value(person.phone_no):
-            phone_no = _normalize_str(person.phone_no)
-            infos[offset + PHONE] = phone_no.removeprefix("+")
+            infos[offset + PHONE] = _digits_only(_normalize_str(person.phone_no))
         if _has_question_value(person.phone_no_alternative):
-            phone_no_alternative = _normalize_str(person.phone_no_alternative)
-            infos[offset + PHONE_ALT] = phone_no_alternative.removeprefix("+")
+            infos[offset + PHONE_ALT] = _digits_only(_normalize_str(person.phone_no_alternative))
         if person.first_registration_date:
             infos[offset + FIRST_REG] = person.first_registration_date
         if iban := self._get_individual_iban(person):
@@ -100,12 +116,21 @@ class Inspector:
                 infos[offset + IBAN] = iban
         return infos
 
+    @staticmethod
+    def _admin_label(level: int) -> str:
+        return _("Administrative area (Admin Level {level})").format(level=level)
+
+    @staticmethod
+    def _name_questions_enabled() -> bool:
+        return bool(config.VERIFICATION_ENABLE_NAME_QUESTIONS)
+
     def _collect_household_data(self) -> dict[int, Any]:
         infos: dict[int, Any] = {}
-        admin2 = getattr(self.household, "admin2", None)
-        admin2_name = _normalize_str(getattr(admin2, "name", None))
-        if admin2 and admin2_name:
-            infos[HOUSEHOLD + ADMIN2] = admin2_name
+        for level, key in ADMIN_LEVEL_KEYS.items():
+            admin = getattr(self.household, f"admin{level}", None)
+            admin_name = _normalize_str(getattr(admin, "name", None))
+            if admin and admin_name:
+                infos[HOUSEHOLD + key] = admin_name
         return infos
 
     def _person_cache_parts(self, person: Individual | None) -> tuple[str, ...]:
@@ -124,16 +149,21 @@ class Inspector:
             str(iban),
         )
 
+    def _admin_cache_parts(self) -> tuple[str, ...]:
+        return tuple(
+            str(_normalize_str(getattr(getattr(self.household, f"admin{level}", None), "name", None)) or "")
+            for level in ADMIN_LEVEL_KEYS
+        )
+
     def _cache_key(self) -> str:
         head = self.household.head_of_household
         primary_collector = self.household.primary_collector  # type: ignore[attr-defined]
-        admin2_name = _normalize_str(getattr(getattr(self.household, "admin2", None), "name", None)) or ""
         cache_fingerprint = "\x1f".join(
             (
                 str(self.household.program_registration_id),
                 *self._person_cache_parts(head),
                 *self._person_cache_parts(primary_collector),
-                str(admin2_name),
+                *self._admin_cache_parts(),
             )
         )
         digest = sha256(cache_fingerprint.encode("utf-8")).hexdigest()
@@ -171,8 +201,11 @@ class Inspector:
 
     def _collect_per_person_questions(self, per_field: int) -> list[QuestionData]:
         questions: list[QuestionData] = []
+        name_questions_enabled = self._name_questions_enabled()
         for offset, role_label in self._PERSON_ROLES:
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
+                if field_key in _NAME_FIELDS and not name_questions_enabled:
+                    continue
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
                     continue
@@ -182,23 +215,28 @@ class Inspector:
 
     def _collect_household_questions(self, per_field: int) -> list[QuestionData]:
         questions: list[QuestionData] = []
-        value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
-        if value:
-            questions.extend(LetterExtractor(_("Administrative area"), value).get_questions(per_field))
+        for level, key in ADMIN_LEVEL_KEYS.items():
+            value = _normalize_str(self.infos.get(HOUSEHOLD + key))
+            if value:
+                questions.extend(LetterExtractor(self._admin_label(level), value).get_questions(per_field))
         return questions
 
     def _collect_all_questions(self) -> list[QuestionData]:
         questions: list[QuestionData] = []
+        name_questions_enabled = self._name_questions_enabled()
         for offset, role_label in self._PERSON_ROLES:
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
+                if field_key in _NAME_FIELDS and not name_questions_enabled:
+                    continue
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
                     continue
                 label = _(label_tpl).format(label=_(role_label))
                 questions.extend(extractor_cls(label, value).iter_all_questions())
-        value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
-        if value:
-            questions.extend(LetterExtractor(_("Administrative area"), value).iter_all_questions())
+        for level, key in ADMIN_LEVEL_KEYS.items():
+            value = _normalize_str(self.infos.get(HOUSEHOLD + key))
+            if value:
+                questions.extend(LetterExtractor(self._admin_label(level), value).iter_all_questions())
         return questions
 
     def get_questions(self, other_candidates: list["Household"] | None = None) -> list[QuestionData]:
@@ -271,8 +309,11 @@ class Inspector:
 
     def build_answer_map(self) -> dict[str, str]:
         answer_map: dict[str, str] = {}
+        name_questions_enabled = self._name_questions_enabled()
         for offset, role_label in self._PERSON_ROLES:
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
+                if field_key in _NAME_FIELDS and not name_questions_enabled:
+                    continue
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
                     continue
@@ -281,10 +322,11 @@ class Inspector:
                 for question_data in extractor.iter_all_questions():
                     answer_map[question_data.question] = question_data.answer
 
-        value = _normalize_str(self.infos.get(HOUSEHOLD + ADMIN2))
-        if value:
-            for question_data in LetterExtractor(_("Administrative area"), value).iter_all_questions():
-                answer_map[question_data.question] = question_data.answer
+        for level, key in ADMIN_LEVEL_KEYS.items():
+            value = _normalize_str(self.infos.get(HOUSEHOLD + key))
+            if value:
+                for question_data in LetterExtractor(self._admin_label(level), value).iter_all_questions():
+                    answer_map[question_data.question] = question_data.answer
 
         return answer_map
 

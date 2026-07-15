@@ -173,6 +173,21 @@ DEFAULTS = {
     ),
     "GDAL_LIBRARY_PATH": (str, None, None, False, "The path to the GDAL library."),
     "GEOS_LIBRARY_PATH": (str, None, None, False, "The path to the GEOS library."),
+    "ISSUES_API_TOKEN": (
+        str,
+        "",
+        "",
+        True,
+        "The access token used by the header 'Open Issue' widget (GitHub backend). "
+        "Leave empty to hide the widget.",
+    ),
+    "ISSUES_PROJECT": (
+        str,
+        "",
+        "",
+        False,
+        "The GitHub project (owner/repo) used by the header 'Open Issue' widget.",
+    ),
     "LOGGING_LEVEL": (
         str,
         "CRITICAL",

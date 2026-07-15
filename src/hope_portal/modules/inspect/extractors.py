@@ -89,7 +89,10 @@ class LetterExtractor(Extractor):
 
 class PhoneNumberExtractor(LetterExtractor):
     QUESTION = "What is the {ordinal} digit of '{label}'?"
-    HINT = ""
+    HINT = _(
+        "Count digits starting right after the leading '+' sign "
+        "(the international/country calling code counts as the first digits)."
+    )
 
     def __init__(self, label: str, value: str) -> None:
         super().__init__(label, value)

@@ -29,6 +29,18 @@ CONSTANCE_CONFIG: dict[str, tuple[Any, str, Any]] = {
     "MAX_QUESTIONS": (20, "Max number if questions to ask to indentify beneficiart", int),
     "MAX_QUESTIONS_PER_FIELD": (2, "Max questions generated from a single field", int),
     "MIN_QUESTIONS": (8, "Min number if questions that must be available to make identification safe", int),
+    "VERIFICATION_PASS_THRESHOLD": (
+        100,
+        "Minimum percentage (1-100) of asked security questions that must be answered correctly to pass "
+        "identification. 100 means every question must be correct.",
+        int,
+    ),
+    "VERIFICATION_ENABLE_NAME_QUESTIONS": (
+        False,
+        "Ask verification questions about given/middle/last name letters. Disabled by default: many "
+        "households only have a combined full name captured, making these questions unreliable.",
+        bool,
+    ),
     "MAX_VISITOR_ATTEMPTS": (5, "Max number of attempts per user (cookie based, not really safe)", int),
     "MAX_REGISTRATION_ATTEMPTS": (5, "Max number of attempts per registration number", int),
     "MAX_REGISTRATION_LOCKOUT_HOURS": (
