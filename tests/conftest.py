@@ -87,11 +87,16 @@ def enable_flow_flags():
 
 
 @pytest.fixture(autouse=True)
-def _default_name_questions_enabled_for_tests():
+def _default_name_questions_enabled_for_tests(db):
     """VERIFICATION_ENABLED_FIELDS excludes given/middle/last name by default (see constance.py),
     but most of the test suite uses given name as its go-to field for generic question-generation
     mechanics, predating that setting. Keep that working by default here; tests exercising the
-    field-selection behavior itself override VERIFICATION_ENABLED_FIELDS explicitly."""
+    field-selection behavior itself override VERIFICATION_ENABLED_FIELDS explicitly.
+
+    Depends on the `db` fixture so that pytest-django enables database access for every test
+    (needed because overriding a constance setting reads/writes it via the database backend),
+    even for tests that don't otherwise touch the database.
+    """
     from hope_portal.utils.verification_fields import VerificationField
 
     with override_config(VERIFICATION_ENABLED_FIELDS=VerificationField.values):
