@@ -3,7 +3,9 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from constance import config
 from django.contrib.auth.models import Group
-from django.forms import ChoiceField, TextInput, Textarea, Widget
+from django.forms import CheckboxSelectMultiple, ChoiceField, MultipleChoiceField, TextInput, Textarea, Widget
+
+from hope_portal.utils.verification_fields import VerificationField
 
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import UploadedFile
@@ -22,6 +24,14 @@ class GroupSelect(ChoiceField):
             (c["pk"], c["name"]) for c in Group.objects.values("pk", "name")
         ]
         kwargs["choices"] = ret
+        super().__init__(**kwargs)
+
+
+class VerificationFieldsSelect(MultipleChoiceField):
+    def __init__(self, **kwargs: Any) -> None:
+        kwargs["choices"] = VerificationField.choices
+        kwargs["widget"] = CheckboxSelectMultiple
+        kwargs["required"] = False
         super().__init__(**kwargs)
 
 

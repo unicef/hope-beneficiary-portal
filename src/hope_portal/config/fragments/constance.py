@@ -1,5 +1,7 @@
 from typing import Any
 
+from hope_portal.utils.verification_fields import DEFAULT_ENABLED_VERIFICATION_FIELDS
+
 from .. import env
 from .mail import MAILJET_API_KEY, MAILJET_SECRET_KEY
 
@@ -14,6 +16,10 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     "group_select": [
         "hope_portal.utils.constance.GroupSelect",
         {"initial": None},
+    ],
+    "verification_fields_select": [
+        "hope_portal.utils.constance.VerificationFieldsSelect",
+        {"required": False},
     ],
 }
 
@@ -35,11 +41,10 @@ CONSTANCE_CONFIG: dict[str, tuple[Any, str, Any]] = {
         "identification. 100 means every question must be correct.",
         int,
     ),
-    "VERIFICATION_ENABLE_NAME_QUESTIONS": (
-        False,
-        "Ask verification questions about given/middle/last name letters. Disabled by default: many "
-        "households only have a combined full name captured, making these questions unreliable.",
-        bool,
+    "VERIFICATION_ENABLED_FIELDS": (
+        DEFAULT_ENABLED_VERIFICATION_FIELDS,
+        "Which data fields may be used to generate identity-verification questions.",
+        "verification_fields_select",
     ),
     "MAX_VISITOR_ATTEMPTS": (5, "Max number of attempts per user (cookie based, not really safe)", int),
     "MAX_REGISTRATION_ATTEMPTS": (5, "Max number of attempts per registration number", int),

@@ -88,9 +88,11 @@ def enable_flow_flags():
 
 @pytest.fixture(autouse=True)
 def _default_name_questions_enabled_for_tests():
-    """VERIFICATION_ENABLE_NAME_QUESTIONS defaults to False in the app (see constance.py),
-    but most of the test suite uses given/middle/last name as its go-to field for generic
-    question-generation mechanics, predating that toggle. Keep that working by default here;
-    tests exercising the toggle itself override it explicitly with @override_config."""
-    with override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True):
+    """VERIFICATION_ENABLED_FIELDS excludes given/middle/last name by default (see constance.py),
+    but most of the test suite uses given name as its go-to field for generic question-generation
+    mechanics, predating that setting. Keep that working by default here; tests exercising the
+    field-selection behavior itself override VERIFICATION_ENABLED_FIELDS explicitly."""
+    from hope_portal.utils.verification_fields import VerificationField
+
+    with override_config(VERIFICATION_ENABLED_FIELDS=VerificationField.values):
         yield

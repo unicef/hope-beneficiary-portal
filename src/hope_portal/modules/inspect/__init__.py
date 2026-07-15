@@ -17,6 +17,7 @@ from hope_portal.modules.inspect.extractors import (
     PhoneNumberExtractor,
     QuestionData,
 )
+from hope_portal.utils.verification_fields import VerificationField
 
 logger = logging.getLogger(__name__)
 
@@ -52,10 +53,33 @@ PRIMARY_COLLECTOR_PHONE = PRIMARY_COLLECTOR + PHONE
 
 IBAN_ACCOUNT_TYPE_KEYS = ("bank", "iban")
 
-# Given/middle/last name questions are gated behind VERIFICATION_ENABLE_NAME_QUESTIONS
-# (disabled by default) — many households only ever had a combined full name captured,
-# making these questions unreliable until that data quality issue is resolved.
-_NAME_FIELDS = frozenset({GIVEN_NAME, MIDDLE_NAME, LAST_NAME})
+# Maps each selectable VERIFICATION_ENABLED_FIELDS key (see hope_portal.utils.verification_fields)
+# to the internal per-person field key it gates. Admin levels aren't per-person fields — they're
+# handled separately via ADMIN_AREA_SELECT_KEYS, one selectable key per level.
+_PERSON_FIELD_SELECT_KEYS: dict[int, str] = {
+    DOB: VerificationField.DOB.value,
+    GIVEN_NAME: VerificationField.GIVEN_NAME.value,
+    MIDDLE_NAME: VerificationField.MIDDLE_NAME.value,
+    LAST_NAME: VerificationField.LAST_NAME.value,
+    PHONE: VerificationField.PHONE.value,
+    PHONE_ALT: VerificationField.PHONE_ALT.value,
+    FIRST_REG: VerificationField.FIRST_REGISTRATION_DATE.value,
+    IBAN: VerificationField.IBAN.value,
+}
+ADMIN_AREA_SELECT_KEYS: dict[int, str] = {
+    1: VerificationField.ADMIN_AREA1.value,
+    2: VerificationField.ADMIN_AREA2.value,
+    3: VerificationField.ADMIN_AREA3.value,
+    4: VerificationField.ADMIN_AREA4.value,
+}
+
+_expected_select_keys = set(_PERSON_FIELD_SELECT_KEYS.values()) | set(ADMIN_AREA_SELECT_KEYS.values())
+_actual_select_keys = set(VerificationField.values)
+if _actual_select_keys != _expected_select_keys:
+    raise ValueError(
+        "VerificationField is out of sync with Inspector's field mapping: "
+        f"expected {_expected_select_keys!r}, got {_actual_select_keys!r}"
+    )
 
 
 def _normalize_str(value: Any) -> Any:
@@ -121,8 +145,11 @@ class Inspector:
         return _("Administrative area (Admin Level {level})").format(level=level)
 
     @staticmethod
-    def _name_questions_enabled() -> bool:
-        return bool(config.VERIFICATION_ENABLE_NAME_QUESTIONS)
+    def _enabled_fields() -> frozenset[str]:
+        try:
+            return frozenset(config.VERIFICATION_ENABLED_FIELDS)
+        except TypeError:
+            return frozenset()
 
     def _collect_household_data(self) -> dict[int, Any]:
         infos: dict[int, Any] = {}
@@ -201,10 +228,10 @@ class Inspector:
 
     def _collect_per_person_questions(self, per_field: int) -> list[QuestionData]:
         questions: list[QuestionData] = []
-        name_questions_enabled = self._name_questions_enabled()
+        enabled_fields = self._enabled_fields()
         for offset, role_label in self._PERSON_ROLES:
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
-                if field_key in _NAME_FIELDS and not name_questions_enabled:
+                if _PERSON_FIELD_SELECT_KEYS[field_key] not in enabled_fields:
                     continue
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
@@ -215,7 +242,10 @@ class Inspector:
 
     def _collect_household_questions(self, per_field: int) -> list[QuestionData]:
         questions: list[QuestionData] = []
+        enabled_fields = self._enabled_fields()
         for level, key in ADMIN_LEVEL_KEYS.items():
+            if ADMIN_AREA_SELECT_KEYS[level] not in enabled_fields:
+                continue
             value = _normalize_str(self.infos.get(HOUSEHOLD + key))
             if value:
                 questions.extend(LetterExtractor(self._admin_label(level), value).get_questions(per_field))
@@ -223,10 +253,10 @@ class Inspector:
 
     def _collect_all_questions(self) -> list[QuestionData]:
         questions: list[QuestionData] = []
-        name_questions_enabled = self._name_questions_enabled()
+        enabled_fields = self._enabled_fields()
         for offset, role_label in self._PERSON_ROLES:
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
-                if field_key in _NAME_FIELDS and not name_questions_enabled:
+                if _PERSON_FIELD_SELECT_KEYS[field_key] not in enabled_fields:
                     continue
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
@@ -234,6 +264,8 @@ class Inspector:
                 label = _(label_tpl).format(label=_(role_label))
                 questions.extend(extractor_cls(label, value).iter_all_questions())
         for level, key in ADMIN_LEVEL_KEYS.items():
+            if ADMIN_AREA_SELECT_KEYS[level] not in enabled_fields:
+                continue
             value = _normalize_str(self.infos.get(HOUSEHOLD + key))
             if value:
                 questions.extend(LetterExtractor(self._admin_label(level), value).iter_all_questions())
@@ -309,10 +341,10 @@ class Inspector:
 
     def build_answer_map(self) -> dict[str, str]:
         answer_map: dict[str, str] = {}
-        name_questions_enabled = self._name_questions_enabled()
+        enabled_fields = self._enabled_fields()
         for offset, role_label in self._PERSON_ROLES:
             for field_key, label_tpl, extractor_cls in self._PERSON_FIELDS:
-                if field_key in _NAME_FIELDS and not name_questions_enabled:
+                if _PERSON_FIELD_SELECT_KEYS[field_key] not in enabled_fields:
                     continue
                 value = _normalize_str(self.infos.get(offset + field_key))
                 if not value:
@@ -323,6 +355,8 @@ class Inspector:
                     answer_map[question_data.question] = question_data.answer
 
         for level, key in ADMIN_LEVEL_KEYS.items():
+            if ADMIN_AREA_SELECT_KEYS[level] not in enabled_fields:
+                continue
             value = _normalize_str(self.infos.get(HOUSEHOLD + key))
             if value:
                 for question_data in LetterExtractor(self._admin_label(level), value).iter_all_questions():

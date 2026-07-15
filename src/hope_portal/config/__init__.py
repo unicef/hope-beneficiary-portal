@@ -177,9 +177,8 @@ DEFAULTS = {
         str,
         "",
         "",
-        True,
-        "The access token used by the header 'Open Issue' widget (GitHub backend). "
-        "Leave empty to hide the widget.",
+        False,
+        "The access token used by the header 'Open Issue' widget (GitHub backend). Leave empty to hide the widget.",
     ),
     "ISSUES_PROJECT": (
         str,

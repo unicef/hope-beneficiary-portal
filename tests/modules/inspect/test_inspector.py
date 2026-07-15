@@ -3,8 +3,16 @@ from constance.test import override_config
 from django.core.cache import cache
 from django.utils import timezone
 
-from hope_portal.modules.inspect import HEAD, MIDDLE_NAME, PHONE, Inspector, _digits_only
+from hope_portal.modules.inspect import ADMIN1, ADMIN2, HEAD, HOUSEHOLD, MIDDLE_NAME, PHONE, Inspector, _digits_only
+from hope_portal.utils.verification_fields import VerificationField
 from testutils.factories.hope.houshold import HouseholdFactory
+
+ALL_VERIFICATION_FIELDS = VerificationField.values
+FIELDS_WITHOUT_NAMES = [
+    key
+    for key in ALL_VERIFICATION_FIELDS
+    if key not in (VerificationField.GIVEN_NAME, VerificationField.MIDDLE_NAME, VerificationField.LAST_NAME)
+]
 
 
 def _household_with_only_given_name(given_name: str) -> object:
@@ -54,9 +62,7 @@ def test_cache_key_changes_when_middle_name_changes():
     assert HEAD + MIDDLE_NAME not in refreshed.infos
 
 
-# ---------------------------------------------------------------------------
 # phone number digit extraction — spaces/formatting must not shift digit positions
-# ---------------------------------------------------------------------------
 
 
 def test_digits_only_strips_plus_spaces_and_punctuation():
@@ -71,38 +77,42 @@ def test_collect_person_data_stores_phone_as_digits_only():
     assert inspector.infos[HEAD + PHONE] == "48609456001"
 
 
-# ---------------------------------------------------------------------------
-# VERIFICATION_ENABLE_NAME_QUESTIONS — name questions disabled by default
-# ---------------------------------------------------------------------------
+# VERIFICATION_ENABLED_FIELDS — admins choose exactly which fields are askable;
+# given/middle/last name are excluded from the default set (data-quality concerns).
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=False)
-def test_name_questions_excluded_by_default():
-    """Given/middle/last name questions are disabled out of the box (data-quality concerns)."""
+@override_config(VERIFICATION_ENABLED_FIELDS=FIELDS_WITHOUT_NAMES)
+def test_name_questions_excluded_when_not_in_enabled_fields():
     household = _household_with_only_given_name("Arsen")
     assert Inspector(household)._collect_all_questions() == []
     assert Inspector(household).build_answer_map() == {}
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
-def test_name_questions_included_when_enabled():
+@override_config(VERIFICATION_ENABLED_FIELDS=["given_name"])
+def test_name_questions_included_when_selected():
     household = _household_with_only_given_name("Arsen")
     questions = Inspector(household)._collect_all_questions()
     assert len(questions) == 5
     assert {q.answer for q in questions} == set("Arsen")
 
 
-# ---------------------------------------------------------------------------
-# _collect_all_questions
-# (name questions enabled below so these generic-mechanics tests keep using
-# "given name" as their vehicle field, independent of the name-questions toggle)
-# ---------------------------------------------------------------------------
+@pytest.mark.django_db
+@override_config(VERIFICATION_ENABLED_FIELDS=["phone"])
+def test_only_selected_fields_are_used_even_if_others_have_data():
+    household = HouseholdFactory(head_of_household__given_name="Arsen", head_of_household__phone_no="+48123456789")
+    answer_map = Inspector(household).build_answer_map()
+    assert answer_map
+    assert set(answer_map.values()) <= set("48123456789")
+
+
+# All fields enabled below so these generic-mechanics tests keep using "given name" as their
+# vehicle field, independent of VERIFICATION_ENABLED_FIELDS.
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_collect_all_questions_returns_every_position_for_given_name():
     household = _household_with_only_given_name("Arsen")
     questions = Inspector(household)._collect_all_questions()
@@ -111,19 +121,14 @@ def test_collect_all_questions_returns_every_position_for_given_name():
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_collect_all_questions_empty_household_returns_empty():
     household = _household_with_only_given_name("")
     assert Inspector(household)._collect_all_questions() == []
 
 
-# ---------------------------------------------------------------------------
-# build_answer_map
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_build_answer_map_contains_entry_for_every_position():
     household = _household_with_only_given_name("Arsen")
     answer_map = Inspector(household).build_answer_map()
@@ -132,7 +137,7 @@ def test_build_answer_map_contains_entry_for_every_position():
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_build_answer_map_is_keyed_by_question_text():
     household = _household_with_only_given_name("AB")
     answer_map = Inspector(household).build_answer_map()
@@ -141,13 +146,8 @@ def test_build_answer_map_is_keyed_by_question_text():
         assert answer in "AB"
 
 
-# ---------------------------------------------------------------------------
-# matches_answers
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_matches_answers_true_for_correct_answers():
     household = _household_with_only_given_name("Arsen")
     inspector = Inspector(household)
@@ -157,7 +157,7 @@ def test_matches_answers_true_for_correct_answers():
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_matches_answers_true_case_insensitive():
     household = _household_with_only_given_name("Arsen")
     inspector = Inspector(household)
@@ -167,7 +167,7 @@ def test_matches_answers_true_case_insensitive():
 
 
 @pytest.mark.django_db
-@override_config(VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS)
 def test_matches_answers_false_for_wrong_answer():
     household = _household_with_only_given_name("Arsen")
     inspector = Inspector(household)
@@ -190,10 +190,8 @@ def test_matches_answers_empty_list_returns_false():
     assert not Inspector(household).matches_answers([])
 
 
-# ---------------------------------------------------------------------------
-# Administrative area — all admin levels (1-4) are collected, not a single
-# configured level, so each question explicitly names which level it refers to.
-# ---------------------------------------------------------------------------
+# Administrative area — all admin levels (1-4) are collected, not a single configured level,
+# so each question explicitly names which level it refers to.
 
 
 def test_admin_label_names_the_level_explicitly():
@@ -209,13 +207,25 @@ def test_collect_household_data_has_no_admin_entries_when_areas_unset():
     assert Inspector(household)._collect_household_data() == {}
 
 
-# ---------------------------------------------------------------------------
-# get_questions — single candidate (no other_candidates)
-# ---------------------------------------------------------------------------
+@pytest.mark.django_db
+@override_config(VERIFICATION_ENABLED_FIELDS=["admin_area1"])
+def test_only_selected_admin_level_produces_questions():
+    """Each admin level (admin_area1..4) is independently toggleable in VERIFICATION_ENABLED_FIELDS."""
+    household = _household_with_only_given_name("Arsen")
+    cache.set(
+        Inspector(household)._cache_key(),
+        {HOUSEHOLD + ADMIN1: "Kyiv", HOUSEHOLD + ADMIN2: "Oblast"},
+        timeout=60,
+    )
+    answer_map = Inspector(household).build_answer_map()
+    assert answer_map
+    assert set(answer_map.values()) <= set("Kyiv")
 
 
 @pytest.mark.django_db
-@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3, MAX_QUESTIONS_PER_FIELD=3, VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(
+    MIN_QUESTIONS=1, MAX_QUESTIONS=3, MAX_QUESTIONS_PER_FIELD=3, VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS
+)
 def test_get_questions_single_candidate_returns_random_sample():
     household = _household_with_only_given_name("Arsen")
     questions = Inspector(household).get_questions()
@@ -229,13 +239,10 @@ def test_get_questions_below_min_returns_empty():
     assert Inspector(household).get_questions() == []
 
 
-# ---------------------------------------------------------------------------
-# get_questions — with other_candidates (discriminating set)
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.django_db
-@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=5, MAX_QUESTIONS_PER_FIELD=5, VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(
+    MIN_QUESTIONS=1, MAX_QUESTIONS=5, MAX_QUESTIONS_PER_FIELD=5, VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS
+)
 def test_get_questions_includes_discriminating_question_for_two_candidates():
     household_a = _household_with_only_given_name("Arsen")
     household_b = _household_with_only_given_name("Artem")
@@ -247,7 +254,9 @@ def test_get_questions_includes_discriminating_question_for_two_candidates():
 
 
 @pytest.mark.django_db
-@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=5, MAX_QUESTIONS_PER_FIELD=5, VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(
+    MIN_QUESTIONS=1, MAX_QUESTIONS=5, MAX_QUESTIONS_PER_FIELD=5, VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS
+)
 def test_get_discriminating_question_set_covers_all_pairs():
     # Arsen vs Artem vs Artom vs Arson — two discriminating positions needed.
     household_arsen = _household_with_only_given_name("Arsen")
@@ -266,7 +275,9 @@ def test_get_discriminating_question_set_covers_all_pairs():
 
 
 @pytest.mark.django_db
-@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=5, MAX_QUESTIONS_PER_FIELD=5, VERIFICATION_ENABLE_NAME_QUESTIONS=True)
+@override_config(
+    MIN_QUESTIONS=1, MAX_QUESTIONS=5, MAX_QUESTIONS_PER_FIELD=5, VERIFICATION_ENABLED_FIELDS=ALL_VERIFICATION_FIELDS
+)
 def test_get_questions_indistinguishable_candidates_logs_debug(caplog):
     import logging
 
