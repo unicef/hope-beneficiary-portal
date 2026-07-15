@@ -1,5 +1,7 @@
 from typing import Any
 
+from hope_portal.utils.verification_fields import DEFAULT_ENABLED_VERIFICATION_FIELDS
+
 from .. import env
 from .mail import MAILJET_API_KEY, MAILJET_SECRET_KEY
 
@@ -15,6 +17,10 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         "hope_portal.utils.constance.GroupSelect",
         {"initial": None},
     ],
+    "verification_fields_select": [
+        "hope_portal.utils.constance.VerificationFieldsSelect",
+        {"required": False},
+    ],
 }
 
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
@@ -29,6 +35,17 @@ CONSTANCE_CONFIG: dict[str, tuple[Any, str, Any]] = {
     "MAX_QUESTIONS": (20, "Max number if questions to ask to indentify beneficiart", int),
     "MAX_QUESTIONS_PER_FIELD": (2, "Max questions generated from a single field", int),
     "MIN_QUESTIONS": (8, "Min number if questions that must be available to make identification safe", int),
+    "VERIFICATION_PASS_THRESHOLD": (
+        100,
+        "Minimum percentage (1-100) of asked security questions that must be answered correctly to pass "
+        "identification. 100 means every question must be correct.",
+        int,
+    ),
+    "VERIFICATION_ENABLED_FIELDS": (
+        DEFAULT_ENABLED_VERIFICATION_FIELDS,
+        "Which data fields may be used to generate identity-verification questions.",
+        "verification_fields_select",
+    ),
     "MAX_VISITOR_ATTEMPTS": (5, "Max number of attempts per user (cookie based, not really safe)", int),
     "MAX_REGISTRATION_ATTEMPTS": (5, "Max number of attempts per registration number", int),
     "MAX_REGISTRATION_LOCKOUT_HOURS": (

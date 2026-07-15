@@ -1,6 +1,7 @@
 import logging
 from typing import Any
 
+from constance import config
 from django.conf import settings
 from django.core import signing
 from django.core.cache import cache
@@ -62,10 +63,11 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         if not asked:
             return HttpResponseRedirect(reverse("ui:flow:not-available"))
 
-        if all(
+        results = [
             form.check_value(expected_answers.get(question_text, ""))
             for form, (question_text, _) in zip(formset.forms, asked, strict=True)
-        ):
+        ]
+        if self._meets_pass_threshold(results):
             cache.delete(self._answers_cache_key())
             return self.form_valid(formset)
 
@@ -76,6 +78,17 @@ class AskView(TemplateResponseMixin, ContextMixin, ProcessFormView):
                 return self.form_valid(formset)
 
         return self.render_to_response(self.get_context_data(retry=True))
+
+    @staticmethod
+    def _meets_pass_threshold(results: list[bool]) -> bool:
+        if not results:
+            return False
+        try:
+            threshold = int(config.VERIFICATION_PASS_THRESHOLD)
+        except (TypeError, ValueError):
+            threshold = 100
+        threshold = max(1, min(100, threshold))
+        return (sum(results) / len(results)) * 100 >= threshold
 
     def _answers_cache_key(self) -> str:
         return f"portal:ask:{self.kwargs['signed_data']}"

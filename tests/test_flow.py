@@ -348,6 +348,65 @@ def test_ask_view_skips_candidate_with_no_questions_and_redirects(django_app):
 
 
 # ---------------------------------------------------------------------------
+# AskView: VERIFICATION_PASS_THRESHOLD — partial credit
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3, VERIFICATION_PASS_THRESHOLD=60)
+def test_ask_view_passes_with_partial_credit_above_threshold(django_app, household):
+    """2 correct answers out of 3 (~67%) passes when the threshold is 60%."""
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = household.program_registration_id
+    res = res.forms["reg-form"].submit().follow()
+
+    with mock.patch(
+        "hope_portal.ui.forms.flow.QuestionForm.check_value",
+        side_effect=[True, True, False],
+    ):
+        res.forms["ask-form"]["form-0-question"] = "any"
+        res.forms["ask-form"]["form-1-question"] = "any"
+        res.forms["ask-form"]["form-2-question"] = "any"
+        res = res.forms["ask-form"].submit()
+
+    assert res.status_code == 302
+    assert "info" in res.location
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3, VERIFICATION_PASS_THRESHOLD=100)
+def test_ask_view_fails_with_partial_credit_at_default_threshold(django_app, household):
+    """The same 2-out-of-3 answers fail when the threshold is left at 100% (all-or-nothing)."""
+    url = reverse("ui:flow:start-registration")
+    res = django_app.get(url)
+    res.forms["reg-form"]["registration_number"] = household.program_registration_id
+    res = res.forms["reg-form"].submit().follow()
+
+    with mock.patch(
+        "hope_portal.ui.forms.flow.QuestionForm.check_value",
+        side_effect=[True, True, False],
+    ):
+        res.forms["ask-form"]["form-0-question"] = "any"
+        res.forms["ask-form"]["form-1-question"] = "any"
+        res.forms["ask-form"]["form-2-question"] = "any"
+        res = res.forms["ask-form"].submit()
+
+    assert res.status_code == 200
+    assert b"Sorry cannot find your data" in res.content
+
+
+@pytest.mark.django_db
+@override_config(VERIFICATION_PASS_THRESHOLD=100)
+def test_meets_pass_threshold_boundaries():
+    from hope_portal.ui.views.flow.ask import AskView
+
+    assert AskView._meets_pass_threshold([True, True, True])
+    assert not AskView._meets_pass_threshold([])
+    assert not AskView._meets_pass_threshold([True, False, False])
+
+
+# ---------------------------------------------------------------------------
 # AskView: GET — all candidates have no questions → not-available
 # ---------------------------------------------------------------------------
 
