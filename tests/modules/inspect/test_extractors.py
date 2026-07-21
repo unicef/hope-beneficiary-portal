@@ -3,6 +3,7 @@ import datetime
 
 from hope_portal.modules.inspect.extractors import (
     DateExtractor,
+    DocumentNumberExtractor,
     IbanExtractor,
     LetterExtractor,
     PhoneNumberExtractor,
@@ -41,6 +42,14 @@ def test_iban_extractor_iter_all_questions_strips_spaces():
     extractor = IbanExtractor("IBAN", "PL 61 1090")
     questions = extractor.iter_all_questions()
     assert len(questions) == 8
+    assert all(q.answer != " " for q in questions)
+
+
+def test_document_number_extractor_iter_all_questions_strips_spaces():
+    # "AB 12 34" → spaces removed → "AB1234" (6 chars)
+    extractor = DocumentNumberExtractor("Document number", "AB 12 34")
+    questions = extractor.iter_all_questions()
+    assert len(questions) == 6
     assert all(q.answer != " " for q in questions)
 
 

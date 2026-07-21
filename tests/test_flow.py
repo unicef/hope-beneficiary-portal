@@ -83,7 +83,7 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
     settings.HOPE_API_TIMEOUT = 5
 
     info_res = _go_to_info_page(django_app, household)
-    issue_link = info_res.pyquery("a:contains('Open issue')").attr("href")
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
     assert issue_link
 
     captured = {}
@@ -111,7 +111,7 @@ def test_flow_open_issue_requires_ticket_service_config(django_app, household, s
     settings.HOPE_API_TOKEN = ""
 
     info_res = _go_to_info_page(django_app, household)
-    issue_link = info_res.pyquery("a:contains('Open issue')").attr("href")
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
     assert issue_link
 
     def _fail_create(self, business_area_slug, description, program_id=None):
@@ -139,7 +139,7 @@ def test_flow_open_issue_form_no_longer_shows_business_area_choice(django_app, h
     )
 
     info_res = _go_to_info_page(django_app, household)
-    issue_link = info_res.pyquery("a:contains('Open issue')").attr("href")
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
     issue_res = django_app.get(issue_link)
 
     assert issue_res.status_code == 200
@@ -158,7 +158,7 @@ def test_flow_open_issue_requires_available_business_area(django_app, household,
     household.program.business_area.save(update_fields=["slug"])
 
     info_res = _go_to_info_page(django_app, household)
-    issue_link = info_res.pyquery("a:contains('Open issue')").attr("href")
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
     assert issue_link
 
     def _fail_create(self, business_area_slug, description, program_id=None):

@@ -1,5 +1,5 @@
 {% if not field.is_hidden %}
-    <div class="floating-field">
+    <div class="floating-field{% if field.name == "question" %} floating-field--long-label{% endif %}">
         {{ field.errors }}
         {{ field }}
         <label>

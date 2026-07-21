@@ -10,6 +10,7 @@ class VerificationField(TextChoices):
     PHONE_ALT = "phone_alt", "Alternative phone number"
     FIRST_REGISTRATION_DATE = "first_registration_date", "First registration date"
     IBAN = "iban", "IBAN / account number"
+    DOCUMENT_NUMBER = "document_number", "Document number"
     ADMIN_AREA1 = "admin_area1", "Administrative area (Admin Level 1)"
     ADMIN_AREA2 = "admin_area2", "Administrative area (Admin Level 2)"
     ADMIN_AREA3 = "admin_area3", "Administrative area (Admin Level 3)"

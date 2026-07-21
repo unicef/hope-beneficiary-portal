@@ -501,7 +501,7 @@ msgid "Home"
 msgstr "Inicio"
 
 #: ui/templates/unfold/helpers/userlinks.html:12
-msgid "Open Issue"
+msgid "Open Support Issue"
 msgstr "Abrir Incidencia"
 
 #~ msgid "HOPE"

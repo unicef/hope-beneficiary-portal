@@ -441,7 +441,7 @@
         <div class="flex flex-wrap justify-center gap-3 mt-6">
             <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
             {% if signed_data %}
-                <a class="btn btn-outline btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open issue" %}</a>
+                <a class="btn btn-outline btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open Hope Grievance" %}</a>
             {% endif %}
             {% if signed_data %}
                 <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
