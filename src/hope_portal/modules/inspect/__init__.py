@@ -8,9 +8,10 @@ from constance import config
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
-from hope_portal.modules.hope.models import Account, Household, Individual
+from hope_portal.modules.hope.models import Account, Document, Household, Individual
 from hope_portal.modules.inspect.extractors import (
     DateExtractor,
+    DocumentNumberExtractor,
     Extractor,
     IbanExtractor,
     LetterExtractor,
@@ -33,6 +34,7 @@ IBAN = 5
 MIDDLE_NAME = 6
 PHONE_ALT = 7
 FIRST_REG = 8
+DOCUMENT_NUMBER = 9
 
 ADMIN1 = 10
 ADMIN2 = 11
@@ -52,6 +54,7 @@ PRIMARY_COLLECTOR_LAST_NAME = PRIMARY_COLLECTOR + LAST_NAME
 PRIMARY_COLLECTOR_PHONE = PRIMARY_COLLECTOR + PHONE
 
 IBAN_ACCOUNT_TYPE_KEYS = ("bank", "iban")
+VALID_DOCUMENT_STATUS = "VALID"
 
 # Maps each selectable VERIFICATION_ENABLED_FIELDS key (see hope_portal.utils.verification_fields)
 # to the internal per-person field key it gates. Admin levels aren't per-person fields — they're
@@ -65,6 +68,7 @@ _PERSON_FIELD_SELECT_KEYS: dict[int, str] = {
     PHONE_ALT: VerificationField.PHONE_ALT.value,
     FIRST_REG: VerificationField.FIRST_REGISTRATION_DATE.value,
     IBAN: VerificationField.IBAN.value,
+    DOCUMENT_NUMBER: VerificationField.DOCUMENT_NUMBER.value,
 }
 ADMIN_AREA_SELECT_KEYS: dict[int, str] = {
     1: VerificationField.ADMIN_AREA1.value,
@@ -118,26 +122,41 @@ class Inspector:
         )
         return account.number if account else None
 
+    def _get_individual_document_number(self, person: Individual) -> str | None:
+        document = (
+            Document.objects.filter(
+                individual=person,
+                status=VALID_DOCUMENT_STATUS,
+            )
+            .exclude(is_removed=True)
+            .exclude(document_number__isnull=True)
+            .exclude(document_number__exact="")
+            .order_by("-updated_at")
+            .first()
+        )
+        return document.document_number if document else None
+
+    @staticmethod
+    def _set_if_present(infos: dict[int, Any], key: int, value: Any) -> None:
+        value = _normalize_str(value)
+        if value:
+            infos[key] = value
+
     def _collect_person_data(self, person: Individual, offset: int) -> dict[int, Any]:
         infos: dict[int, Any] = {}
         if person.birth_date and not person.estimated_birth_date:
             infos[offset + DOB] = person.birth_date
-        if _has_question_value(person.given_name):
-            infos[offset + GIVEN_NAME] = _normalize_str(person.given_name)
-        if _has_question_value(person.middle_name):
-            infos[offset + MIDDLE_NAME] = _normalize_str(person.middle_name)
-        if _has_question_value(person.family_name):
-            infos[offset + LAST_NAME] = _normalize_str(person.family_name)
+        self._set_if_present(infos, offset + GIVEN_NAME, person.given_name)
+        self._set_if_present(infos, offset + MIDDLE_NAME, person.middle_name)
+        self._set_if_present(infos, offset + LAST_NAME, person.family_name)
         if _has_question_value(person.phone_no):
             infos[offset + PHONE] = _digits_only(_normalize_str(person.phone_no))
         if _has_question_value(person.phone_no_alternative):
             infos[offset + PHONE_ALT] = _digits_only(_normalize_str(person.phone_no_alternative))
         if person.first_registration_date:
             infos[offset + FIRST_REG] = person.first_registration_date
-        if iban := self._get_individual_iban(person):
-            iban = _normalize_str(iban)
-            if iban:
-                infos[offset + IBAN] = iban
+        self._set_if_present(infos, offset + IBAN, self._get_individual_iban(person))
+        self._set_if_present(infos, offset + DOCUMENT_NUMBER, self._get_individual_document_number(person))
         return infos
 
     @staticmethod
@@ -164,6 +183,7 @@ class Inspector:
         if not person:
             return ("",)
         iban = _normalize_str(self._get_individual_iban(person)) or ""
+        document_number = _normalize_str(self._get_individual_document_number(person)) or ""
         return (
             str(person.birth_date or ""),
             str(bool(person.estimated_birth_date)),
@@ -174,6 +194,7 @@ class Inspector:
             str(_normalize_str(person.phone_no_alternative) or ""),
             str(person.first_registration_date or ""),
             str(iban),
+            str(document_number),
         )
 
     def _admin_cache_parts(self) -> tuple[str, ...]:
@@ -219,6 +240,7 @@ class Inspector:
         (PHONE_ALT, "{label} Alternative phone number", PhoneNumberExtractor),
         (FIRST_REG, "{label} First registration date", DateExtractor),
         (IBAN, "{label} IBAN / account number", IbanExtractor),
+        (DOCUMENT_NUMBER, "{label} Document number", DocumentNumberExtractor),
     )
 
     _PERSON_ROLES: tuple[tuple[int, str], ...] = (

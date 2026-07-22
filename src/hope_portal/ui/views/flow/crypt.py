@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.conf import settings
 from django.core import signing
 from django.core.signing import SignatureExpired
 from django.http import HttpRequest
@@ -19,7 +20,10 @@ def sign(request: HttpRequest, value: Any) -> str:
     return signer.sign_object(value)
 
 
-def unsign(request: HttpRequest, value: Any, max_age: int = 60) -> Any:
+def unsign(request: HttpRequest, value: Any, max_age: int | None = None) -> Any:
+    if max_age is None:
+        max_age = settings.FLOW_SESSION_TIMEOUT_MINUTES * 60
+
     signer = get_signer(request)
     try:
         return signer.unsign_object(value, max_age=max_age)

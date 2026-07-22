@@ -482,7 +482,7 @@ msgid "Home"
 msgstr "Accueil"
 
 #: ui/templates/unfold/helpers/userlinks.html:12
-msgid "Open Issue"
+msgid "Open Support Issue"
 msgstr ""
 
 #~ msgid "Spanish"

@@ -1,21 +1,23 @@
 (function() {
   document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
-    const timeout = parseInt(body.dataset.timeout, 10);
+    // data-timeout is expressed in seconds (LOGOUT_TIMEOUT_SECONDS); setTimeout needs milliseconds.
+    const timeoutSeconds = parseInt(body.dataset.timeout, 10);
     const logoutUrl = body.dataset.logoutUrl;
 
-    if (!timeout || !logoutUrl) {
+    if (!timeoutSeconds || !logoutUrl) {
       console.error("Auto-logout: missing data-timeout or data-logout-url on <body>");
       return;
     }
 
+    const timeoutMs = timeoutSeconds * 1000;
     let timer;
 
     function resetTimer() {
       clearTimeout(timer);
       timer = setTimeout(() => {
         window.location.href = logoutUrl;
-      }, timeout);
+      }, timeoutMs);
     }
 
     ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {

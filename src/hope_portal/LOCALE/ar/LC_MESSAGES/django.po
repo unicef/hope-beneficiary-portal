@@ -512,7 +512,7 @@ msgid "Home"
 msgstr "الرئيسية"
 
 #: ui/templates/unfold/helpers/userlinks.html:12
-msgid "Open Issue"
+msgid "Open Support Issue"
 msgstr "فتح مشكلة"
 
 #~ msgid "HOPE"

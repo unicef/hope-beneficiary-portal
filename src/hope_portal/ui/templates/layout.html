@@ -18,7 +18,7 @@
         {% endblock extra_head %}
     </head>
     <body class="lang-{{ LANGUAGE_CODE }} flex flex-col min-h-screen"
-          data-timeout="{{ LOGOUT_TIMEOUT_MS }}"
+          data-timeout="{{ LOGOUT_TIMEOUT_SECONDS }}"
           data-logout-url="{% url 'ui:logout' %}">
         {% block header %}
             {% include "includes/header.html" %}

@@ -274,7 +274,22 @@ DEFAULTS = {
     "TWILIO_AUTH_TOKEN": (str, "", "", False, "The Twilio auth token."),
     "TWILIO_FROM_NUMBER": (str, "", "", False, "The Twilio from number."),
     "URL_PREFIX": (str, "", "", False, "The URL prefix for the application."),
-    "LOGOUT_TIMEOUT_MS": (int, 300000, 300000, False, "The timeout for the logout in milliseconds."),
+    "LOGOUT_TIMEOUT_SECONDS": (
+        int,
+        300,
+        300,
+        False,
+        "The number of seconds of user inactivity before the beneficiary is automatically logged out.",
+    ),
+    "FLOW_SESSION_TIMEOUT_MINUTES": (
+        int,
+        15,
+        15,
+        False,
+        "How long (in minutes) a signed registration-flow token (used across the ask/info/"
+        "account-create/open-issue pages) remains valid before the beneficiary is bounced back "
+        "to the start of the flow and has to re-verify.",
+    ),
 }
 
 env = SmartEnv(**DEFAULTS)

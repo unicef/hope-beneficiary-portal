@@ -108,6 +108,14 @@ class IbanExtractor(LetterExtractor):
         super().__init__(label, "".join(value.split()))
 
 
+class DocumentNumberExtractor(LetterExtractor):
+    QUESTION = "What is the {ordinal} character of your '{label}'?"
+    HINT = ""
+
+    def __init__(self, label: str, value: str) -> None:
+        super().__init__(label, "".join(value.split()))
+
+
 class DateExtractor(Extractor):
     _PARTS: tuple[str, ...] = ("day", "month", "year")
 
