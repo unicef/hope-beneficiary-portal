@@ -1,11 +1,19 @@
+<div class="django-issues-header">
+    <span class="django-issues-title">Report an issue</span>
+    <button type="button" class="django-issues-close" aria-label="Close" onclick="document.getElementById('django-issues-modal-overlay').remove()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+    </button>
+</div>
+<p class="django-issues-subtitle">
+    Let us know what went wrong. Adding a few details (and a screenshot) helps us fix it faster.
+</p>
 <div id="django-issues-form-message-container">
-    <div class="django-issues-message">
-    </div>
+    <div class="django-issues-message"></div>
 </div>
 <form id="django-issues-form" method="post">
-    <div id="django-issues-form-error-container">
-        <div class="django-issues-message">
-        </div>
+        <div class="django-issues-message"></div>
     </div>
     {% csrf_token %}
     {{ form.non_field_errors }}
@@ -38,14 +46,15 @@
         {{ form.add_screenshot.errors }}
     </div>
     <div id="django-issues-screenshot-preview-container">
+        <span class="django-issues-screenshot-caption">Screenshot preview</span>
         <img id="django-issues-screenshot-preview-img" alt="screenshot preview" src="" />
     </div>
     <div class="issues-actions">
         <button type="button" id="django-issues-cancel" onclick="document.getElementById('django-issues-modal-overlay').remove()">
             Cancel
         </button>
-        <button type="submit">
-            Submit
+        <button type="submit" id="django-issues-submit">
+            <span class="django-issues-submit-label">Submit</span>
         </button>
     </div>
     {{ form.screenshot }}

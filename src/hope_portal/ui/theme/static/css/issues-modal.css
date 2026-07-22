@@ -1,0 +1,382 @@
+#django-issues-modal-overlay {
+  transition: opacity 150ms ease-out;
+}
+
+  #django-issues-modal-overlay #django-issues-form-container {
+    all: unset;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    color: var(--color-base-content, #000);
+    font-family: "Roboto", sans-serif;
+    width: 480px;
+    max-width: 90vw;
+    max-height: min(640px, 85vh);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow:
+      0 11px 15px -7px rgba(0, 0, 0, 0.2),
+      0 24px 38px 3px rgba(0, 0, 0, 0.14),
+      0 9px 46px 8px rgba(0, 0, 0, 0.12);
+    animation: django-issues-pop-in 180ms ease-out;
+  }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-header {
+      all: unset;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--color-primary, oklch(33% 0.128 257));
+      color: var(--color-primary-content, #fff);
+      padding: 1.125rem 1.25rem 1.125rem 1.5rem;
+      flex-shrink: 0;
+    }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-header .django-issues-title {
+        font-size: 1.0625rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-header .django-issues-close {
+        all: unset;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.85;
+        transition:
+          background-color 150ms,
+          opacity 150ms;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-header .django-issues-close:hover,
+        #django-issues-modal-overlay #django-issues-form-container .django-issues-header .django-issues-close:focus-visible {
+          background: rgba(255, 255, 255, 0.16);
+          opacity: 1;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-header .django-issues-close:focus-visible {
+          outline: 2px solid rgba(255, 255, 255, 0.6);
+          outline-offset: 1px;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-header .django-issues-close svg {
+          display: block;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container .django-issues-subtitle {
+      all: unset;
+      display: block;
+      font-family: "Roboto", sans-serif;
+      font-size: 0.8125rem;
+      line-height: 1.4;
+      color: #6b7280;
+      padding: 0.875rem 1.5rem 0;
+      flex-shrink: 0;
+    }
+
+  #django-issues-modal-overlay #django-issues-form-container #django-issues-form-message-container {
+      all: unset;
+      display: none;
+      margin: 0.875rem 1.5rem 0;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+  #django-issues-modal-overlay #django-issues-form-container #django-issues-form-message-container .django-issues-message {
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-align: left;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container #django-issues-form-message-container.is-success {
+        background: color-mix(in oklab, var(--color-success, oklch(66% 0.16 142)) 12%, white);
+        border: 1px solid color-mix(in oklab, var(--color-success, oklch(66% 0.16 142)) 40%, transparent);
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container #django-issues-form-message-container.is-success .django-issues-message {
+          color: color-mix(in oklab, var(--color-success, oklch(66% 0.16 142)) 70%, black);
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container #django-issues-form-message-container.is-error {
+        background: color-mix(in oklab, var(--color-error, oklch(46% 0.191 27)) 10%, white);
+        border: 1px solid color-mix(in oklab, var(--color-error, oklch(46% 0.191 27)) 30%, transparent);
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container #django-issues-form-message-container.is-error .django-issues-message {
+          color: var(--color-error, oklch(46% 0.191 27));
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form {
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      width: auto;
+      margin: 0;
+      gap: 1.125rem;
+      overflow-y: auto;
+    }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-form-error-container {
+        all: unset;
+        display: none;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-form-error-container:has(.django-issues-message:not(:empty)) {
+          display: block;
+          background: oklch(46% 0.191 27 / 0.1);
+          border: 1px solid oklch(46% 0.191 27 / 0.2);
+          border-radius: 4px;
+          padding: 0.75rem;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-form-error-container:has(.django-issues-message:not(:empty)) .django-issues-message {
+            color: var(--color-error, oklch(46% 0.191 27));
+            font-size: 0.875rem;
+          }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form p {
+        margin: 0;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .errorlist {
+        all: unset;
+        display: block;
+        list-style: none;
+        margin: 0.25rem 0 0;
+        padding: 0;
+        font-size: 0.75rem;
+        color: var(--color-error, oklch(46% 0.191 27));
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field.floating-field {
+          position: relative;
+          margin: 0;
+        }
+
+  /* These fields keep their own native `placeholder` text (e.g. "issue title" under
+          the "Title" label), so the label can't rest inside the field like a true Material
+          floating label without overlapping/doubling up with that placeholder. Keeping the
+          label permanently in the raised "notch" position (same treatment as the `select`
+          below) sidesteps the overlap entirely instead of only fixing it once focused/filled. */
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field.floating-field label {
+            position: absolute;
+            left: 0.75rem;
+            top: -0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+            pointer-events: none;
+            background: #fff;
+            padding: 0 0.25rem;
+            transition: color 200ms;
+            z-index: 1;
+            text-transform: none;
+            font-weight: 400;
+            letter-spacing: normal;
+          }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field.floating-field input:focus ~ label,
+          #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field.floating-field select:focus ~ label,
+          #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field.floating-field textarea:focus ~ label {
+            color: #1b2a6b;
+          }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field label {
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: #666;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-checkbox {
+        flex-direction: row;
+        align-items: center;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-checkbox label {
+          text-transform: none;
+          font-size: 0.875rem;
+          color: inherit;
+          cursor: pointer;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-checkbox input[type="checkbox"] {
+          width: 1.125rem;
+          height: 1.125rem;
+          accent-color: var(--color-primary, oklch(33% 0.128 257));
+          cursor: pointer;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form input[type="text"],
+      #django-issues-modal-overlay #django-issues-form-container form#django-issues-form textarea,
+      #django-issues-modal-overlay #django-issues-form-container form#django-issues-form select {
+        background: #fff !important;
+        border: 1px solid #c4c4c4 !important;
+        border-radius: 4px !important;
+        color: inherit !important;
+        padding: 0.625rem 0.75rem !important;
+        font-size: 0.9375rem !important;
+        font-family: "Roboto", sans-serif !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        outline: none !important;
+        transition: border-color 200ms !important;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form input[type="text"]:focus, #django-issues-modal-overlay #django-issues-form-container form#django-issues-form textarea:focus, #django-issues-modal-overlay #django-issues-form-container form#django-issues-form select:focus {
+          border: 2px solid #1b2a6b !important;
+          padding: 0.5625rem 0.6875rem !important;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form select {
+        height: auto !important;
+        appearance: auto;
+        text-transform: capitalize;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form input[type="text"]::placeholder,
+      #django-issues-modal-overlay #django-issues-form-container form#django-issues-form textarea::placeholder {
+        text-transform: capitalize;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form textarea {
+        min-height: 6rem;
+        resize: vertical;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-screenshot-preview-container {
+        position: relative;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #c4c4c4;
+        height: auto;
+        max-height: 200px;
+        /* Without this, the item's own `overflow: hidden` resets its flexbox automatic
+        minimum size to 0, so `form#django-issues-form`'s `overflow-y: auto` lets it get
+        crushed down to a couple of pixels instead of sizing to the screenshot's height. */
+        flex-shrink: 0;
+        background: #f5f5f5;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-screenshot-preview-container .django-issues-screenshot-caption {
+          position: absolute;
+          top: 0.375rem;
+          left: 0.5rem;
+          font-size: 0.6875rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: #fff;
+          background: rgba(0, 0, 0, 0.55);
+          padding: 0.1875rem 0.5rem;
+          border-radius: 999px;
+          pointer-events: none;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-screenshot-preview-container #django-issues-screenshot-preview-img {
+          max-height: 200px;
+          max-width: 100%;
+          display: block;
+          margin: 0 auto;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form button {
+        all: unset;
+        appearance: button;
+        padding: 0.625rem 1.5rem;
+        text-align: center;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition:
+          background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 200ms;
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form button:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form button[type="submit"] {
+        background: var(--color-primary, oklch(33% 0.128 257));
+        color: var(--color-primary-content, #fff);
+        box-shadow:
+          0 2px 4px -1px rgba(0, 0, 0, 0.2),
+          0 4px 5px 0 rgba(0, 0, 0, 0.14);
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form button[type="submit"]:hover:not(:disabled) {
+          box-shadow:
+            0 2px 4px -1px rgba(0, 0, 0, 0.3),
+            0 5px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form button[type="submit"] .django-issues-submit-label {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form button[type="submit"].is-loading .django-issues-submit-label::after {
+          content: "";
+          width: 0.8125rem;
+          height: 0.8125rem;
+          border-radius: 999px;
+          border: 2px solid rgba(255, 255, 255, 0.4);
+          border-top-color: #fff;
+          animation: django-issues-spin 700ms linear infinite;
+        }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-cancel {
+        background: transparent;
+        color: var(--color-primary, oklch(33% 0.128 257));
+        border: 1px solid var(--color-primary, oklch(33% 0.128 257));
+      }
+
+  #django-issues-modal-overlay #django-issues-form-container form#django-issues-form #django-issues-cancel:hover:not(:disabled) {
+          background: color-mix(in oklab, var(--color-primary, oklch(33% 0.128 257)) 8%, transparent);
+        }
+
+@keyframes django-issues-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes django-issues-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
