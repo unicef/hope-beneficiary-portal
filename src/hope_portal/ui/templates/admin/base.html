@@ -2,7 +2,7 @@
 {% load admin_list i18n issues static unfold %}
 {% block extrahead %}
     {% issues_tags %}
-    <link href="{% static 'css/issues-modal.css' %}?v={% now "U" %}" rel="stylesheet" />
+    <link href="{% static 'css/issues-modal.css' %}" rel="stylesheet" />
 {% endblock extrahead %}
 {% block base %}
     <div id="page" class="flex max-w-full min-h-screen {% element_classes "page" %}">
