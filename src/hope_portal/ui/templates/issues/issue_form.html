@@ -14,11 +14,13 @@
     Let us know what went wrong. Adding a few details (and a screenshot) helps us fix it faster.
 </p>
 <div id="django-issues-form-message-container">
-    <div class="django-issues-message"></div>
+    <div class="django-issues-message">
+    </div>
 </div>
 <form id="django-issues-form" method="post">
     <div id="django-issues-form-error-container">
-        <div class="django-issues-message"></div>
+        <div class="django-issues-message">
+        </div>
     </div>
     {% csrf_token %}
     {{ form.non_field_errors }}
