@@ -45,16 +45,25 @@ document.addEventListener('DOMContentLoaded', function () {
     function displayMessage(container, message, isError = false) {
         const target = container.querySelector('.django-issues-message');
         target.innerHTML = message;
-        container.style.backgroundColor = isError ? '#f8d7da' : '#d4edda'; // Light red for error, light green for success
-        container.style.color = isError ? '#721c24' : '#155724'; // Dark red for error, dark green for success
-        container.style.border = `1px solid ${isError ? '#f5c6cb' : '#c3e6cb'}`;
+        container.classList.toggle('is-error', isError);
+        container.classList.toggle('is-success', !isError);
         container.style.display = 'block';
     }
 
     function clearMessage(container) {
         const target = container.querySelector('.django-issues-message');
         if (target) target.innerHTML = "";
+        container.classList.remove('is-error', 'is-success');
         container.style.display = 'none';
+    }
+
+    function setSubmitLoading(form, isLoading) {
+        const submitButton = form.querySelector('#django-issues-submit');
+        if (!submitButton) return;
+        const label = submitButton.querySelector('.django-issues-submit-label');
+        submitButton.disabled = isLoading;
+        submitButton.classList.toggle('is-loading', isLoading);
+        if (label) label.textContent = isLoading ? 'Submitting…' : 'Submit';
     }
 
     const issueOpener = document.getElementById(OPENER_ID);
@@ -186,6 +195,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 delete data.screenshot;
             }
 
+            setSubmitLoading(form, true);
+
             axios.post(SUBMIT_URL, data, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -227,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (errorContainer) {
                             displayMessage(errorContainer, errorMessage, true);
                         }
+                        setSubmitLoading(form, false);
                     }
                 })
                 .catch(error => {
@@ -235,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         : "An unexpected error occurred.";
                     if (messageContainer) displayMessage(messageContainer, errorMessage, true);
                     console.error('Error submitting form:', error);
+                    setSubmitLoading(form, false);
                 });
         }
     });

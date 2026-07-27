@@ -1,0 +1,19 @@
+{% extends "admin/login.html" %}
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var next = new URLSearchParams(window.location.search).get("next");
+            if (!next) {
+                return;
+            }
+            document.querySelectorAll('a[href*="azuread-tenant-oauth2"]').forEach(function (link) {
+                var url = new URL(link.href, window.location.origin);
+                if (!url.searchParams.has("next")) {
+                    url.searchParams.set("next", next);
+                    link.href = url.pathname + url.search + url.hash;
+                }
+            });
+        });
+    </script>
+{% endblock %}
