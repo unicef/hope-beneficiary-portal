@@ -136,14 +136,14 @@ class AuthView(FormView[AuthForm]):
 
     def form_valid(self, form: forms.Form) -> TemplateResponse | HttpResponseRedirect:
         try:
-            url = reverse("ui:index")
             beneficiary = Beneficiary.objects.get(username=form.cleaned_data["username"])
-            if beneficiary.check_password(form.cleaned_data["password"]):
-                url = reverse(
-                    "ui:flow:info", kwargs={"signed_data": sign_household(self.request, beneficiary.household)}
-                )
-            return HttpResponseRedirect(url)
-        except Beneficiary.DoesNotExist:
+            if beneficiary.suspended or not beneficiary.check_password(form.cleaned_data["password"]):
+                form.add_error("username", "Invalid username or password")
+                return self.form_invalid(form)
+            return HttpResponseRedirect(
+                reverse("ui:flow:info", kwargs={"signed_data": sign_household(self.request, beneficiary.household)})
+            )
+        except (Beneficiary.DoesNotExist, Household.DoesNotExist):
             logger.warning("Beneficiary not found", extra={"username": form.cleaned_data["username"]})
             form.add_error("username", "Invalid username or password")
             return self.form_invalid(form)

@@ -1,14 +1,44 @@
 {% extends "pages/flow/_base.html" %}
 {% load i18n %}
 {% block page %}
-    <div class="flex flex-col justify-center items-center">
-        <div class="m-auto w-1/12 border-2 dark:border-gray-200 border-b-gray-900 rounded-2xl  items-center p-5 my-10">
-            <div>
-                {{ username }}
+    <div class="flex flex-col justify-center items-center flex-1 px-4">
+        <div class="w-full max-w-lg bg-base-200 rounded shadow-sm my-10">
+            <div class="bg-primary text-primary-content px-6 py-4 rounded-t">
+                <h2 class="text-xl font-medium">
+                    {% if has_account %}
+                        {% trans "View or reset login" %}
+                    {% else %}
+                        {% trans "Set username and password" %}
+                    {% endif %}
+                </h2>
+                <p class="text-sm opacity-80 mt-1">
+                    {% if has_account %}
+                        {% trans "Your username is shown below. Set a new password to use next time. The previous password cannot be recovered." %}
+                    {% else %}
+                        {% trans "Choose a username and password so you can sign in later without your registration number." %}
+                    {% endif %}
+                </p>
             </div>
-            <div>
-                {{ password }}
-            </div>
+            <form method="post" action="." id="account-form" autocomplete="off" class="p-6">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="bg-error/10 text-error border border-error/20 rounded p-3 mb-4 text-sm">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+                <fieldset class="form-group">
+                    {{ form }}
+                </fieldset>
+                <p class="text-sm opacity-70 mt-2">
+                    {% trans "Save these credentials in a safe place. We cannot show your password again after you leave this page." %}
+                </p>
+                <div class="flex justify-end gap-3 mt-6">
+                    <a class="btn btn-outline btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Cancel" %}</a>
+                    <input type="submit"
+                           class="btn btn-primary"
+                           value="{% if has_account %}{% trans "Save login" %}{% else %}{% trans "Create login" %}{% endif %}" />
+                </div>
+            </form>
         </div>
     </div>
 {% endblock page %}

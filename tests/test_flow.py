@@ -4,9 +4,13 @@ from unittest import mock
 import pytest
 from constance.test import override_config
 from django.core import signing
+from django.db import IntegrityError
 from django.urls import reverse
+from testutils.factories.beneficiary import BeneficiaryFactory
 from testutils.factories.hope.houshold import HouseholdFactory
 
+from hope_portal.exception import FlowLockoutError
+from hope_portal.models.beneficiary import Beneficiary, household_key
 from hope_portal.modules.inspect import Inspector
 from hope_portal.modules.security.clients import HopeAPIClient
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
@@ -552,3 +556,196 @@ def test_ask_post_rejects_empty_formset(django_app):
     assert res.status_code == 302
     res = res.follow()
     assert "not-available" in res.request.url
+
+
+ACCOUNT_PASSWORD = "PortalLogin-42!"
+
+
+def _account_create_link(info_res):
+    return info_res.pyquery("a:contains('Set username and password')").attr("href")
+
+
+def _account_reset_link(info_res):
+    return info_res.pyquery("a:contains('View or reset login')").attr("href")
+
+
+def _submit_account_form(res, username, password, password_confirm=None):
+    form = res.forms["account-form"]
+    form["username"] = username
+    form["password"] = password
+    form["password_confirm"] = password if password_confirm is None else password_confirm
+    return form.submit()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_info_page_offers_set_credentials_when_no_account(django_app, household):
+    info_res = _go_to_info_page(django_app, household)
+    assert _account_create_link(info_res)
+    assert _account_reset_link(info_res) is None
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_create_account_with_chosen_credentials_then_login(django_app, household):
+    info_res = _go_to_info_page(django_app, household)
+    res = django_app.get(_account_create_link(info_res))
+    assert res.status_code == 200
+    assert b"Choose a username and password" in res.content
+
+    res = _submit_account_form(res, "my-login", ACCOUNT_PASSWORD)
+    assert res.status_code == 200
+    assert b"Login created" in res.content
+    assert b"my-login" in res.content
+    assert ACCOUNT_PASSWORD.encode() not in res.content
+
+    beneficiary = Beneficiary.objects.get(username="my-login")
+    assert beneficiary.household_id == household_key(household)
+    assert beneficiary.check_password(ACCOUNT_PASSWORD)
+
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "my-login"
+    res.forms["reg-form"]["password"] = ACCOUNT_PASSWORD
+    res = res.forms["reg-form"].submit().follow()
+    assert b"Welcome" in res.content
+    assert _account_reset_link(res)
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_existing_account_shows_username_and_allows_password_reset(django_app, household):
+    BeneficiaryFactory(household=household, username="existing-user")
+    info_res = _go_to_info_page(django_app, household)
+    assert _account_reset_link(info_res)
+    assert _account_create_link(info_res) is None
+
+    res = django_app.get(_account_reset_link(info_res))
+    assert res.status_code == 200
+    assert res.forms["account-form"]["username"].value == "existing-user"
+    assert b"previous password cannot be recovered" in res.content
+    assert b"existing-user" in res.content
+    hashed = Beneficiary.objects.get(username="existing-user").password
+    assert hashed.encode() not in res.content
+
+    res = _submit_account_form(res, "existing-user", ACCOUNT_PASSWORD)
+    assert b"Login updated" in res.content
+    assert b"existing-user" in res.content
+    assert ACCOUNT_PASSWORD.encode() not in res.content
+
+    beneficiary = Beneficiary.objects.get(username="existing-user")
+    assert beneficiary.check_password(ACCOUNT_PASSWORD)
+
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "existing-user"
+    res.forms["reg-form"]["password"] = ACCOUNT_PASSWORD
+    res = res.forms["reg-form"].submit().follow()
+    assert b"Welcome" in res.content
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_account_form_rejects_password_mismatch(django_app, household):
+    info_res = _go_to_info_page(django_app, household)
+    res = django_app.get(_account_create_link(info_res))
+    res = _submit_account_form(res, "mismatch-user", ACCOUNT_PASSWORD, password_confirm="OtherPass-99!")
+    assert res.status_code == 200
+    assert b"Passwords do not match." in res.content
+    assert not Beneficiary.objects.filter(username="mismatch-user").exists()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_account_form_rejects_duplicate_username(django_app, household):
+    other = HouseholdFactory()
+    BeneficiaryFactory(household=other, username="taken-name")
+    info_res = _go_to_info_page(django_app, household)
+    res = django_app.get(_account_create_link(info_res))
+    res = _submit_account_form(res, "taken-name", ACCOUNT_PASSWORD)
+    assert res.status_code == 200
+    assert b"This username is already taken." in res.content
+    assert not Beneficiary.objects.filter(household_id=household_key(household)).exists()
+
+
+@pytest.mark.django_db
+def test_auth_login_rejects_wrong_password(django_app, household):
+    BeneficiaryFactory(household=household, username="auth-user")
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "auth-user"
+    res.forms["reg-form"]["password"] = "WrongPass-99!"
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 200
+    assert b"Invalid username or password" in res.content
+
+
+@pytest.mark.django_db
+def test_auth_login_rejects_unknown_user(django_app):
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "nobody"
+    res.forms["reg-form"]["password"] = ACCOUNT_PASSWORD
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 200
+    assert b"Invalid username or password" in res.content
+
+
+@pytest.mark.django_db
+def test_auth_login_rejects_suspended_beneficiary(django_app, household):
+    BeneficiaryFactory(household=household, username="suspended-user", suspended=True)
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "suspended-user"
+    res.forms["reg-form"]["password"] = ACCOUNT_PASSWORD
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 200
+    assert b"Invalid username or password" in res.content
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_account_form_prefills_empty_username_when_unicef_id_missing(django_app, household):
+    household.unicef_id = ""
+    household.save(update_fields=["unicef_id"])
+    info_res = _go_to_info_page(django_app, household)
+    res = django_app.get(_account_create_link(info_res))
+    assert res.forms["account-form"]["username"].value == ""
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_account_create_handles_integrity_error(django_app, household):
+    info_res = _go_to_info_page(django_app, household)
+    res = django_app.get(_account_create_link(info_res))
+    with mock.patch(
+        "hope_portal.ui.views.flow.account.Beneficiary.set_credentials",
+        side_effect=IntegrityError(),
+    ):
+        res = _submit_account_form(res, "race-user", ACCOUNT_PASSWORD)
+    assert res.status_code == 200
+    assert b"This username is already taken." in res.content
+    assert not Beneficiary.objects.filter(username="race-user").exists()
+
+
+@pytest.mark.django_db
+def test_auth_login_rejects_missing_household(django_app, household):
+    beneficiary = BeneficiaryFactory(household=household, username="orphan-user")
+    beneficiary.household_id = uuid.uuid4().hex
+    beneficiary.save(update_fields=["household_id"])
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "orphan-user"
+    res.forms["reg-form"]["password"] = ACCOUNT_PASSWORD
+    res = res.forms["reg-form"].submit()
+    assert res.status_code == 200
+    assert b"Invalid username or password" in res.content
+
+
+@pytest.mark.django_db
+def test_auth_login_shows_lockout_page(django_app, household):
+    BeneficiaryFactory(household=household, username="locked-user")
+    res = django_app.get(reverse("ui:flow:start-auth"))
+    res.forms["reg-form"]["username"] = "locked-user"
+    res.forms["reg-form"]["password"] = ACCOUNT_PASSWORD
+    with mock.patch(
+        "hope_portal.ui.views.flow.start.Beneficiary.objects.get",
+        side_effect=FlowLockoutError("Too many attempts."),
+    ):
+        res = res.forms["reg-form"].submit()
+    assert res.status_code == 200
+    assert b"Locked out" in res.content

@@ -1,0 +1,31 @@
+{% extends "pages/flow/_base.html" %}
+{% load i18n %}
+{% block page %}
+    <div class="flex flex-col justify-center items-center flex-1 px-4">
+        <div class="w-full max-w-lg bg-base-200 rounded shadow-sm my-10">
+            <div class="bg-primary text-primary-content px-6 py-4 rounded-t">
+                <h2 class="text-xl font-medium">
+                    {% if created %}
+                        {% trans "Login created" %}
+                    {% else %}
+                        {% trans "Login updated" %}
+                    {% endif %}
+                </h2>
+                <p class="text-sm opacity-80 mt-1">
+                    {% trans "Next time, choose Login on the home page and sign in with these credentials." %}
+                </p>
+            </div>
+            <div class="p-6">
+                <p class="mb-2 text-sm opacity-70">{% trans "Username" %}</p>
+                <p class="text-lg font-medium break-all" id="saved-username">{{ username }}</p>
+                <p class="text-sm opacity-70 mt-4">
+                    {% trans "Your password has been saved. Keep it in a safe place. We cannot show it again." %}
+                </p>
+                <div class="flex justify-end gap-3 mt-6">
+                    <a class="btn btn-outline btn-primary" href="{% url "ui:index" %}">{% trans "Home" %}</a>
+                    <a class="btn btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Back to household" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page %}

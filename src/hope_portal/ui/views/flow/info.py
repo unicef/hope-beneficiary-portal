@@ -9,6 +9,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
 from flags.decorators import flag_check
 
+from hope_portal.models.beneficiary import Beneficiary
 from hope_portal.modules.hope.models import GrievanceticketPrograms, Household, Payment
 from hope_portal.ui.views.flow.crypt import unsign
 
@@ -65,6 +66,7 @@ class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         kwargs["program_registration_id"] = hh.program_registration_id
         kwargs["household"] = hh
         kwargs["signed_data"] = self.kwargs["signed_data"]
+        kwargs["has_account"] = Beneficiary.for_household(hh) is not None
         kwargs["linked_grievances_count"] = GrievanceticketPrograms.objects.filter(
             grievanceticket__household_unicef_id=hh.unicef_id
         ).count()
