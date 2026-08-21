@@ -164,9 +164,6 @@ class Currency(HopeModel):
     code = models.CharField(unique=True, max_length=5, null=True)
     name = models.CharField(max_length=255, null=True)
     is_crypto = models.BooleanField(null=True)
-    vision_code = models.CharField(max_length=5, null=True)
-    active = models.BooleanField(null=True)
-    number_of_decimals = models.SmallIntegerField(null=True)
 
     class Routing:
         key = "hope"
@@ -258,43 +255,6 @@ class DatacollectingtypeLimitTo(HopeModel):
 
     class Tenant:
         tenant_filter_field: str = "__all__"
-
-
-class Periodicasyncjob(HopeModel):
-    id = models.BigAutoField(primary_key=True)
-    version = models.BigIntegerField(null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    curr_async_result_id = models.CharField(max_length=36, blank=True, null=True)
-    last_async_result_id = models.CharField(max_length=36, blank=True, null=True)
-    datetime_created = models.DateTimeField(null=True)
-    datetime_queued = models.DateTimeField(blank=True, null=True)
-    repeatable = models.BooleanField(null=True)
-    celery_history = models.JSONField(null=True)
-    local_status = models.CharField(max_length=100, blank=True, null=True)
-    group_key = models.CharField(max_length=255, blank=True, null=True)
-    type = models.CharField(max_length=50, null=True)
-    config = models.JSONField(null=True)
-    action = models.CharField(max_length=500, blank=True, null=True)
-    sentry_id = models.CharField(max_length=255, blank=True, null=True)
-    object_id = models.CharField(max_length=64, blank=True, null=True)
-    job_name = models.CharField(max_length=255, blank=True, null=True)
-    errors = models.JSONField(null=True)
-    program = models.ForeignKey(
-        "Program", on_delete=models.DO_NOTHING, related_name="periodicasyncjob_program", blank=True, null=True
-    )
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "core_periodicasyncjob"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-    def __str__(self) -> str:
-        return str(self.description)
 
 
 class Periodicfielddata(HopeModel):
@@ -399,9 +359,6 @@ class Country(HopeModel):
     level = models.IntegerField(null=True)
     parent = models.ForeignKey(
         "self", on_delete=models.DO_NOTHING, related_name="country_parent", blank=True, null=True
-    )
-    currency = models.ForeignKey(
-        Currency, on_delete=models.DO_NOTHING, related_name="country_currency", blank=True, null=True
     )
 
     class Routing:
@@ -1267,6 +1224,7 @@ class Household(HopeModel):
     org_name_enumerator = models.CharField(max_length=250, null=True)
     village = models.CharField(max_length=250, null=True)
     registration_method = models.CharField(max_length=250, null=True)
+    currency_old = models.CharField(max_length=250, null=True)
     unhcr_id = models.CharField(max_length=250, null=True)
     internal_data = models.JSONField(null=True)
     detail_id = models.CharField(max_length=150, blank=True, null=True)
@@ -1449,6 +1407,9 @@ class Individual(HopeModel):
     preferred_language = models.CharField(max_length=6, blank=True, null=True)
     relationship_confirmed = models.BooleanField(null=True)
     age_at_registration = models.SmallIntegerField(blank=True, null=True)
+    wallet_name = models.CharField(max_length=64, null=True)
+    blockchain_name = models.CharField(max_length=64, null=True)
+    wallet_address = models.CharField(max_length=128, null=True)
     origin_unicef_id = models.CharField(max_length=100, blank=True, null=True)
     is_migration_handled = models.BooleanField(null=True)
     migrated_at = models.DateTimeField(blank=True, null=True)
@@ -1905,30 +1866,6 @@ class Financialserviceproviderxlsxtemplate(HopeModel):
         return str(self.name)
 
 
-class Followupinstruction(HopeModel):
-    id = models.UUIDField(primary_key=True)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
-    unicef_id = models.CharField(max_length=255, blank=True, null=True)
-    background_action_status = models.CharField(max_length=255, blank=True, null=True)
-    business_area = models.ForeignKey(
-        BusinessArea, on_delete=models.DO_NOTHING, related_name="followupinstruction_business_area", null=True
-    )
-    program = models.ForeignKey(
-        "Program", on_delete=models.DO_NOTHING, related_name="followupinstruction_program", null=True
-    )
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_followupinstruction"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-
 class Fspnamemapping(HopeModel):
     id = models.BigAutoField(primary_key=True)
     external_name = models.CharField(max_length=255, null=True)
@@ -1993,6 +1930,7 @@ class Payment(HopeModel):
     signature_hash = models.CharField(max_length=40, null=True)
     status = models.CharField(max_length=255, null=True)
     status_date = models.DateTimeField(null=True)
+    currency_old = models.CharField(max_length=5, blank=True, null=True)
     entitlement_quantity = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
     entitlement_quantity_usd = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
     delivered_quantity = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
@@ -2103,6 +2041,7 @@ class PaymentPlan(HopeModel):
     total_undelivered_quantity_usd = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
     status = models.CharField(max_length=50, null=True)
     background_action_status = models.CharField(max_length=50, blank=True, null=True)
+    currency_old = models.CharField(max_length=5, blank=True, null=True)
     dispersion_start_date = models.DateField(blank=True, null=True)
     dispersion_end_date = models.DateField(blank=True, null=True)
     female_children_count = models.IntegerField(null=True)
@@ -2113,6 +2052,7 @@ class PaymentPlan(HopeModel):
     total_individuals_count = models.IntegerField(null=True)
     imported_file_date = models.DateTimeField(blank=True, null=True)
     steficon_applied_date = models.DateTimeField(blank=True, null=True)
+    is_follow_up = models.BooleanField(null=True)
     exclusion_reason = models.TextField(blank=True, null=True)
     exclude_household_error = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -2155,24 +2095,6 @@ class PaymentPlan(HopeModel):
     currency = models.ForeignKey(
         Currency, on_delete=models.DO_NOTHING, related_name="paymentplan_currency", blank=True, null=True
     )
-    use_payment_gateway = models.BooleanField(null=True)
-    closure_comment = models.TextField(blank=True, null=True)
-    payment_plan_group = models.ForeignKey(
-        "Paymentplangroup",
-        on_delete=models.DO_NOTHING,
-        related_name="paymentplan_payment_plan_group",
-        blank=True,
-        null=True,
-    )
-    plan_type = models.CharField(max_length=20, null=True)
-    export_tag = models.SmallIntegerField(blank=True, null=True)
-    follow_up_instruction = models.ForeignKey(
-        Followupinstruction,
-        on_delete=models.DO_NOTHING,
-        related_name="paymentplan_follow_up_instruction",
-        blank=True,
-        null=True,
-    )
 
     class Routing:
         key = "hope"
@@ -2186,99 +2108,6 @@ class PaymentPlan(HopeModel):
 
     def __str__(self) -> str:
         return str(self.name)
-
-
-class PaymentplanPaymentPlanPurposes(HopeModel):
-    id = models.BigAutoField(primary_key=True)
-    paymentplan = models.ForeignKey(
-        PaymentPlan, on_delete=models.DO_NOTHING, related_name="paymentplanpaymentplanpurposes_paymentplan", null=True
-    )
-    paymentplanpurpose = models.ForeignKey(
-        "Paymentplanpurpose",
-        on_delete=models.DO_NOTHING,
-        related_name="paymentplanpaymentplanpurposes_paymentplanpurpose",
-        null=True,
-    )
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_paymentplan_payment_plan_purposes"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-
-class Paymentplangroup(HopeModel):
-    id = models.UUIDField(primary_key=True)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
-    unicef_id = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True)
-    cycle = models.ForeignKey(
-        "ProgramCycle", on_delete=models.DO_NOTHING, related_name="paymentplangroup_cycle", null=True
-    )
-    background_action_status = models.CharField(max_length=50, blank=True, null=True)
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_paymentplangroup"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-    def __str__(self) -> str:
-        return str(self.name)
-
-
-class Paymentplanpurpose(HopeModel):
-    id = models.UUIDField(primary_key=True)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
-    unicef_id = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(unique=True, max_length=255, null=True)
-    description = models.TextField(null=True)
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_paymentplanpurpose"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-    def __str__(self) -> str:
-        return str(self.name)
-
-
-class PaymentplanpurposeLimitTo(HopeModel):
-    id = models.BigAutoField(primary_key=True)
-    paymentplanpurpose = models.ForeignKey(
-        Paymentplanpurpose,
-        on_delete=models.DO_NOTHING,
-        related_name="paymentplanpurposelimitto_paymentplanpurpose",
-        null=True,
-    )
-    businessarea = models.ForeignKey(
-        BusinessArea, on_delete=models.DO_NOTHING, related_name="paymentplanpurposelimitto_businessarea", null=True
-    )
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_paymentplanpurpose_limit_to"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
 
 
 class Paymentplansplit(HopeModel):
@@ -2446,45 +2275,9 @@ class Paymentverificationsummary(HopeModel):
         tenant_filter_field: str = "__all__"
 
 
-class Westernuniondata(HopeModel):
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(unique=True, max_length=255, null=True)
-    date = models.DateField(blank=True, null=True)
-    amount = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
-    status = models.CharField(max_length=20, null=True)
-    error_msg = models.TextField(blank=True, null=True)
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_westernuniondata"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-    def __str__(self) -> str:
-        return str(self.name)
-
-
 class Westernunioninvoice(HopeModel):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(unique=True, max_length=255, null=True)
-    is_legacy = models.BooleanField(null=True)
-    advice_name = models.CharField(max_length=255, blank=True, null=True)
-    charges = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
-    error_msg = models.TextField(blank=True, null=True)
-    net_amount = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
-    matched_data = models.ForeignKey(
-        Westernuniondata,
-        on_delete=models.DO_NOTHING,
-        related_name="westernunioninvoice_matched_data",
-        blank=True,
-        null=True,
-    )
-    status = models.CharField(max_length=20, null=True)
 
     class Routing:
         key = "hope"
@@ -2502,7 +2295,7 @@ class Westernunioninvoice(HopeModel):
 
 class Westernunioninvoicepayment(HopeModel):
     id = models.BigAutoField(primary_key=True)
-    transaction_status = models.CharField(max_length=1, blank=True, null=True)
+    transaction_status = models.CharField(max_length=1, null=True)
     payment = models.ForeignKey(
         Payment, on_delete=models.DO_NOTHING, related_name="westernunioninvoicepayment_payment", null=True
     )
@@ -2530,10 +2323,10 @@ class Westernunionpaymentplanreport(HopeModel):
     payment_plan = models.ForeignKey(
         PaymentPlan, on_delete=models.DO_NOTHING, related_name="westernunionpaymentplanreport_payment_plan", null=True
     )
-    invoice = models.ForeignKey(
+    qcf_file = models.ForeignKey(
         Westernunioninvoice,
         on_delete=models.DO_NOTHING,
-        related_name="westernunionpaymentplanreport_invoice",
+        related_name="westernunionpaymentplanreport_qcf_file",
         null=True,
     )
 
@@ -2639,29 +2432,6 @@ class ProgramAdminAreas(HopeModel):
     class Meta:
         managed = False
         db_table = "program_program_admin_areas"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-
-class ProgramPaymentPlanPurposes(HopeModel):
-    id = models.BigAutoField(primary_key=True)
-    program = models.ForeignKey(
-        Program, on_delete=models.DO_NOTHING, related_name="programpaymentplanpurposes_program", null=True
-    )
-    paymentplanpurpose = models.ForeignKey(
-        Paymentplanpurpose,
-        on_delete=models.DO_NOTHING,
-        related_name="programpaymentplanpurposes_paymentplanpurpose",
-        null=True,
-    )
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "program_program_payment_plan_purposes"
 
     class Tenant:
         tenant_filter_field: str = "__all__"
@@ -2941,7 +2711,6 @@ class ListSanctionlistindividual(HopeModel):
         related_name="listsanctionlistindividual_sanction_list",
         null=True,
     )
-    internal_data = models.JSONField(null=True)
 
     class Routing:
         key = "hope"
