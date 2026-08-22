@@ -7,7 +7,7 @@ from testutils.factories.beneficiary import BeneficiaryFactory
 from testutils.factories.hope.houshold import HouseholdFactory
 
 from hope_portal.models.beneficiary import Beneficiary, household_key
-from hope_portal.ui.forms.flow import AccountCredentialsForm
+from hope_portal.ui.forms.flow import AccountCredentialsForm, AuthForm
 
 ACCOUNT_PASSWORD = "PortalLogin-42!"
 
@@ -153,3 +153,19 @@ def test_account_credentials_form_clean_skips_password_checks_when_missing():
     assert not form.is_valid()
     assert "password" in form.errors
     assert "password_confirm" in form.errors
+
+
+@pytest.mark.django_db
+def test_account_credentials_form_preserves_password_whitespace():
+    password = f"  {ACCOUNT_PASSWORD}  "
+    form = AccountCredentialsForm(data=_form_data(password=password, password_confirm=password))
+    assert form.is_valid()
+    assert form.cleaned_data["password"] == password
+    assert form.cleaned_data["password_confirm"] == password
+
+
+def test_auth_form_preserves_password_whitespace():
+    password = f"  {ACCOUNT_PASSWORD}  "
+    form = AuthForm(data={"username": "login-user", "password": password})
+    assert form.is_valid()
+    assert form.cleaned_data["password"] == password

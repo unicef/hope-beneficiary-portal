@@ -749,3 +749,15 @@ def test_auth_login_shows_lockout_page(django_app, household):
         res = res.forms["reg-form"].submit()
     assert res.status_code == 200
     assert b"Locked out" in res.content
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_account_create_posts_to_refreshed_signed_data(django_app, household):
+    info_res = _go_to_info_page(django_app, household)
+    link = _account_create_link(info_res)
+    res = django_app.get(link)
+    form_action = res.forms["account-form"].action
+    assert form_action
+    assert form_action.rstrip("/") != res.request.path.rstrip("/")
+    assert "/account/create/" in form_action

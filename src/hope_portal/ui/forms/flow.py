@@ -102,6 +102,7 @@ class AuthForm(BaseForm):
         ),
     )
     password = forms.CharField(
+        strip=False,
         widget=forms.PasswordInput(
             attrs={
                 "class": "input w-full",
@@ -127,6 +128,7 @@ class AccountCredentialsForm(BaseForm):
         ),
     )
     password = forms.CharField(
+        strip=False,
         widget=forms.PasswordInput(
             attrs={
                 "class": "input w-full",
@@ -137,6 +139,7 @@ class AccountCredentialsForm(BaseForm):
     )
     password_confirm = forms.CharField(
         label="Confirm password",
+        strip=False,
         widget=forms.PasswordInput(
             attrs={
                 "class": "input w-full",

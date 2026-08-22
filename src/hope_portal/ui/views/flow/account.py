@@ -10,7 +10,7 @@ from flags.decorators import flag_check
 from hope_portal.models.beneficiary import Beneficiary
 from hope_portal.modules.hope.models import Household
 from hope_portal.ui.forms.flow import AccountCredentialsForm
-from hope_portal.ui.views.flow.crypt import unsign_household
+from hope_portal.ui.views.flow.crypt import sign_household, unsign_household
 
 
 @method_decorator(flag_check("FLOW_ACCOUNT_CREATE", True), name="dispatch")
@@ -19,10 +19,12 @@ class AccountCreate(FormView[AccountCredentialsForm]):
     template_name = "pages/flow/account_create.html"
     household: Household
     beneficiary: Beneficiary | None
+    signed_data: str
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         self.household = unsign_household(request, self.kwargs["signed_data"])
         self.beneficiary = Beneficiary.for_household(self.household)
+        self.signed_data = sign_household(request, self.household)
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self) -> dict[str, Any]:
@@ -38,7 +40,7 @@ class AccountCreate(FormView[AccountCredentialsForm]):
         return {}
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        kwargs["signed_data"] = self.kwargs["signed_data"]
+        kwargs["signed_data"] = self.signed_data
         kwargs["has_account"] = self.beneficiary is not None
         return super().get_context_data(**kwargs)
 
@@ -60,6 +62,6 @@ class AccountCreate(FormView[AccountCredentialsForm]):
             {
                 "username": self.beneficiary.username,
                 "created": created,
-                "signed_data": self.kwargs["signed_data"],
+                "signed_data": self.signed_data,
             },
         )
