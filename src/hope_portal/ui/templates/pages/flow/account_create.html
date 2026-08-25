@@ -19,11 +19,7 @@
                     {% endif %}
                 </p>
             </div>
-            <form method="post"
-                  action="{% url "ui:flow:account-create" signed_data %}"
-                  id="account-form"
-                  autocomplete="off"
-                  class="p-6">
+            <form method="post" action="{% url "ui:flow:account-create" signed_data %}" id="account-form" autocomplete="off" class="p-6">
                 {% csrf_token %}
                 {% if form.non_field_errors %}
                     <div class="bg-error/10 text-error border border-error/20 rounded p-3 mb-4 text-sm">
