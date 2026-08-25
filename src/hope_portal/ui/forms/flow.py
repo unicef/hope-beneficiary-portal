@@ -1,15 +1,20 @@
 import re
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
 
 import phonenumbers
 from django import forms
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core import signing
+from django.core.exceptions import ValidationError
 from django.db.models import CharField, Func, Value
 from django.db.models.functions import Replace
 from django.forms.renderers import DjangoTemplates
 from phonenumbers import NumberParseException
 
 from hope_portal.exception import FlowLockoutError
+from hope_portal.models.beneficiary import Beneficiary
 from hope_portal.modules.hope.models import Household
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
 
@@ -91,12 +96,39 @@ class AuthForm(BaseForm):
             attrs={
                 "class": "input w-full",
                 "autofocus": True,
-                "autocomplete": "new-password",
+                "autocomplete": "username",
                 "placeholder": " ",
             }
         ),
     )
     password = forms.CharField(
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "input w-full",
+                "autocomplete": "current-password",
+                "placeholder": " ",
+            }
+        ),
+    )
+
+
+class AccountCredentialsForm(BaseForm):
+    username = forms.CharField(
+        min_length=3,
+        max_length=150,
+        validators=[UnicodeUsernameValidator()],
+        widget=forms.TextInput(
+            attrs={
+                "class": "input w-full",
+                "autofocus": True,
+                "autocomplete": "username",
+                "placeholder": " ",
+            }
+        ),
+    )
+    password = forms.CharField(
+        strip=False,
         widget=forms.PasswordInput(
             attrs={
                 "class": "input w-full",
@@ -105,6 +137,47 @@ class AuthForm(BaseForm):
             }
         ),
     )
+    password_confirm = forms.CharField(
+        label="Confirm password",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "input w-full",
+                "autocomplete": "new-password",
+                "placeholder": " ",
+            }
+        ),
+    )
+
+    def __init__(self, *args: Any, instance: Beneficiary | None = None, **kwargs: Any) -> None:
+        self.instance = instance
+        super().__init__(*args, **kwargs)
+        if instance is not None:
+            self.fields["password"].label = "New password"
+            self.fields["password_confirm"].label = "Confirm new password"
+
+    def clean_username(self) -> str:
+        username = self.cleaned_data["username"]
+        qs = Beneficiary.objects.filter(username=username)
+        if self.instance is not None and self.instance.pk is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("This username is already taken.")
+        return username
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        password_confirm = cleaned_data.get("password_confirm")
+        username = cleaned_data.get("username")
+        if password and password_confirm and password != password_confirm:
+            self.add_error("password_confirm", "Passwords do not match.")
+        if password:
+            try:
+                validate_password(password, user=SimpleNamespace(username=username or ""))
+            except ValidationError as exc:
+                self.add_error("password", exc)
+        return cleaned_data
 
 
 class StartForm(BaseForm):

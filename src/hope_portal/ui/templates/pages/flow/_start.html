@@ -5,7 +5,7 @@
         <div class="m-auto w-full max-w-lg border border-base-300 rounded bg-base-200 shadow-sm items-center p-5 my-10 mx-4">
             {% block message %}
             {% endblock message %}
-            <form method="POST" action="." id="reg-form" autocomplete="off">
+            <form method="post" action="." id="reg-form" autocomplete="off">
                 {% csrf_token %}
                 {{ formset.management_form }}
                 <fieldset class="form-group">
@@ -13,7 +13,9 @@
                 </fieldset>
                 <div class="flex justify-end gap-3">
                     <a class="btn btn-outline btn-primary" href="{% url "ui:index" %}">{% trans "Back" %}</a>
-                    <input type="submit" class="btn btn-primary" value="{% trans "Validate" %}" />
+                    {% block submit %}
+                        <input type="submit" class="btn btn-primary" value="{% trans "Validate" %}" />
+                    {% endblock submit %}
                 </div>
             </form>
         </div>

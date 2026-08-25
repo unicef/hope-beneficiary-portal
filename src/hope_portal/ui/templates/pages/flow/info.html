@@ -1,5 +1,5 @@
 {% extends "pages/flow/_base.html" %}
-{% load i18n %}
+{% load i18n feature_flags %}
 {% block header %}
 {% endblock header %}
 {% block footer %}
@@ -443,11 +443,15 @@
             {% if signed_data %}
                 <a class="btn btn-outline btn-primary" href="{% url "ui:flow:open-issue" signed_data %}">{% trans "Open Hope Grievance" %}</a>
             {% endif %}
-            {% if signed_data %}
-                <form action="{% url "ui:flow:account-create" signed_data %}" method="post">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-ghost btn-primary" value="{% trans "Create account" %}" />
-                </form>
+            {% flag_enabled "FLOW_ACCOUNT_CREATE" as show_account_create %}
+            {% if signed_data and show_account_create %}
+                <a class="btn btn-ghost btn-primary" href="{% url "ui:flow:account-create" signed_data %}">
+                    {% if has_account %}
+                        {% trans "View or reset login" %}
+                    {% else %}
+                        {% trans "Set username and password" %}
+                    {% endif %}
+                </a>
             {% endif %}
         </div>
     </div>
