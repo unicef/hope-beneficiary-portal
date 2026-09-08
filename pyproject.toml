@@ -43,13 +43,13 @@ dependencies = [
   "django-stubs[compatible-mypy]",
   "django-tailwind>=4.2",
   "django-unfold",
-  "djangorestframework",
+  "djangorestframework>=3.17.2",
   "drf-spectacular",
   "drf-spectacular-sidecar",
   "inflect>=7.5",
   "pdbpp>=0.11.7",
   "phonenumbers>=9.0.17",
-  "pillow>=12",
+  "pillow>=12.3.0",
   "psycopg2-binary",
   "pytz",
   "sentry-sdk",
@@ -106,7 +106,7 @@ docs = [
   "mkdocs-simple-hooks>=0.1.5",
   "mkdocstrings[python]>=0.24.1",
   "mkdocstrings-python",
-  "pymdown-extensions>=10.16.1",
+  "pymdown-extensions>=11.0.1",
   "watchdog>=6",
 ]
 
@@ -156,3 +156,12 @@ exclude = [
 
 [tool.uv]
 package = true
+constraint-dependencies = [
+  "aiohttp>=3.14.3",
+  "cryptography>=50",
+  "gitpython>=3.1.58",
+  "pip>=26.2.0",
+  "setuptools>=83.0.0",
+  "sqlparse>=0.6.0",
+  "webob>=1.8.11",
+]
