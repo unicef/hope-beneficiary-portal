@@ -43,7 +43,7 @@ dependencies = [
   "django-stubs[compatible-mypy]",
   "django-tailwind>=4.2",
   "django-unfold",
-  "djangorestframework>=3.17.2",
+  "djangorestframework>=3.17.2,<3.18",
   "drf-spectacular",
   "drf-spectacular-sidecar",
   "inflect>=7.5",
@@ -156,12 +156,3 @@ exclude = [
 
 [tool.uv]
 package = true
-constraint-dependencies = [
-  "aiohttp>=3.14.3",
-  "cryptography>=50",
-  "gitpython>=3.1.58",
-  "pip>=26.2.0",
-  "setuptools>=83.0.0",
-  "sqlparse>=0.6.0",
-  "webob>=1.8.11",
-]
