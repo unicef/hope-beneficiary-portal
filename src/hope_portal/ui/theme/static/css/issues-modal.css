@@ -167,12 +167,6 @@
           margin: 0;
         }
 
-  /* These fields keep their own native `placeholder` text (e.g. "issue title" under
-          the "Title" label), so the label can't rest inside the field like a true Material
-          floating label without overlapping/doubling up with that placeholder. Keeping the
-          label permanently in the raised "notch" position (same treatment as the `select`
-          below) sidesteps the overlap entirely instead of only fixing it once focused/filled. */
-
   #django-issues-modal-overlay #django-issues-form-container form#django-issues-form .issues-field.floating-field label {
             position: absolute;
             left: 0.75rem;
@@ -266,9 +260,6 @@
         border: 1px solid #c4c4c4;
         height: auto;
         max-height: 200px;
-        /* Without this, the item's own `overflow: hidden` resets its flexbox automatic
-        minimum size to 0, so `form#django-issues-form`'s `overflow-y: auto` lets it get
-        crushed down to a couple of pixels instead of sizing to the screenshot's height. */
         flex-shrink: 0;
         background: #f5f5f5;
       }
