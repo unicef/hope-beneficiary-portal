@@ -43,7 +43,7 @@ dependencies = [
   "django-stubs[compatible-mypy]",
   "django-tailwind>=4.2",
   "django-unfold",
-  "djangorestframework>=3.17.2,<3.18",
+  "djangorestframework>=3.17.2,<3.19",
   "drf-spectacular",
   "drf-spectacular-sidecar",
   "inflect>=7.5",
