@@ -18,6 +18,9 @@ CONTENT_SECURITY_POLICY = {
             "uni-hope-ukr-sr-dev.azurefd.net",
             "uni-hope-ukr-sr-dev.unitst.org",
         ),
+        "frame-src": ("'self'",),
+        "object-src": ("'none'",),
+        "base-uri": ("'self'",),
         "frame-ancestors": ("'self'",),
     }
 }
