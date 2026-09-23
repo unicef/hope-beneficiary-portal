@@ -105,6 +105,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -237,15 +238,23 @@ TEMPLATES = [
 ]
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = env("SECURE_CONTENT_TYPE_NOSNIFF")
+# The obsolete X-XSS-Protection header is deliberately NOT set, see
+# https://owasp.org/www-project-secure-headers/#x-xss-protection
 X_FRAME_OPTIONS = "DENY"
 
+SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS")
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env("SECURE_HSTS_INCLUDE_SUBDOMAINS")
+SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD")
+SECURE_PROXY_SSL_HEADER = env("SECURE_PROXY_SSL_HEADER")
+SECURE_REFERRER_POLICY = env("SECURE_REFERRER_POLICY")
+SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
 
 CSRF_COOKIE_NAME = env("CSRF_COOKIE_NAME")
 CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
 SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
-SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_AGE = env("SESSION_COOKIE_AGE")
+SESSION_EXPIRE_AT_BROWSER_CLOSE = env("SESSION_EXPIRE_AT_BROWSER_CLOSE")
 
 # See: http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
 CRISPY_TEMPLATE_PACK = "bootstrap4"
