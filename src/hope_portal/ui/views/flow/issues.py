@@ -36,10 +36,16 @@ class IssueView(FormView[TicketCreateForm]):
         )
         client.create_beneficiary_ticket(
             business_area_slug=business_area_slug,
-            description=form.cleaned_data["description"],
+            description=self._description_with_household_id(form.cleaned_data["description"]),
             program_id=self._household_program_id(),
         )
         return redirect(self.get_success_url())
+
+    def _description_with_household_id(self, description: str) -> str:
+        """Append the household id, since beneficiary tickets have no other link back to a household in HOPE."""
+        if not self.household.unicef_id:
+            return description
+        return f"{description}\n\nHousehold ID: {self.household.unicef_id}"
 
     def _household_program_id(self) -> str | None:
         program_id = getattr(self.household, "program_id", None)
