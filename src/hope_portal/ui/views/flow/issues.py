@@ -36,16 +36,44 @@ class IssueView(FormView[TicketCreateForm]):
         )
         client.create_beneficiary_ticket(
             business_area_slug=business_area_slug,
-            description=self._description_with_household_id(form.cleaned_data["description"]),
+            description=self._description_with_household_context(form.cleaned_data["description"]),
             program_id=self._household_program_id(),
         )
         return redirect(self.get_success_url())
 
-    def _description_with_household_id(self, description: str) -> str:
-        """Append the household id, since beneficiary tickets have no other link back to a household in HOPE."""
+    def _description_with_household_context(self, description: str) -> str:
+        """Append the household id, since beneficiary tickets have no other link back to a household in HOPE.
+
+        If the household is enrolled in more than one programme, also list every programme so staff
+        can tell which one the beneficiary means.
+        """
         if not self.household.unicef_id:
             return description
-        return f"{description}\n\nHousehold ID: {self.household.unicef_id}"
+
+        lines = [description, "", f"Household ID: {self.household.unicef_id}"]
+        programmes = self._programme_labels()
+        if len(programmes) > 1:
+            lines.append("Programmes:")
+            lines.extend(f"- {label}" for label in programmes)
+        return "\n".join(lines)
+
+    def _programme_labels(self) -> list[str]:
+        rows = (
+            Household.objects.select_related("program__business_area")
+            .filter(
+                household_collection_id=self.household.household_collection_id,
+                unicef_id=self.household.unicef_id,
+            )
+            .exclude(program__isnull=True)
+            .values_list("program__name", "program__business_area__name")
+            .distinct()
+        )
+        labels = {
+            f"{program_name} ({business_area_name})" if business_area_name else program_name
+            for program_name, business_area_name in rows
+            if program_name
+        }
+        return sorted(labels)
 
     def _household_program_id(self) -> str | None:
         program_id = getattr(self.household, "program_id", None)

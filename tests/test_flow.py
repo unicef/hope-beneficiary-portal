@@ -110,6 +110,50 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
 
 @pytest.mark.django_db
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_flow_open_issue_lists_programmes_when_household_has_multiple(django_app, household, settings, monkeypatch):
+    """When the household is enrolled in more than one programme, list them all in the ticket text."""
+    settings.HOPE_API_BASE_URL = "https://hope.example.org"
+    settings.HOPE_API_TOKEN = "token"
+    settings.HOPE_API_TIMEOUT = 5
+
+    household.program.name = "Cash Programme"
+    household.program.save(update_fields=["name"])
+
+    other_household = HouseholdFactory(
+        household_collection_id=household.household_collection_id,
+        unicef_id=household.unicef_id,
+        head_of_household=None,
+    )
+    other_household.program.name = "School Feeding"
+    other_household.program.business_area.name = "Other Business Area"
+    other_household.program.business_area.save(update_fields=["name"])
+    other_household.program.save(update_fields=["name"])
+
+    info_res = _go_to_info_page(django_app, household)
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
+    assert issue_link
+
+    captured = {}
+
+    def _capture_create(self, business_area_slug, description, program_id=None):
+        captured["description"] = description
+
+    monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
+
+    issue_res = django_app.get(issue_link)
+    issue_res.forms[0]["description"] = "Manual issue description"
+    issue_res = issue_res.forms[0].submit()
+    assert issue_res.status_code == 302
+
+    description = captured["description"]
+    assert f"Household ID: {household.unicef_id}" in description
+    assert "Programmes:" in description
+    assert "- Cash Programme (Business Area)" in description
+    assert "- School Feeding (Other Business Area)" in description
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_open_issue_requires_ticket_service_config(django_app, household, settings, monkeypatch):
     settings.HOPE_API_BASE_URL = ""
     settings.HOPE_API_TOKEN = ""
