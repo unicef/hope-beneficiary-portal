@@ -1,26 +1,36 @@
+AZURE_BLOB = "https://*.blob.core.windows.net"
+
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": (
+        "default-src": ["'self'"],
+        "style-src": [
             "'self'",
-            "inline",
-            "unsafe-inline",
-            "data:",
-            "blob:",
             "'unsafe-inline'",
-            "localhost:8000",
-            "unpkg.com",
-            "browser.sentry-cdn.com",
-            "cdnjs.cloudflare.com",
-            "unisitetracker.unicef.io",
-            "cdn.jsdelivr.net",
-            "register.unicef.org",
-            "uni-hope-ukr-sr.azurefd.net",
-            "uni-hope-ukr-sr-dev.azurefd.net",
-            "uni-hope-ukr-sr-dev.unitst.org",
-        ),
-        "frame-src": ("'self'",),
-        "object-src": ("'none'",),
-        "base-uri": ("'self'",),
-        "frame-ancestors": ("'self'",),
+            AZURE_BLOB,
+        ],
+        "script-src": [
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            AZURE_BLOB,
+        ],
+        "img-src": [
+            "'self'",
+            "data:",
+            AZURE_BLOB,
+        ],
+        "font-src": [
+            "'self'",
+            "data:",
+            AZURE_BLOB,
+        ],
+        "connect-src": [
+            "'self'",
+            AZURE_BLOB,
+        ],
+        "frame-src": ["'self'"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
+        "frame-ancestors": ["'self'"],
     }
 }
