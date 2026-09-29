@@ -8,9 +8,15 @@ from django.db import IntegrityError
 from django.urls import reverse
 from testutils.factories.beneficiary import BeneficiaryFactory
 from testutils.factories.hope.houshold import HouseholdFactory
+from testutils.factories.hope.tickets import GrievanceticketProgramsFactory
 
 from hope_portal.exception import FlowLockoutError
 from hope_portal.models.beneficiary import Beneficiary, household_key
+from hope_portal.modules.hope.models import Grievanceticket
+from hope_portal.modules.hope.patcher.tickets import (
+    ISSUE_TYPE_INDIVIDUAL_DATA_CHANGE_DATA_UPDATE,
+    STATUS_IN_PROGRESS,
+)
 from hope_portal.modules.inspect import Inspector
 from hope_portal.modules.security.clients import HopeAPIClient
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
@@ -619,6 +625,24 @@ def _submit_account_form(res, username, password, password_confirm=None):
     form["password"] = password
     form["password_confirm"] = password if password_confirm is None else password_confirm
     return form.submit()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_info_page_shows_linked_ticket_number(django_app, household):
+    ticket = Grievanceticket.objects.create(
+        id=uuid.uuid4(),
+        unicef_id="GRV-000060.001",
+        household_unicef_id=household.unicef_id,
+        issue_type=ISSUE_TYPE_INDIVIDUAL_DATA_CHANGE_DATA_UPDATE,
+        status=STATUS_IN_PROGRESS,
+    )
+    GrievanceticketProgramsFactory(grievanceticket=ticket, program=household.program)
+
+    info_res = _go_to_info_page(django_app, household)
+    assert b"GRV-000060.001" in info_res.content
+    assert b"Individual Data Update" in info_res.content
+    assert b"In Progress" in info_res.content
 
 
 @pytest.mark.django_db

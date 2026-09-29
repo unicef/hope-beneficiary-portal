@@ -419,6 +419,7 @@
                                                     <ul class="space-y-1">
                                                         {% for ticket in hh.tickets %}
                                                             <li class="flex flex-wrap items-center gap-2">
+                                                                <span class="font-mono text-xs opacity-70">{{ ticket.grievanceticket.unicef_id }}</span>
                                                                 <span class="text-xs">{{ ticket.grievanceticket.get_issue_type_display }}</span>
                                                                 <span class="pill pill-no">{{ ticket.grievanceticket.get_status_display }}</span>
                                                             </li>
