@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
 from hope_portal.modules.hope.models import Household
 from hope_portal.modules.security.clients import HopeAPIClient
@@ -52,7 +52,7 @@ class IssueView(FormView[TicketCreateForm]):
         return str(program_id) if program_id else None
 
     def get_success_url(self) -> str:
-        return reverse("ui:flow:info", kwargs={"signed_data": self.kwargs["signed_data"]})
+        return reverse("ui:flow:issue-submitted", kwargs={"signed_data": self.kwargs["signed_data"]})
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs["signed_data"] = self.kwargs["signed_data"]
@@ -73,3 +73,17 @@ class IssueView(FormView[TicketCreateForm]):
             if slug:
                 return slug
         return None
+
+
+class IssueSubmittedView(TemplateView):
+    """Confirmation shown after a beneficiary grievance is created."""
+
+    template_name = "pages/flow/issue_submitted.html"
+
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        unsign_household(request, self.kwargs["signed_data"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        kwargs["signed_data"] = self.kwargs["signed_data"]
+        return super().get_context_data(**kwargs)

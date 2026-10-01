@@ -103,6 +103,11 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
     issue_res.forms[0]["description"] = "Manual issue description"
     issue_res = issue_res.forms[0].submit()
     assert issue_res.status_code == 302
+    issue_res = issue_res.follow()
+    assert (
+        b"Thank you for submitting your grievance. "
+        b"Your case has been received and will be reviewed by the relevant team." in issue_res.content
+    )
     assert captured["business_area_slug"] == household.program.business_area.slug
     assert captured["description"] == f"Manual issue description\n\nHousehold ID: {household.unicef_id}"
     assert uuid.UUID(captured["program_id"]) == uuid.UUID(str(household.program_id))
