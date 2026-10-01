@@ -1,0 +1,21 @@
+{% extends "pages/flow/_base.html" %}
+{% load i18n %}
+{% block page %}
+    <div class="flex flex-col justify-center items-center flex-1 px-4">
+        <div class="w-full max-w-lg bg-base-200 rounded shadow-sm my-10">
+            <div class="bg-primary text-primary-content px-6 py-4 rounded-t">
+                <h2 class="text-xl font-medium">
+                    {% trans "Grievance submitted" %}
+                </h2>
+            </div>
+            <div class="p-6">
+                <p>
+                    {% trans "Thank you for submitting your grievance. Your case has been received and will be reviewed by the relevant team." %}
+                </p>
+                <div class="flex justify-end gap-3 mt-6">
+                    <a class="btn btn-primary" href="{% url "ui:flow:info" signed_data %}">{% trans "Back to household" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page %}
