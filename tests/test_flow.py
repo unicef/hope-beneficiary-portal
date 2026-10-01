@@ -117,7 +117,7 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
 @pytest.mark.django_db
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_flow_open_issue_lists_programmes_when_household_has_multiple(django_app, household, settings, monkeypatch):
-    """When the household is enrolled in more than one programme, list them all in the ticket text."""
+    """When enrolled in more than one programme, the ticket text says which one this ticket is for."""
     settings.HOPE_API_BASE_URL = "https://hope.example.org"
     settings.HOPE_API_TOKEN = "token"
     settings.HOPE_API_TIMEOUT = 5
@@ -152,10 +152,53 @@ def test_flow_open_issue_lists_programmes_when_household_has_multiple(django_app
     assert issue_res.status_code == 302
 
     description = captured["description"]
-    assert f"Household ID: {household.unicef_id}" in description
-    assert "Programmes:" in description
-    assert "- Cash Programme (Business Area)" in description
-    assert "- School Feeding (Other Business Area)" in description
+    assert description == (
+        "Manual issue description\n"
+        "\n"
+        f"Household ID: {household.unicef_id}\n"
+        "Programme for this ticket: Cash Programme (Business Area)\n"
+        "Household is also enrolled in:\n"
+        "- School Feeding (Other Business Area)"
+    )
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_flow_open_issue_uses_business_area_of_the_ticket_programme(django_app, household, settings, monkeypatch):
+    """A sibling programme in another business area must not decide where this ticket is posted."""
+    settings.HOPE_API_BASE_URL = "https://hope.example.org"
+    settings.HOPE_API_TOKEN = "token"
+    settings.HOPE_API_TIMEOUT = 5
+
+    household.program.business_area.slug = "current-ba"
+    household.program.business_area.save(update_fields=["slug"])
+
+    other_household = HouseholdFactory(
+        household_collection_id=household.household_collection_id,
+        unicef_id=household.unicef_id,
+        head_of_household=None,
+    )
+    other_household.program.business_area.slug = "other-ba"
+    other_household.program.business_area.save(update_fields=["slug"])
+
+    info_res = _go_to_info_page(django_app, household)
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
+    assert issue_link
+
+    captured = {}
+
+    def _capture_create(self, business_area_slug, description, program_id=None):
+        captured["business_area_slug"] = business_area_slug
+        captured["program_id"] = program_id
+
+    monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
+
+    issue_res = django_app.get(issue_link)
+    issue_res.forms[0]["description"] = "Manual issue description"
+    issue_res = issue_res.forms[0].submit()
+    assert issue_res.status_code == 302
+    assert captured["business_area_slug"] == "current-ba"
+    assert uuid.UUID(captured["program_id"]) == uuid.UUID(str(household.program_id))
 
 
 @pytest.mark.django_db
@@ -210,6 +253,14 @@ def test_flow_open_issue_requires_available_business_area(django_app, household,
 
     household.program.business_area.slug = None
     household.program.business_area.save(update_fields=["slug"])
+    # A sibling programme with its own business area must not stand in for this ticket's programme.
+    other_household = HouseholdFactory(
+        household_collection_id=household.household_collection_id,
+        unicef_id=household.unicef_id,
+        head_of_household=None,
+    )
+    other_household.program.business_area.slug = "other-ba"
+    other_household.program.business_area.save(update_fields=["slug"])
 
     info_res = _go_to_info_page(django_app, household)
     issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
@@ -768,9 +819,20 @@ def test_auth_login_rejects_suspended_beneficiary(django_app, household):
 
 @pytest.mark.django_db
 @override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_account_form_prefills_individual_unicef_id(django_app, household):
+    household.head_of_household.unicef_id = "IND-24-0002.5254"
+    household.head_of_household.save(update_fields=["unicef_id"])
+    info_res = _go_to_info_page(django_app, household)
+    res = django_app.get(_account_create_link(info_res))
+    assert res.forms["account-form"]["username"].value == "IND-24-0002.5254"
+    assert res.forms["account-form"]["username"].value != household.unicef_id
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
 def test_account_form_prefills_empty_username_when_unicef_id_missing(django_app, household):
-    household.unicef_id = ""
-    household.save(update_fields=["unicef_id"])
+    household.head_of_household.unicef_id = ""
+    household.head_of_household.save(update_fields=["unicef_id"])
     info_res = _go_to_info_page(django_app, household)
     res = django_app.get(_account_create_link(info_res))
     assert res.forms["account-form"]["username"].value == ""

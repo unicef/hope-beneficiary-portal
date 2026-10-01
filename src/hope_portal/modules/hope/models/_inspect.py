@@ -83,6 +83,9 @@ class BusinessArea(HopeModel):
         "Country", on_delete=models.DO_NOTHING, related_name="businessarea_office_country", blank=True, null=True
     )
     rdi_import_xlsx_disabled = models.BooleanField(null=True)
+    vision_integration_active = models.BooleanField(null=True)
+    timezone = models.CharField(max_length=63, null=True)
+    ingest_source = models.CharField(max_length=64, null=True)
 
     class Routing:
         key = "hope"
@@ -158,7 +161,7 @@ class Countrycodemap(HopeModel):
 
 class Currency(HopeModel):
     id = models.BigAutoField(primary_key=True)
-    code = models.CharField(unique=True, max_length=5, null=True)
+    code = models.CharField(max_length=5, null=True)
     name = models.CharField(max_length=255, null=True)
     is_crypto = models.BooleanField(null=True)
     vision_code = models.CharField(max_length=5, null=True)
@@ -693,7 +696,6 @@ class Ticketindividualdataupdatedetails(HopeModel):
     created_at = models.DateTimeField(null=True)
     updated_at = models.DateTimeField(null=True)
     individual_data = models.JSONField(blank=True, null=True)
-    role_reassign_data = models.JSONField(null=True)
     individual = models.ForeignKey(
         "Individual",
         on_delete=models.DO_NOTHING,
@@ -1935,30 +1937,6 @@ class Financialserviceproviderxlsxtemplate(HopeModel):
         return str(self.name)
 
 
-class Followupinstruction(HopeModel):
-    id = models.UUIDField(primary_key=True)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
-    unicef_id = models.CharField(max_length=255, blank=True, null=True)
-    background_action_status = models.CharField(max_length=255, blank=True, null=True)
-    business_area = models.ForeignKey(
-        BusinessArea, on_delete=models.DO_NOTHING, related_name="followupinstruction_business_area", null=True
-    )
-    program = models.ForeignKey(
-        "Program", on_delete=models.DO_NOTHING, related_name="followupinstruction_program", null=True
-    )
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_followupinstruction"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-
 class Fspnamemapping(HopeModel):
     id = models.BigAutoField(primary_key=True)
     external_name = models.CharField(max_length=255, null=True)
@@ -2143,6 +2121,7 @@ class PaymentPlan(HopeModel):
     total_individuals_count = models.IntegerField(null=True)
     imported_file_date = models.DateTimeField(blank=True, null=True)
     steficon_applied_date = models.DateTimeField(blank=True, null=True)
+    is_follow_up = models.BooleanField(null=True)
     exclusion_reason = models.TextField(blank=True, null=True)
     exclude_household_error = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -2187,22 +2166,6 @@ class PaymentPlan(HopeModel):
     )
     use_payment_gateway = models.BooleanField(null=True)
     closure_comment = models.TextField(blank=True, null=True)
-    payment_plan_group = models.ForeignKey(
-        "Paymentplangroup",
-        on_delete=models.DO_NOTHING,
-        related_name="paymentplan_payment_plan_group",
-        blank=True,
-        null=True,
-    )
-    plan_type = models.CharField(max_length=20, null=True)
-    export_tag = models.SmallIntegerField(blank=True, null=True)
-    follow_up_instruction = models.ForeignKey(
-        Followupinstruction,
-        on_delete=models.DO_NOTHING,
-        related_name="paymentplan_follow_up_instruction",
-        blank=True,
-        null=True,
-    )
 
     class Routing:
         key = "hope"
@@ -2239,31 +2202,6 @@ class PaymentplanPaymentPlanPurposes(HopeModel):
 
     class Tenant:
         tenant_filter_field: str = "__all__"
-
-
-class Paymentplangroup(HopeModel):
-    id = models.UUIDField(primary_key=True)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
-    unicef_id = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True)
-    cycle = models.ForeignKey(
-        "ProgramCycle", on_delete=models.DO_NOTHING, related_name="paymentplangroup_cycle", null=True
-    )
-    background_action_status = models.CharField(max_length=50, blank=True, null=True)
-
-    class Routing:
-        key = "hope"
-
-    class Meta:
-        managed = False
-        db_table = "payment_paymentplangroup"
-
-    class Tenant:
-        tenant_filter_field: str = "__all__"
-
-    def __str__(self) -> str:
-        return str(self.name)
 
 
 class Paymentplanpurpose(HopeModel):
@@ -2893,7 +2831,7 @@ class DataRegistrationdataimport(HopeModel):
         null=True,
     )
     program = models.ForeignKey(
-        Program, on_delete=models.DO_NOTHING, related_name="dataregistrationdataimport_program", blank=True, null=True
+        Program, on_delete=models.DO_NOTHING, related_name="dataregistrationdataimport_program", null=True
     )
     import_from_ids = models.TextField(blank=True, null=True)
     exclude_external_collectors = models.BooleanField(null=True)
@@ -2971,7 +2909,6 @@ class ListSanctionlistindividual(HopeModel):
         related_name="listsanctionlistindividual_sanction_list",
         null=True,
     )
-    internal_data = models.JSONField(null=True)
 
     class Routing:
         key = "hope"

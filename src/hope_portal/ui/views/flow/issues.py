@@ -25,7 +25,7 @@ class IssueView(FormView[TicketCreateForm]):
         if not settings.HOPE_API_BASE_URL or not settings.HOPE_API_TOKEN:
             form.add_error(None, "Ticket service is not configured.")
             return self.form_invalid(form)
-        if not (business_area_slug := self._first_business_area_slug()):
+        if not (business_area_slug := self._business_area_slug()):
             form.add_error(None, "No business area available for this household.")
             return self.form_invalid(form)
 
@@ -44,20 +44,27 @@ class IssueView(FormView[TicketCreateForm]):
     def _description_with_household_context(self, description: str) -> str:
         """Append the household id, since beneficiary tickets have no other link back to a household in HOPE.
 
-        If the household is enrolled in more than one programme, also list every programme so staff
-        can tell which one the beneficiary means.
+        The ticket itself is only ever about the programme tied to `self.household`, but a household can
+        be enrolled in more than one programme (a separate Household row per programme, sharing the same
+        household_collection/unicef_id). When that's the case, spell out which programme this ticket is
+        for and list the others only as extra context, so staff aren't left guessing which one applies.
         """
         if not self.household.unicef_id:
             return description
 
         lines = [description, "", f"Household ID: {self.household.unicef_id}"]
-        programmes = self._programme_labels()
-        if len(programmes) > 1:
-            lines.append("Programmes:")
-            lines.extend(f"- {label}" for label in programmes)
+        current_label, other_labels = self._programme_labels()
+        if other_labels:
+            if current_label:
+                lines.append(f"Programme for this ticket: {current_label}")
+                lines.append("Household is also enrolled in:")
+            else:
+                lines.append("Household is enrolled in multiple programmes:")
+            lines.extend(f"- {label}" for label in other_labels)
         return "\n".join(lines)
 
-    def _programme_labels(self) -> list[str]:
+    def _programme_labels(self) -> tuple[str | None, list[str]]:
+        """Return the label for this ticket's own programme, and labels for any other programmes."""
         rows = (
             Household.objects.select_related("program__business_area")
             .filter(
@@ -65,15 +72,20 @@ class IssueView(FormView[TicketCreateForm]):
                 unicef_id=self.household.unicef_id,
             )
             .exclude(program__isnull=True)
-            .values_list("program__name", "program__business_area__name")
+            .values_list("program_id", "program__name", "program__business_area__name")
             .distinct()
         )
-        labels = {
-            f"{program_name} ({business_area_name})" if business_area_name else program_name
-            for program_name, business_area_name in rows
-            if program_name
-        }
-        return sorted(labels)
+        current_label = None
+        other_labels = set()
+        for program_id, program_name, business_area_name in rows:
+            if not program_name:
+                continue
+            label = f"{program_name} ({business_area_name})" if business_area_name else program_name
+            if program_id == self.household.program_id:
+                current_label = label
+            else:
+                other_labels.add(label)
+        return current_label, sorted(other_labels)
 
     def _household_program_id(self) -> str | None:
         program_id = getattr(self.household, "program_id", None)
@@ -86,18 +98,14 @@ class IssueView(FormView[TicketCreateForm]):
         kwargs["signed_data"] = self.kwargs["signed_data"]
         return super().get_context_data(**kwargs)
 
-    def _first_business_area_slug(self) -> str | None:
-        rows = (
-            Household.objects.select_related("program__business_area")
-            .filter(
-                household_collection_id=self.household.household_collection_id,
-                unicef_id=self.household.unicef_id,
-            )
-            .exclude(program__business_area__slug__isnull=True)
-            .values_list("program__business_area__slug", "program__business_area__name")
-            .distinct()
-        )
-        for slug, _name in rows:
-            if slug:
-                return slug
-        return None
+    def _business_area_slug(self) -> str | None:
+        """Business area of the programme this ticket is opened for.
+
+        The same household can be enrolled in several programmes, and those programmes can sit in
+        different business areas. The slug must come from the programme we also send as program_id,
+        which is the programme on the current household, not whichever sibling row the query hits first.
+        """
+        program = self.household.program
+        if program is None or program.business_area is None:
+            return None
+        return program.business_area.slug or None
