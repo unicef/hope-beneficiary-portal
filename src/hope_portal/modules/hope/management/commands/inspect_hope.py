@@ -368,9 +368,8 @@ class Command(BaseCommand):
 
         # Add max_length for all CharFields. psycopg reports the varchar length on
         # display_size; internal_size (row[3]) is None.
-        if field_type == "CharField" and row[2]:
-            if (size := int(row[2])) > 0:
-                field_params["max_length"] = size
+        if field_type == "CharField" and row[2] and (size := int(row[2])) > 0:
+            field_params["max_length"] = size
 
         if field_type == "DecimalField":
             if row[4] is None or row[5] is None:

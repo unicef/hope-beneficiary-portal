@@ -99,7 +99,7 @@ class IssueView(FormView[TicketCreateForm]):
         return super().get_context_data(**kwargs)
 
     def _business_area_slug(self) -> str | None:
-        """Business area of the programme this ticket is opened for.
+        """Return the business area of the programme this ticket is opened for.
 
         The same household can be enrolled in several programmes, and those programmes can sit in
         different business areas. The slug must come from the programme we also send as program_id,
