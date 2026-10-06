@@ -15,17 +15,29 @@
                 {% if ticket_number %}
                     <dl class="mt-6 space-y-3 text-sm">
                         <div>
-                            <dt class="opacity-70">{% trans "Ticket number" %}</dt>
-                            <dd class="font-mono text-base font-medium">{{ ticket_number }}</dd>
+                            <dt class="opacity-70">
+                                {% trans "Ticket number" %}
+                            </dt>
+                            <dd class="font-mono text-base font-medium">
+                                {{ ticket_number }}
+                            </dd>
                         </div>
                         <div>
-                            <dt class="opacity-70">{% trans "Status" %}</dt>
-                            <dd>{{ ticket_status }}</dd>
+                            <dt class="opacity-70">
+                                {% trans "Status" %}
+                            </dt>
+                            <dd>
+                                {{ ticket_status }}
+                            </dd>
                         </div>
                         {% if ticket_submitted_at %}
                             <div>
-                                <dt class="opacity-70">{% trans "Submitted" %}</dt>
-                                <dd>{{ ticket_submitted_at|date:"j M Y" }}</dd>
+                                <dt class="opacity-70">
+                                    {% trans "Submitted" %}
+                                </dt>
+                                <dd>
+                                    {{ ticket_submitted_at|date:"j M Y" }}
+                                </dd>
                             </div>
                         {% endif %}
                     </dl>
