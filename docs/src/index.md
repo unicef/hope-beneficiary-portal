@@ -3,45 +3,52 @@
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  border-spacing: 0;
-  margin: 0;
-  padding: 0;
+  margin: 10px 0;
 }
 
 .steps-table td {
-  padding: 8px;
+  padding: 3px;
   text-align: center;
   vertical-align: middle;
   box-sizing: border-box;
 }
 
-/* Same height for all title cells */
-.steps-table tr:first-child td {
-  height: 80px;
+/* Keep all step titles aligned */
+.steps-table .step-title {
+  height: 90px;
+  padding: 8px 12px;
+  vertical-align: middle;
+  font-weight: bold;
+  line-height: 1.5;
 }
 
-/* Same height for all image areas */
-.steps-table tr:last-child td {
-  height: 300px;
+/* Remove the large fixed height from the image row */
+.steps-table .image-cell {
+  height: auto;
+  padding: 8px;
 }
 
-/* Each image fills its equally divided area */
-.steps-table img {
-  display: block;
+/* Equal image area for every screenshot */
+.steps-table .image-frame {
   width: 100%;
-  height: 100%;
-  max-height: 300px;
-  object-fit: contain;
-  object-position: center;
-  margin: 0;
-  padding: 0;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-
+/* Fit the screenshot inside the equal image area */
+.steps-table .image-frame img {
+  display: block;
+  max-width: 100%;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0;
 }
 </style>
-
-
 
 # HOPE Beneficiary Portal User Manual
 
@@ -54,7 +61,6 @@ Through the portal, beneficiaries can view their personal and household informat
 The portal reduces the need for beneficiaries to rely solely on intermediaries and provides greater transparency and confidence that their requests and grievances have been recorded and can be followed up. The portal provides an alternative and direct channel for beneficiaries to submit grievances. This may be particularly important for beneficiaries who do not feel comfortable using other available grievance channels, are uncertain whether their grievance will reach the responsible team, or are conceThank yorned about possible retaliation or negative consequences, such as unfair treatment or exclusion from assistance, after reporting an issue.
 
 After identity verification, beneficiaries can:
-
 - View their household profile and demographic details.
 - View linked programmes, payment statuses, and grievance tickets.
 - View payments already made to them and upcoming payments, when available.
@@ -99,7 +105,7 @@ Follow the steps below to access the HOPE Beneficiary Portal:
 > [!NOTE]
 > The available login methods may depend on the contact and account information recorded for the beneficiary in HOPE.
 
-<table class="steps-table">
+<table width = "60%" class="steps-table">
 <tr>
 <td>
 <b>Select your preferred language and choose one of the four available login methods</b>
@@ -107,8 +113,7 @@ Follow the steps below to access the HOPE Beneficiary Portal:
 </tr>
 <tr>
 <td>
-
-<img src="images/language_and_login_methods.png" alt="Select your preferred language and choose one of the four available login methods.">
+<img src="images/language_and_login_methods.png" alt="Select your preferred language and choose one of the four available login methods." style="width: 60%; height: auto;">
 </td>
 </tr>
 </table>
@@ -118,7 +123,6 @@ Follow the steps below to access the HOPE Beneficiary Portal:
 The HOPE Beneficiary Portal supports four login methods:
 
 ### 1) Registration Number
-
 You can access the portal using the registration number you received during registration.
 
 1. Select **REGISTRATION NUMBER**.
@@ -148,12 +152,11 @@ You can access the portal using the mobile number provided during registration.
 4. Enter the OTP in the relevant field, then select **VALIDATE**.
 
 After successful OTP verification, you are redirected to the Household Page, where you can view your household, programme, payment, and grievance information.
-
 <table class="steps-table">
   <tr>
     <td ><b>Step 1: Select SMS</b></td>
     <td ><b>Step 2: Enter your mobile number</b></td>
-    <td ><b>Step 3: Enter the one-time password (OTP) received by SMS</b></td>
+    <td ><b>Step 3: Enter the OTP received by SMS</b></td>
   </tr>
   <tr>
     <td><img src="images/sms_login_option.png" alt="SMS option on the portal login page" ></td>
@@ -174,7 +177,7 @@ After successful OTP verification, you are redirected to the Household Page, whe
   <tr>
     <td ><b>Step 1: Select EMAIL</b></td>
     <td ><b>Step 2: Enter your email address</b></td>
-    <td ><b>Step 3: Enter the one-time password (OTP) received by email</b></td>
+    <td ><b>Step 3: Enter the OTP received by email</b></td>
   </tr>
   <tr>
     <td><img src="images/email_login_option.png" alt="Email option on the portal login page" ></td>
@@ -191,12 +194,10 @@ You can access the portal using previously created account credentials. These cr
 2. Enter your username and password in the relevant fields, then select **SIGN IN**.
 
 After successful login, you are redirected to the Household Page.
-
 <table class="steps-table">
   <tr>
     <td ><b>Step 1: Select LOGIN</b></td>
-    <td ><b>Step 2: Enter your username and password, then select SIGN IN</b></td>
-    
+    <td ><b>Step 2: Enter your credentials, then select SIGN IN</b></td>
   </tr>
   <tr>
     <td><img src="images/username_password_login_option.png" alt="LOGIN option on the portal login page"></td>
@@ -216,8 +217,7 @@ After successful identity verification using Registration Number, SMS, or Email,
 <table class="steps-table">
   <tr>
     <td ><b>Step 1: On the Household Page, select VIEW OR RESET LOGIN</b></td>
-    <td ><b>Step 2: Create or update your username, reset your password, or both, then select SAVE LOGIN</b></td>
-    
+    <td ><b>Step 2: Create or update your login details, then select SAVE LOGIN </b></td>
   </tr>
   <tr>
     <td><img src="images/view_reset_login_option.png" alt="VIEW OR RESET LOGIN option on the Household Page"></td>
@@ -244,7 +244,6 @@ At the bottom of the page, you can:
 1. Select **DONE** to leave the Household Page and securely end your portal session.
 2. Select **OPEN HOPE GRIEVANCE** to submit a new grievance, concern, feedback, complaint, or request.
 3. Select **VIEW OR RESET LOGIN** to create, view, or update your username, reset your password, or both.
-
 <table class="steps-table">
 <tr>
 <td>
@@ -253,7 +252,7 @@ At the bottom of the page, you can:
 </tr>
 <tr>
 <td >
-<img src="images/portal_main_page.png" alt="Household Page showing household, programme, payment, and grievance information" ></td>
+<img src="images/portal_main_page.png" alt="Household Page showing household, programme, payment, and grievance information" style="width: 60%; height: auto;"></td>
 </td>
 </tr>
 </table>
@@ -273,7 +272,6 @@ You can return to the Programmes and Cases section of the Household Page to view
   <tr>
     <td ><b>Step 1: On the Household Page, select OPEN HOPE GRIEVANCE</b></td>
     <td ><b>Step 2: Enter the grievance description, then select CREATE</b></td>
-    
   </tr>
   <tr>
     <td><img src="images/open_hope_grievance_option.png" alt="OPEN HOPE GRIEVANCE option on the Household Page"></td>
