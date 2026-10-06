@@ -2,9 +2,10 @@
 .steps-table {
   width: 100%;
   table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 12px;
-  margin: 20px 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .steps-table td {
@@ -14,18 +15,29 @@
   box-sizing: border-box;
 }
 
+/* Same height for all title cells */
 .steps-table tr:first-child td {
-  height: 70px;
-  vertical-align: middle;
+  height: 80px;
 }
 
+/* Same height for all image areas */
+.steps-table tr:last-child td {
+  height: 300px;
+}
+
+/* Each image fills its equally divided area */
 .steps-table img {
   display: block;
   width: 100%;
-  
+  height: 100%;
+  max-height: 300px;
   object-fit: contain;
   object-position: center;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
+}
+
+
 }
 </style>
 
@@ -77,13 +89,15 @@ Protecting Your Information
 
 Follow the steps below to access the HOPE Beneficiary Portal:
 
-1) Open a supported web browser on your phone, tablet, or computer.
-2) Enter the official HOPE Beneficiary Portal link in the address bar.
-3) On the welcome page, select your preferred language.
-4) Select one of the available login methods.
+1. Open a supported web browser on your phone, tablet, or computer.
+2. Enter the official HOPE Beneficiary Portal link in the address bar.
+3. On the welcome page, select your preferred language.
+4. Select one of the available login methods.
 
-Note: The available login methods may depend on the contact and account information recorded for the beneficiary in HOPE.
 
+
+> [!NOTE]
+> The available login methods may depend on the contact and account information recorded for the beneficiary in HOPE.
 
 <table class="steps-table">
 <tr>
@@ -99,7 +113,7 @@ Note: The available login methods may depend on the contact and account informat
 </tr>
 </table>
 
-## Login Methods
+### Login Methods
 
 The HOPE Beneficiary Portal supports four login methods:
 
@@ -107,13 +121,11 @@ The HOPE Beneficiary Portal supports four login methods:
 
 You can access the portal using the registration number you received during registration.
 
-1. Select REGISTRATION NUMBER.
-2. Enter your registration number in the relevant field, then select VALIDATE.
-3. Answer the identity-verification questions displayed by the portal, then select VALIDATE.
+1. Select **REGISTRATION NUMBER**.
+2. Enter your registration number in the relevant field, then select **VALIDATE**.
+3. Answer the identity-verification questions displayed by the portal, then select **VALIDATE**.
 
 After successful identity verification, you are redirected to the Household Page, where you can view your household, programme, payment, and grievance information.
-
-
 <table class="steps-table">
   <tr>
     <td><b>Step 1: Select REGISTRATION NUMBER</b></td>
@@ -130,10 +142,10 @@ After successful identity verification, you are redirected to the Household Page
 ### 2) SMS verification
 You can access the portal using the mobile number provided during registration. 
 
-1. Select SMS.
-2. Enter your mobile number in the relevant field, then select VALIDATE.
+1. Select **SMS**.
+2. Enter your mobile number in the relevant field, then select **VALIDATE**.
 3. The portal sends a one-time password (OTP) by SMS to the registered mobile number. The OTP is valid for five minutes.
-4. Enter the OTP in the relevant field, then select VALIDATE.
+4. Enter the OTP in the relevant field, then select **VALIDATE**.
 
 After successful OTP verification, you are redirected to the Household Page, where you can view your household, programme, payment, and grievance information.
 
@@ -151,12 +163,11 @@ After successful OTP verification, you are redirected to the Household Page, whe
 </table>
 
 ### 3) Email verification
-
 You can access the portal using the email address provided during registration.
 
-1. Select EMAIL.
-2. Enter your email address in the relevant field, then select VALIDATE. The portal sends a one-time password to the registered email address. The OTP is valid for five minutes.
-3. Enter the OTP in the relevant field, then select VALIDATE.
+1. Select **EMAIL**.
+2. Enter your email address in the relevant field, then select **VALIDATE**. The portal sends a one-time password to the registered email address. The OTP is valid for five minutes.
+3. Enter the OTP in the relevant field, then select **VALIDATE**.
 
 After successful OTP verification, you are redirected to the Household Page, where you can view your household, programme, payment, and grievance information.
 <table class="steps-table">
@@ -176,8 +187,8 @@ After successful OTP verification, you are redirected to the Household Page, whe
 
 You can access the portal using previously created account credentials. These credentials can be created after successfully accessing the portal through one of the other three verification methods: Registration Number, SMS, or Email.
 
-1. Select LOGIN.
-2. Enter your username and password in the relevant fields, then select SIGN IN.
+1. Select **LOGIN**.
+2. Enter your username and password in the relevant fields, then select **SIGN IN**.
 
 After successful login, you are redirected to the Household Page.
 
@@ -200,8 +211,8 @@ After successful identity verification using Registration Number, SMS, or Email,
 1. If you do not have login credentials, enter a username and password.
 2. If login credentials already exist, you can view or update your username, reset your password, or both.
 3. For security reasons, your existing password cannot be displayed. If you do not remember your password, you must set a new one.
-4. Select SAVE LOGIN to save your changes.
-5. During future visits, select LOGIN and enter your username and password. You will not need to repeat the Registration Number, SMS, or Email verification process.
+4. Select **SAVE LOGIN** to save your changes.
+5. During future visits, select **LOGIN** and enter your username and password. You will not need to repeat the Registration Number, SMS, or Email verification process.
 <table class="steps-table">
   <tr>
     <td ><b>Step 1: On the Household Page, select VIEW OR RESET LOGIN</b></td>
@@ -250,10 +261,10 @@ At the bottom of the page, you can:
 ## Submitting a Grievance
 You can submit a grievance, concern, feedback, complaint, or request directly through the portal.
 
-1. On the Household Page, select OPEN HOPE GRIEVANCE.
+1. On the Household Page, select **OPEN HOPE GRIEVANCE**.
 2. The grievance form is displayed.
 3. Enter a clear description of your grievance, concern, feedback, complaint, or request.
-4. Select CREATE to submit the grievance.
+4. Select **CREATE** to submit the grievance.
 5. After successful submission, the portal creates a grievance ticket that you can use to follow up on your case.
 
 You can return to the Programmes and Cases section of the Household Page to view your submitted grievance ticket and its current status. If the grievance relates to a data-update request, the updated information will automatically appear in the portal after the request has been completed and the ticket has been closed.
@@ -287,7 +298,7 @@ When you have finished using the portal, select **DONE** to leave the Household 
 <img src="images/done_button.png" Alt="DONE button used to leave the Household Page">
 </td>
 <td>
-<img src="images/login_options.png" Alt="Portal login page displayed after leaving the Household Page">
+<img src="images/login_page.png" Alt="Portal login page displayed after leaving the Household Page">
 </td>
 </tr>
 </table>
