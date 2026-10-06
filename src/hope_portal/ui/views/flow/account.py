@@ -35,8 +35,9 @@ class AccountCreate(FormView[AccountCredentialsForm]):
     def get_initial(self) -> dict[str, Any]:
         if self.beneficiary is not None:
             return {"username": self.beneficiary.username}
-        if self.household.unicef_id:
-            return {"username": self.household.unicef_id}
+        head = self.household.head_of_household
+        if head is not None and head.unicef_id:
+            return {"username": head.unicef_id}
         return {}
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
