@@ -1,4 +1,5 @@
 import uuid
+from datetime import UTC, datetime
 from unittest import mock
 
 import pytest
@@ -14,7 +15,10 @@ from hope_portal.exception import FlowLockoutError
 from hope_portal.models.beneficiary import Beneficiary, household_key
 from hope_portal.modules.hope.models import Grievanceticket
 from hope_portal.modules.hope.patcher.tickets import (
+    CATEGORY_GRIEVANCE_COMPLAINT,
+    CATEGORY_SYSTEM_FLAGGING,
     ISSUE_TYPE_INDIVIDUAL_DATA_CHANGE_DATA_UPDATE,
+    STATUS_CLOSED,
     STATUS_IN_PROGRESS,
 )
 from hope_portal.modules.inspect import Inspector
@@ -98,10 +102,12 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
 
     captured = {}
 
-    def _capture_create(self, business_area_slug, description, program_id=None):
+    def _capture_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         captured["business_area_slug"] = business_area_slug
         captured["description"] = description
         captured["program_id"] = program_id
+        captured["household_unicef_id"] = household_unicef_id
+        return {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"}
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -114,6 +120,10 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
         b"Thank you for submitting your grievance. "
         b"Your case has been received and will be reviewed by the relevant team." in issue_res.content
     )
+    assert b"GRV-100" in issue_res.content
+    assert b"New" in issue_res.content
+    assert b"6 Oct 2026" in issue_res.content
+    assert captured["household_unicef_id"] == household.unicef_id
     assert captured["business_area_slug"] == household.program.business_area.slug
     assert captured["description"] == f"Manual issue description\n\nHousehold ID: {household.unicef_id}"
     assert uuid.UUID(captured["program_id"]) == uuid.UUID(str(household.program_id))
@@ -146,8 +156,9 @@ def test_flow_open_issue_lists_programmes_when_household_has_multiple(django_app
 
     captured = {}
 
-    def _capture_create(self, business_area_slug, description, program_id=None):
+    def _capture_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         captured["description"] = description
+        return {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"}
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -192,9 +203,10 @@ def test_flow_open_issue_uses_business_area_of_the_ticket_programme(django_app, 
 
     captured = {}
 
-    def _capture_create(self, business_area_slug, description, program_id=None):
+    def _capture_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         captured["business_area_slug"] = business_area_slug
         captured["program_id"] = program_id
+        return {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"}
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -216,7 +228,7 @@ def test_flow_open_issue_requires_ticket_service_config(django_app, household, s
     issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
     assert issue_link
 
-    def _fail_create(self, business_area_slug, description, program_id=None):
+    def _fail_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         raise AssertionError("Ticket creation should not be called")
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _fail_create)
@@ -271,7 +283,7 @@ def test_flow_open_issue_requires_available_business_area(django_app, household,
     issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
     assert issue_link
 
-    def _fail_create(self, business_area_slug, description, program_id=None):
+    def _fail_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         raise AssertionError("Ticket creation should not be called when no business area is available")
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _fail_create)
@@ -681,6 +693,50 @@ def _submit_account_form(res, username, password, password_confirm=None):
     form["password"] = password
     form["password_confirm"] = password if password_confirm is None else password_confirm
     return form.submit()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_info_page_lists_household_grievances_with_dates(django_app, household):
+    submitted = datetime(2026, 3, 2, 8, 0, tzinfo=UTC)
+    closed = datetime(2026, 4, 1, 8, 0, tzinfo=UTC)
+    Grievanceticket.objects.create(
+        id=uuid.uuid4(),
+        unicef_id="GRV-OPEN",
+        household_unicef_id=household.unicef_id,
+        status=STATUS_IN_PROGRESS,
+        category=CATEGORY_GRIEVANCE_COMPLAINT,
+        created_at=submitted,
+        updated_at=submitted,
+    )
+    Grievanceticket.objects.create(
+        id=uuid.uuid4(),
+        unicef_id="GRV-CLOSED",
+        household_unicef_id=household.unicef_id,
+        status=STATUS_CLOSED,
+        category=CATEGORY_GRIEVANCE_COMPLAINT,
+        created_at=submitted,
+        updated_at=closed,
+    )
+    Grievanceticket.objects.create(
+        id=uuid.uuid4(),
+        unicef_id="GRV-SYSTEM",
+        household_unicef_id=household.unicef_id,
+        status=STATUS_IN_PROGRESS,
+        category=CATEGORY_SYSTEM_FLAGGING,
+        created_at=submitted,
+        updated_at=submitted,
+    )
+
+    info_res = _go_to_info_page(django_app, household)
+    assert b"GRV-OPEN" in info_res.content
+    assert b"In Progress" in info_res.content
+    assert b"2 Mar 2026" in info_res.content
+    assert b"GRV-CLOSED" in info_res.content
+    assert b"Closed" in info_res.content
+    assert b"1 Apr 2026" in info_res.content
+    assert b"GRV-SYSTEM" not in info_res.content
+    assert b"You have not submitted any grievances yet." not in info_res.content
 
 
 @pytest.mark.django_db

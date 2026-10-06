@@ -1,8 +1,9 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
-from django.db.models import QuerySet
+from django.db.models import F, QuerySet
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
@@ -10,8 +11,21 @@ from django.views.generic.edit import ProcessFormView
 from flags.decorators import flag_check
 
 from hope_portal.models.beneficiary import Beneficiary
-from hope_portal.modules.hope.models import GrievanceticketPrograms, Household, Payment
+from hope_portal.modules.hope.models import Grievanceticket, GrievanceticketPrograms, Household, Payment
+from hope_portal.modules.hope.patcher.tickets import (
+    CATEGORY_NEEDS_ADJUDICATION,
+    CATEGORY_PAYMENT_VERIFICATION,
+    CATEGORY_SYSTEM_FLAGGING,
+    STATUS_CHOICES,
+    STATUS_CLOSED,
+)
 from hope_portal.ui.views.flow.crypt import unsign
+
+_HIDDEN_GRIEVANCE_CATEGORIES = (
+    CATEGORY_PAYMENT_VERIFICATION,
+    CATEGORY_NEEDS_ADJUDICATION,
+    CATEGORY_SYSTEM_FLAGGING,
+)
 
 
 @dataclass
@@ -23,6 +37,35 @@ class HHInfo:
     program_registration_id: str
     tickets: QuerySet[GrievanceticketPrograms]
     payments: QuerySet[Payment, Any]
+
+
+@dataclass(frozen=True)
+class HouseholdGrievance:
+    number: str
+    status: str
+    submitted_at: datetime | None
+    closed_at: datetime | None
+
+
+def household_grievances(unicef_id: str | None) -> list[HouseholdGrievance]:
+    """Grievances recorded for this household, excluding system-generated tickets."""
+    if not unicef_id:
+        return []
+    labels = dict(STATUS_CHOICES)
+    tickets = (
+        Grievanceticket.objects.filter(household_unicef_id=unicef_id)
+        .exclude(category__in=_HIDDEN_GRIEVANCE_CATEGORIES)
+        .order_by(F("created_at").desc(nulls_last=True))
+    )
+    return [
+        HouseholdGrievance(
+            number=ticket.unicef_id or "",
+            status=labels.get(ticket.status, ""),
+            submitted_at=ticket.created_at,
+            closed_at=ticket.updated_at if ticket.status == STATUS_CLOSED else None,
+        )
+        for ticket in tickets
+    ]
 
 
 def collect_household_infos(hh: Household) -> dict[str, list[HHInfo]]:
@@ -70,6 +113,7 @@ class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         kwargs["linked_grievances_count"] = GrievanceticketPrograms.objects.filter(
             grievanceticket__household_unicef_id=hh.unicef_id
         ).count()
+        kwargs["grievances"] = household_grievances(hh.unicef_id)
 
         return super().get_context_data(**kwargs)
 
@@ -79,9 +123,11 @@ class InspectView(TemplateResponseMixin, ContextMixin, ProcessFormView):
     template_name = "pages/flow/info.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        kwargs["grievances"] = []
         if hh := Household.objects.filter(unicef_id=self.kwargs["uniced_id"]).first():
             hhs = collect_household_infos(hh)
             kwargs["hhs"] = dict(hhs)
             kwargs["program_registration_id"] = hh.program_registration_id
             kwargs["household"] = hh
+            kwargs["grievances"] = household_grievances(hh.unicef_id)
         return super().get_context_data(**kwargs)

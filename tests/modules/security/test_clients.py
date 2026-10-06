@@ -14,20 +14,22 @@ def test_create_beneficiary_ticket_builds_endpoint_and_payload(monkeypatch):
 
     monkeypatch.setattr(client, "_post", _capture_post)
 
-    client.create_beneficiary_ticket("ba-slug", "desc")
+    client.create_beneficiary_ticket("ba-slug", "desc", household_unicef_id="HH-1")
 
     assert captured["endpoint"] == "ba-slug/beneficiary-tickets/"
-    assert captured["payload"] == {"description": "desc"}
+    assert captured["payload"] == {"description": "desc", "household_unicef_id": "HH-1"}
 
 
 def test_post_success_calls_requests_session_with_timeout():
     client = HopeAPIClient(base_url="https://hope.example.org/", token="token", timeout=7)
     response = Mock()
     response.raise_for_status = Mock()
+    response.json.return_value = {"code": "GRV-1", "status": "New"}
     client._session.post = Mock(return_value=response)
 
-    client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
+    body = client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
 
+    assert body == {"code": "GRV-1", "status": "New"}
     client._session.post.assert_called_once_with(
         "https://hope.example.org/ba-slug/beneficiary-tickets/",
         json={"description": "desc"},

@@ -1,9 +1,13 @@
+from datetime import datetime
 from typing import Any
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import is_naive, make_aware
 from django.views.generic import FormView, TemplateView
 
 from hope_portal.modules.hope.models import Household
@@ -34,11 +38,16 @@ class IssueView(FormView[TicketCreateForm]):
             token=settings.HOPE_API_TOKEN,
             timeout=settings.HOPE_API_TIMEOUT,
         )
-        client.create_beneficiary_ticket(
+        ticket = client.create_beneficiary_ticket(
             business_area_slug=business_area_slug,
             description=self._description_with_household_context(form.cleaned_data["description"]),
             program_id=self._household_program_id(),
+            household_unicef_id=self.household.unicef_id,
         )
+        if not ticket or not ticket.get("code"):
+            form.add_error(None, "The grievance could not be submitted. Please try again.")
+            return self.form_invalid(form)
+        self.created_ticket = ticket
         return redirect(self.get_success_url())
 
     def _description_with_household_context(self, description: str) -> str:
@@ -92,7 +101,16 @@ class IssueView(FormView[TicketCreateForm]):
         return str(program_id) if program_id else None
 
     def get_success_url(self) -> str:
-        return reverse("ui:flow:issue-submitted", kwargs={"signed_data": self.kwargs["signed_data"]})
+        url = reverse("ui:flow:issue-submitted", kwargs={"signed_data": self.kwargs["signed_data"]})
+        ticket = getattr(self, "created_ticket", None) or {}
+        query = urlencode(
+            {
+                "ticket": ticket.get("code") or "",
+                "status": ticket.get("status") or "New",
+                "submitted": ticket.get("created_at") or "",
+            }
+        )
+        return f"{url}?{query}"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs["signed_data"] = self.kwargs["signed_data"]
@@ -122,4 +140,18 @@ class IssueSubmittedView(TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs["signed_data"] = self.kwargs["signed_data"]
+        kwargs["ticket_number"] = self.request.GET.get("ticket") or ""
+        kwargs["ticket_status"] = self.request.GET.get("status") or ""
+        kwargs["ticket_submitted_at"] = _parse_submitted_at(self.request.GET.get("submitted"))
         return super().get_context_data(**kwargs)
+
+
+def _parse_submitted_at(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    parsed = parse_datetime(value)
+    if parsed is None:
+        return None
+    if is_naive(parsed):
+        return make_aware(parsed)
+    return parsed
