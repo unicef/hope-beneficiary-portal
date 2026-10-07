@@ -8,6 +8,7 @@ from django.core import signing
 from django.db import IntegrityError
 from django.urls import reverse
 from testutils.factories.beneficiary import BeneficiaryFactory
+from testutils.factories.hope.businessarea import BusinessAreaFactory
 from testutils.factories.hope.houshold import HouseholdFactory
 from testutils.factories.hope.tickets import GrievanceticketProgramsFactory
 
@@ -15,16 +16,17 @@ from hope_portal.exception import FlowLockoutError
 from hope_portal.models.beneficiary import Beneficiary, household_key
 from hope_portal.modules.hope.models import Grievanceticket
 from hope_portal.modules.hope.patcher.tickets import (
+    CATEGORY_BENEFICIARY,
     CATEGORY_GRIEVANCE_COMPLAINT,
-    CATEGORY_SYSTEM_FLAGGING,
     ISSUE_TYPE_INDIVIDUAL_DATA_CHANGE_DATA_UPDATE,
     STATUS_CLOSED,
     STATUS_IN_PROGRESS,
 )
 from hope_portal.modules.inspect import Inspector
-from hope_portal.modules.security.clients import HopeAPIClient
+from hope_portal.modules.security.clients import HopeAPIClient, TicketCreateOutcome, TicketCreateResult
 from hope_portal.modules.security.guards import RegistrationAttemptGuard
 from hope_portal.ui.forms.flow import QuestionForm
+from hope_portal.ui.views.flow.issues import GRIEVANCE_SUBMIT_FAILED, GRIEVANCE_SUBMIT_UNKNOWN
 
 
 @pytest.fixture
@@ -107,7 +109,10 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
         captured["description"] = description
         captured["program_id"] = program_id
         captured["household_unicef_id"] = household_unicef_id
-        return {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"}
+        return TicketCreateResult(
+            TicketCreateOutcome.CREATED,
+            {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"},
+        )
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -127,6 +132,46 @@ def test_flow_open_issue_manual_create(django_app, household, settings, monkeypa
     assert captured["business_area_slug"] == household.program.business_area.slug
     assert captured["description"] == f"Manual issue description\n\nHousehold ID: {household.unicef_id}"
     assert uuid.UUID(captured["program_id"]) == uuid.UUID(str(household.program_id))
+
+
+def _submit_issue(django_app, household, settings, monkeypatch, result):
+    settings.HOPE_API_BASE_URL = "https://hope.example.org"
+    settings.HOPE_API_TOKEN = "token"
+    settings.HOPE_API_TIMEOUT = 5
+    info_res = _go_to_info_page(django_app, household)
+    issue_link = info_res.pyquery("a:contains('Open Hope Grievance')").attr("href")
+
+    def _create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
+        return result
+
+    monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _create)
+    issue_res = django_app.get(issue_link)
+    issue_res.forms[0]["description"] = "Manual issue description"
+    return issue_res.forms[0].submit()
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_flow_open_issue_asks_to_retry_when_hope_rejects_the_grievance(django_app, household, settings, monkeypatch):
+    issue_res = _submit_issue(
+        django_app, household, settings, monkeypatch, TicketCreateResult(TicketCreateOutcome.FAILED)
+    )
+    assert issue_res.status_code == 200
+    assert GRIEVANCE_SUBMIT_FAILED.encode() in issue_res.content
+    assert GRIEVANCE_SUBMIT_UNKNOWN.encode() not in issue_res.content
+
+
+@pytest.mark.django_db
+@override_config(MIN_QUESTIONS=1, MAX_QUESTIONS=3)
+def test_flow_open_issue_does_not_ask_to_retry_when_the_outcome_is_unknown(
+    django_app, household, settings, monkeypatch
+):
+    issue_res = _submit_issue(
+        django_app, household, settings, monkeypatch, TicketCreateResult(TicketCreateOutcome.UNKNOWN)
+    )
+    assert issue_res.status_code == 200
+    assert GRIEVANCE_SUBMIT_UNKNOWN.encode() in issue_res.content
+    assert b"Please try again." not in issue_res.content
 
 
 @pytest.mark.django_db
@@ -158,7 +203,10 @@ def test_flow_open_issue_lists_programmes_when_household_has_multiple(django_app
 
     def _capture_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         captured["description"] = description
-        return {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"}
+        return TicketCreateResult(
+            TicketCreateOutcome.CREATED,
+            {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"},
+        )
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -206,7 +254,10 @@ def test_flow_open_issue_uses_business_area_of_the_ticket_programme(django_app, 
     def _capture_create(self, business_area_slug, description, program_id=None, household_unicef_id=None):
         captured["business_area_slug"] = business_area_slug
         captured["program_id"] = program_id
-        return {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"}
+        return TicketCreateResult(
+            TicketCreateOutcome.CREATED,
+            {"code": "GRV-100", "status": "New", "created_at": "2026-10-06T09:30:00+00:00"},
+        )
 
     monkeypatch.setattr(HopeAPIClient, "create_beneficiary_ticket", _capture_create)
 
@@ -700,12 +751,14 @@ def _submit_account_form(res, username, password, password_confirm=None):
 def test_info_page_lists_household_grievances_with_dates(django_app, household):
     submitted = datetime(2026, 3, 2, 8, 0, tzinfo=UTC)
     closed = datetime(2026, 4, 1, 8, 0, tzinfo=UTC)
+    business_area = household.program.business_area
     Grievanceticket.objects.create(
         id=uuid.uuid4(),
         unicef_id="GRV-OPEN",
         household_unicef_id=household.unicef_id,
+        business_area=business_area,
         status=STATUS_IN_PROGRESS,
-        category=CATEGORY_GRIEVANCE_COMPLAINT,
+        category=CATEGORY_BENEFICIARY,
         created_at=submitted,
         updated_at=submitted,
     )
@@ -713,17 +766,29 @@ def test_info_page_lists_household_grievances_with_dates(django_app, household):
         id=uuid.uuid4(),
         unicef_id="GRV-CLOSED",
         household_unicef_id=household.unicef_id,
+        business_area=business_area,
         status=STATUS_CLOSED,
-        category=CATEGORY_GRIEVANCE_COMPLAINT,
+        category=CATEGORY_BENEFICIARY,
         created_at=submitted,
         updated_at=closed,
     )
     Grievanceticket.objects.create(
         id=uuid.uuid4(),
-        unicef_id="GRV-SYSTEM",
+        unicef_id="GRV-MANUAL",
         household_unicef_id=household.unicef_id,
+        business_area=business_area,
         status=STATUS_IN_PROGRESS,
-        category=CATEGORY_SYSTEM_FLAGGING,
+        category=CATEGORY_GRIEVANCE_COMPLAINT,
+        created_at=submitted,
+        updated_at=submitted,
+    )
+    Grievanceticket.objects.create(
+        id=uuid.uuid4(),
+        unicef_id="GRV-OTHER-BA",
+        household_unicef_id=household.unicef_id,
+        business_area=BusinessAreaFactory(),
+        status=STATUS_IN_PROGRESS,
+        category=CATEGORY_BENEFICIARY,
         created_at=submitted,
         updated_at=submitted,
     )
@@ -735,7 +800,8 @@ def test_info_page_lists_household_grievances_with_dates(django_app, household):
     assert b"GRV-CLOSED" in info_res.content
     assert b"Closed" in info_res.content
     assert b"1 Apr 2026" in info_res.content
-    assert b"GRV-SYSTEM" not in info_res.content
+    assert b"GRV-MANUAL" not in info_res.content
+    assert b"GRV-OTHER-BA" not in info_res.content
     assert b"You have not submitted any grievances yet." not in info_res.content
 
 

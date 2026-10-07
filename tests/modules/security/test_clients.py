@@ -1,7 +1,8 @@
 from unittest.mock import Mock
-from requests.exceptions import HTTPError, RequestException
 
-from hope_portal.modules.security.clients import HopeAPIClient
+from requests.exceptions import HTTPError, RequestException, Timeout
+
+from hope_portal.modules.security.clients import HopeAPIClient, TicketCreateOutcome
 
 
 def test_create_beneficiary_ticket_builds_endpoint_and_payload(monkeypatch):
@@ -29,7 +30,8 @@ def test_post_success_calls_requests_session_with_timeout():
 
     body = client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
 
-    assert body == {"code": "GRV-1", "status": "New"}
+    assert body.outcome is TicketCreateOutcome.CREATED
+    assert body.ticket == {"code": "GRV-1", "status": "New"}
     client._session.post.assert_called_once_with(
         "https://hope.example.org/ba-slug/beneficiary-tickets/",
         json={"description": "desc"},
@@ -46,8 +48,9 @@ def test_post_handles_http_error(monkeypatch):
     warning = Mock()
     monkeypatch.setattr("hope_portal.modules.security.clients.logger.warning", warning)
 
-    client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
+    result = client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
 
+    assert result.outcome is TicketCreateOutcome.FAILED
     warning.assert_called_once()
 
 
@@ -57,9 +60,19 @@ def test_post_handles_request_exception(monkeypatch):
     warning = Mock()
     monkeypatch.setattr("hope_portal.modules.security.clients.logger.warning", warning)
 
-    client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
+    result = client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
 
+    assert result.outcome is TicketCreateOutcome.UNKNOWN
     warning.assert_called_once()
+
+
+def test_post_timeout_is_an_unknown_outcome():
+    client = HopeAPIClient(base_url="https://hope.example.org", token="token", timeout=3)
+    client._session.post = Mock(side_effect=Timeout("timed out"))
+
+    result = client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
+
+    assert result.outcome is TicketCreateOutcome.UNKNOWN
 
 
 def test_post_handles_unexpected_exception(monkeypatch):
@@ -68,6 +81,7 @@ def test_post_handles_unexpected_exception(monkeypatch):
     warning = Mock()
     monkeypatch.setattr("hope_portal.modules.security.clients.logger.warning", warning)
 
-    client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
+    result = client._post("ba-slug/beneficiary-tickets/", {"description": "desc"})
 
+    assert result.outcome is TicketCreateOutcome.UNKNOWN
     warning.assert_called_once()

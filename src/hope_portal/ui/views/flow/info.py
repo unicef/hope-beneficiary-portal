@@ -12,20 +12,8 @@ from flags.decorators import flag_check
 
 from hope_portal.models.beneficiary import Beneficiary
 from hope_portal.modules.hope.models import Grievanceticket, GrievanceticketPrograms, Household, Payment
-from hope_portal.modules.hope.patcher.tickets import (
-    CATEGORY_NEEDS_ADJUDICATION,
-    CATEGORY_PAYMENT_VERIFICATION,
-    CATEGORY_SYSTEM_FLAGGING,
-    STATUS_CHOICES,
-    STATUS_CLOSED,
-)
+from hope_portal.modules.hope.patcher.tickets import CATEGORY_BENEFICIARY, STATUS_CHOICES, STATUS_CLOSED
 from hope_portal.ui.views.flow.crypt import unsign
-
-_HIDDEN_GRIEVANCE_CATEGORIES = (
-    CATEGORY_PAYMENT_VERIFICATION,
-    CATEGORY_NEEDS_ADJUDICATION,
-    CATEGORY_SYSTEM_FLAGGING,
-)
 
 
 @dataclass
@@ -47,16 +35,24 @@ class HouseholdGrievance:
     closed_at: datetime | None
 
 
-def household_grievances(unicef_id: str | None) -> list[HouseholdGrievance]:
-    """Grievances recorded for this household, excluding system-generated tickets."""
-    if not unicef_id:
+def household_grievances(household: Household) -> list[HouseholdGrievance]:
+    """Portal grievances for this household in its programme business area.
+
+    A household unicef id is unique only within a programme, so the same id can
+    exist in another business area. Only tickets created through the beneficiary
+    portal are included.
+    """
+    unicef_id = household.unicef_id
+    program = household.program
+    business_area_id = program.business_area_id if program is not None else None
+    if not unicef_id or not business_area_id:
         return []
     labels = dict(STATUS_CHOICES)
-    tickets = (
-        Grievanceticket.objects.filter(household_unicef_id=unicef_id)
-        .exclude(category__in=_HIDDEN_GRIEVANCE_CATEGORIES)
-        .order_by(F("created_at").desc(nulls_last=True))
-    )
+    tickets = Grievanceticket.objects.filter(
+        household_unicef_id=unicef_id,
+        business_area_id=business_area_id,
+        category=CATEGORY_BENEFICIARY,
+    ).order_by(F("created_at").desc(nulls_last=True))
     return [
         HouseholdGrievance(
             number=ticket.unicef_id or "",
@@ -113,7 +109,7 @@ class InfoView(TemplateResponseMixin, ContextMixin, ProcessFormView):
         kwargs["linked_grievances_count"] = GrievanceticketPrograms.objects.filter(
             grievanceticket__household_unicef_id=hh.unicef_id
         ).count()
-        kwargs["grievances"] = household_grievances(hh.unicef_id)
+        kwargs["grievances"] = household_grievances(hh)
 
         return super().get_context_data(**kwargs)
 
@@ -129,5 +125,5 @@ class InspectView(TemplateResponseMixin, ContextMixin, ProcessFormView):
             kwargs["hhs"] = dict(hhs)
             kwargs["program_registration_id"] = hh.program_registration_id
             kwargs["household"] = hh
-            kwargs["grievances"] = household_grievances(hh.unicef_id)
+            kwargs["grievances"] = household_grievances(hh)
         return super().get_context_data(**kwargs)

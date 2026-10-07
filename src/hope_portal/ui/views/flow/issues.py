@@ -11,9 +11,12 @@ from django.utils.timezone import is_naive, make_aware
 from django.views.generic import FormView, TemplateView
 
 from hope_portal.modules.hope.models import Household
-from hope_portal.modules.security.clients import HopeAPIClient
+from hope_portal.modules.security.clients import HopeAPIClient, TicketCreateOutcome
 from hope_portal.ui.forms.flow import TicketCreateForm
 from hope_portal.ui.views.flow.crypt import unsign_household
+
+GRIEVANCE_SUBMIT_FAILED = "The grievance could not be submitted. Please try again."
+GRIEVANCE_SUBMIT_UNKNOWN = "We could not confirm whether your grievance was received."
 
 
 class IssueView(FormView[TicketCreateForm]):
@@ -38,16 +41,19 @@ class IssueView(FormView[TicketCreateForm]):
             token=settings.HOPE_API_TOKEN,
             timeout=settings.HOPE_API_TIMEOUT,
         )
-        ticket = client.create_beneficiary_ticket(
+        result = client.create_beneficiary_ticket(
             business_area_slug=business_area_slug,
             description=self._description_with_household_context(form.cleaned_data["description"]),
             program_id=self._household_program_id(),
             household_unicef_id=self.household.unicef_id,
         )
-        if not ticket or not ticket.get("code"):
-            form.add_error(None, "The grievance could not be submitted. Please try again.")
+        if result.outcome is not TicketCreateOutcome.CREATED or not result.ticket or not result.ticket.get("code"):
+            message = (
+                GRIEVANCE_SUBMIT_FAILED if result.outcome is TicketCreateOutcome.FAILED else GRIEVANCE_SUBMIT_UNKNOWN
+            )
+            form.add_error(None, message)
             return self.form_invalid(form)
-        self.created_ticket = ticket
+        self.created_ticket = result.ticket
         return redirect(self.get_success_url())
 
     def _description_with_household_context(self, description: str) -> str:
