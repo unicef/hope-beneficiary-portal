@@ -1,15 +1,22 @@
+from datetime import datetime
 from typing import Any
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import FormView
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import is_naive, make_aware
+from django.views.generic import FormView, TemplateView
 
 from hope_portal.modules.hope.models import Household
-from hope_portal.modules.security.clients import HopeAPIClient
+from hope_portal.modules.security.clients import HopeAPIClient, TicketCreateOutcome
 from hope_portal.ui.forms.flow import TicketCreateForm
 from hope_portal.ui.views.flow.crypt import unsign_household
+
+GRIEVANCE_SUBMIT_FAILED = "The grievance could not be submitted. Please try again."
+GRIEVANCE_SUBMIT_UNKNOWN = "We could not confirm whether your grievance was received."
 
 
 class IssueView(FormView[TicketCreateForm]):
@@ -34,11 +41,19 @@ class IssueView(FormView[TicketCreateForm]):
             token=settings.HOPE_API_TOKEN,
             timeout=settings.HOPE_API_TIMEOUT,
         )
-        client.create_beneficiary_ticket(
+        result = client.create_beneficiary_ticket(
             business_area_slug=business_area_slug,
             description=self._description_with_household_context(form.cleaned_data["description"]),
             program_id=self._household_program_id(),
+            household_unicef_id=self.household.unicef_id,
         )
+        if result.outcome is not TicketCreateOutcome.CREATED or not result.ticket or not result.ticket.get("code"):
+            message = (
+                GRIEVANCE_SUBMIT_FAILED if result.outcome is TicketCreateOutcome.FAILED else GRIEVANCE_SUBMIT_UNKNOWN
+            )
+            form.add_error(None, message)
+            return self.form_invalid(form)
+        self.created_ticket = result.ticket
         return redirect(self.get_success_url())
 
     def _description_with_household_context(self, description: str) -> str:
@@ -92,7 +107,16 @@ class IssueView(FormView[TicketCreateForm]):
         return str(program_id) if program_id else None
 
     def get_success_url(self) -> str:
-        return reverse("ui:flow:info", kwargs={"signed_data": self.kwargs["signed_data"]})
+        url = reverse("ui:flow:issue-submitted", kwargs={"signed_data": self.kwargs["signed_data"]})
+        ticket = getattr(self, "created_ticket", None) or {}
+        query = urlencode(
+            {
+                "ticket": ticket.get("code") or "",
+                "status": ticket.get("status") or "New",
+                "submitted": ticket.get("created_at") or "",
+            }
+        )
+        return f"{url}?{query}"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs["signed_data"] = self.kwargs["signed_data"]
@@ -109,3 +133,31 @@ class IssueView(FormView[TicketCreateForm]):
         if program is None or program.business_area is None:
             return None
         return program.business_area.slug or None
+
+
+class IssueSubmittedView(TemplateView):
+    """Confirmation shown after a beneficiary grievance is created."""
+
+    template_name = "pages/flow/issue_submitted.html"
+
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        unsign_household(request, self.kwargs["signed_data"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        kwargs["signed_data"] = self.kwargs["signed_data"]
+        kwargs["ticket_number"] = self.request.GET.get("ticket") or ""
+        kwargs["ticket_status"] = self.request.GET.get("status") or ""
+        kwargs["ticket_submitted_at"] = _parse_submitted_at(self.request.GET.get("submitted"))
+        return super().get_context_data(**kwargs)
+
+
+def _parse_submitted_at(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    parsed = parse_datetime(value)
+    if parsed is None:
+        return None
+    if is_naive(parsed):
+        return make_aware(parsed)
+    return parsed

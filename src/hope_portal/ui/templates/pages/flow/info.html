@@ -438,6 +438,69 @@
                 </details>
             {% endfor %}
         {% endif %}
+        {# Grievances #}
+        <div class="hh-section-title">
+            <h2>
+                {% trans "Your grievances" %}
+            </h2>
+        </div>
+        <div class="hh-card p-4">
+            {% if grievances %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left">
+                                <th class="py-2 pr-3 font-medium">
+                                    {% trans "Ticket number" %}
+                                </th>
+                                <th class="py-2 pr-3 font-medium">
+                                    {% trans "Status" %}
+                                </th>
+                                <th class="py-2 pr-3 font-medium">
+                                    {% trans "Submitted" %}
+                                </th>
+                                <th class="py-2 font-medium">
+                                    {% trans "Closed" %}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grievance in grievances %}
+                                <tr class="border-t border-base-300">
+                                    <td class="py-2 pr-3 font-mono text-xs">
+                                        {{ grievance.number|default:"—" }}
+                                    </td>
+                                    <td class="py-2 pr-3">
+                                        <span class="pill pill-info">{{ grievance.status|default:"—" }}</span>
+                                    </td>
+                                    <td class="py-2 pr-3">
+                                        {% if grievance.submitted_at %}
+                                            {{ grievance.submitted_at|date:"j M Y" }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-2">
+                                        {% if grievance.closed_at %}
+                                            {{ grievance.closed_at|date:"j M Y" }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm opacity-70 mt-4">
+                    {% trans "If a grievance is closed and you are not satisfied with the resolution, open a new grievance and quote the ticket number." %}
+                </p>
+            {% else %}
+                <p class="text-sm opacity-70">
+                    {% trans "You have not submitted any grievances yet." %}
+                </p>
+            {% endif %}
+        </div>
         {# Actions #}
         <div class="flex flex-wrap justify-center gap-3 mt-6">
             <a class="btn btn-primary" href="{% url "ui:logout" %}">{% trans "Done" %}</a>
