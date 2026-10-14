@@ -37,8 +37,10 @@ CONSTANCE_CONFIG: dict[str, tuple[Any, str, Any]] = {
     "MIN_QUESTIONS": (8, "Min number if questions that must be available to make identification safe", int),
     "VERIFICATION_PASS_THRESHOLD": (
         100,
-        "Minimum percentage (1-100) of asked security questions that must be answered correctly to pass "
-        "identification. 100 means every question must be correct.",
+        (
+            "Minimum percentage (1-100) of asked security questions that must be answered correctly to pass "
+            "identification. 100 means every question must be correct."
+        ),
         int,
     ),
     "VERIFICATION_ENABLED_FIELDS": (

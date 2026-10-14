@@ -22,7 +22,7 @@ class AnyUserAuthBackend(ModelBackend):
                     defaults={"is_staff": True, "is_active": True, "is_superuser": True},
                 )
                 return user
-            if username in ["staff"]:
+            if username == "staff":
                 user, __ = get_user_model().objects.update_or_create(  # type: ignore[attr-defined]
                     username=username,
                     defaults={"is_staff": True, "is_active": True, "is_superuser": False},

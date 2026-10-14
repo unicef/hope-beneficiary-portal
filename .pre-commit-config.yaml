@@ -6,13 +6,13 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/djlint/djLint
-    rev: v1.36.4
+    rev: v1.46.4
     hooks:
       - id: djlint-reformat
         args: [ "--configuration", "djlint.toml" ]
 
   - repo: https://github.com/semgrep/semgrep
-    rev: v1.164.0
+    rev: v1.181.0
     hooks:
       - id: semgrep
         exclude: '\.semgrep/'
@@ -36,18 +36,18 @@ repos:
           - --quiet
 
   - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: "1.7.0"
+    rev: "1.10.0"
     hooks:
       - id: tox-ini-fmt
         args: [ "-p", "lint" ]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.11.0"
+    rev: "v2.30.3"
     hooks:
       - id: pyproject-fmt
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.2
+    rev: v0.17.0
     hooks:
       - id: ruff
       - id: ruff-format
@@ -57,7 +57,7 @@ repos:
           - ruff.toml
 
   - repo: https://github.com/saxix/pch
-    rev: "0.2"
+    rev: "0.6"
     hooks:
 
       - id: check-missed-migrations
@@ -84,8 +84,8 @@ repos:
         name: check tailwind CSS ready for production
         files: src/hope_portal/ui/theme/static_src/src/styles.scss
         args:
-          - -o
-          - src/hope_portal/ui/theme/static/css/styles.css
+          - -d
+          - src/hope_portal/ui/theme/static/css
 
       - id: check-minimized
         name: check missing minimized javascript

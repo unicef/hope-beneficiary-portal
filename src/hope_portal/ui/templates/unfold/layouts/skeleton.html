@@ -2,12 +2,10 @@
 {% get_current_language as LANGUAGE_CODE %}
 {% get_current_language_bidi as LANGUAGE_BIDI %}
 {% capture as branding silent %}
-{% block branding %}
-{% endblock %}
+{% block branding %}{% endblock %}
 {% endcapture %}
 {% capture as pretitle silent %}
-{% block pretitle %}
-{% endblock %}
+{% block pretitle %}{% endblock %}
 {% endcapture %}
 {% capture as content_title silent %}
 {% block content_title %}
@@ -24,20 +22,16 @@
 {% endblock %}
 {% endcapture %}
 {% capture as nav_global silent %}
-{% block nav-global %}
-{% endblock %}
+{% block nav-global %}{% endblock %}
 {% endcapture %}
 {% capture as nav_global_side silent %}
-{% block nav-global-side %}
-{% endblock %}
+{% block nav-global-side %}{% endblock %}
 {% endcapture %}
 {% capture as actions_items silent %}
-{% block actions-items %}
-{% endblock %}
+{% block actions-items %}{% endblock %}
 {% endcapture %}
 {% capture as extra_userlinks silent %}
-{% block extra_userlinks %}
-{% endblock %}
+{% block extra_userlinks %}{% endblock %}
 {% endcapture %}
 {% capture as show_back_button silent %}
 {% block show_back_button %}
@@ -53,8 +47,7 @@
       x-cloak>
     <head>
         <title>{{ environment_title_prefix|default:"" }}
-            {% block title %}
-            {% endblock %}
+            {% block title %}{% endblock %}
         </title>
         <link href="{% static "unfold/fonts/inter/styles.css" %}" rel="stylesheet" />
         <link href="{% static "unfold/fonts/material-symbols/styles.css" %}" rel="stylesheet" />
@@ -79,10 +72,8 @@
         {% for script in scripts %}
             <script src="{{ script }}"></script>
         {% endfor %}
-        {% block extrastyle %}
-        {% endblock %}
-        {% block extrahead %}
-        {% endblock %}
+        {% block extrastyle %}{% endblock %}
+        {% block extrahead %}{% endblock %}
         <script src="{% static 'unfold/js/app.js' %}"></script>
         {% block responsive %}
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -91,11 +82,14 @@
             <meta name="robots" content="NONE,NOARCHIVE" />
         {% endblock %}
     </head>
-    <body class="antialiased bg-base-50 font-sans text-font-default-light text-sm dark:bg-base-900 dark:text-font-default-dark {% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" data-admin-utc-offset="{% now "Z" %}" x-data="{
+    <body class="antialiased bg-base-50 font-sans text-font-default-light text-sm dark:bg-base-900 dark:text-font-default-dark {% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+          data-admin-utc-offset="{% now "Z" %}"
+          x-data="{
         {% if opts %}
             activeTab: '{% tabs_primary_active inline_admin_formsets %}',
         {% endif %}
-        sidebarMobileOpen: false, sidebarDesktopOpen: (localStorage.getItem('sidebarDesktopOpen') !== null) ? (localStorage.getItem('sidebarDesktopOpen') == '1') : true }" x-init=" activeTab = {% if opts %}getCurrentTab() || '{% tabs_primary_active inline_admin_formsets %}'{% else %}''{% endif %}; $watch('sidebarDesktopOpen', value => localStorage.setItem('sidebarDesktopOpen', value ? '1' : '0')); ">
+        sidebarMobileOpen: false, sidebarDesktopOpen: (localStorage.getItem('sidebarDesktopOpen') !== null) ? (localStorage.getItem('sidebarDesktopOpen') == '1') : true }"
+          x-init=" activeTab = {% if opts %}getCurrentTab() || '{% tabs_primary_active inline_admin_formsets %}'{% else %}''{% endif %}; $watch('sidebarDesktopOpen', value => localStorage.setItem('sidebarDesktopOpen', value ? '1' : '0')); ">
         {% if colors %}
             <style id="unfold-theme-colors">
                 :root {
@@ -111,8 +105,7 @@
                 }
             </style>
         {% endif %}
-        {% block base %}
-        {% endblock %}
+        {% block base %}{% endblock %}
         {% include "unfold/helpers/modal.html" %}
         {% include "unfold/helpers/command.html" %}
         <script src="{% static 'unfold/js/simplebar/simplebar.js' %}"></script>
