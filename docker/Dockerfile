@@ -63,7 +63,7 @@ RUN pip install uwsgi uv
 
 # ------- builder -------
 FROM deps AS builder
-ARG VERSION
+ARG VERSION=0.0.0
 ENV VIRTUAL_ENV=/venv \
     UV_PROJECT_ENVIRONMENT=/venv \
     HATCH_VCS_VERSION=${VERSION} \
