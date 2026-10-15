@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 
 from hope_portal.modules.inspect.extractors import (
@@ -54,7 +54,7 @@ def test_document_number_extractor_iter_all_questions_strips_spaces():
 
 
 def test_date_extractor_iter_all_questions_returns_day_month_year():
-    extractor = DateExtractor("Birth date", datetime.date(1990, 6, 15))
+    extractor = DateExtractor("Birth date", dt.date(1990, 6, 15))
     questions = extractor.iter_all_questions()
     assert len(questions) == 3
     assert {q.answer for q in questions} == {"15", "6", "1990"}

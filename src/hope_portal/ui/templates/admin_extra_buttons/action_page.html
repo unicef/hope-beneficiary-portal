@@ -8,14 +8,9 @@
             {{ form.as_table }}
         </table>
         <div id="submit-row" class="">
-            <button type="submit" class="primary">
-                Save
-            </button>
-            <button type="submit" name="check" class="secondary">
-                Check + Save
-            </button>
+            <button type="submit" class="primary">Save</button>
+            <button type="submit" name="check" class="secondary">Check + Save</button>
         </div>
     </form>
 {% endblock action-content %}
-{% block submit_buttons_bottom %}
-{% endblock %}
+{% block submit_buttons_bottom %}{% endblock %}

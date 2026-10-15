@@ -313,9 +313,11 @@ DEFAULTS = {
         15,
         15,
         False,
-        "How long (in minutes) a signed registration-flow token (used across the ask/info/"
-        "account-create/open-issue pages) remains valid before the beneficiary is bounced back "
-        "to the start of the flow and has to re-verify.",
+        (
+            "How long (in minutes) a signed registration-flow token (used across the ask/info/"
+            "account-create/open-issue pages) remains valid before the beneficiary is bounced back "
+            "to the start of the flow and has to re-verify."
+        ),
     ),
 }
 

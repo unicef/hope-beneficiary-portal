@@ -9,28 +9,14 @@
         {% endif %}
     </nav>
     <div class="info-line">
-        <div>
-            {% blocktranslate %}Copyright © {{ year }} All right reserved by UNICEF{% endblocktranslate %}
-        </div>
-        <div>
-            {{ app.version }}
-        </div>
-        <div>
-            {% include "includes/_language_switch.html" %}
-        </div>
+        <div>{% blocktranslate %}Copyright © {{ year }} All right reserved by UNICEF{% endblocktranslate %}</div>
+        <div>{{ app.version }}</div>
+        <div>{% include "includes/_language_switch.html" %}</div>
         <div class="font-size-selector">
-            <span class="font-1" data-size="font-size-normal">
-                Az
-            </span>
-            <span class="font-2" data-size="font-size-medium">
-                Az
-            </span>
-            <span class="font-3" data-size="font-size-big">
-                Az
-            </span>
+            <span class="font-1" data-size="font-size-normal">Az</span>
+            <span class="font-2" data-size="font-size-medium">Az</span>
+            <span class="font-3" data-size="font-size-big">Az</span>
         </div>
-        <div>
-            {% include "includes/theme_switch.html" %}
-        </div>
+        <div>{% include "includes/theme_switch.html" %}</div>
     </div>
 </footer>
