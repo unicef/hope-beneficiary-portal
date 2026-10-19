@@ -144,7 +144,7 @@ After successful identity verification, you are redirected to the Household Page
 </table>
 
 ### 2) SMS verification
-You can access the portal using the mobile number provided during registration. 
+You can access the portal using the mobile number provided during registration.
 
 1. Select **SMS**.
 2. Enter your mobile number in the relevant field, then select **VALIDATE**.

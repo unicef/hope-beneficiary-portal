@@ -11,7 +11,7 @@
     {% else %}
         <div class="flex flex-col justify-center items-center">
             <div class="m-auto w-full max-w-lg border border-base-300 rounded bg-base-200 shadow-sm items-center p-5 my-10 mx-4">
-                <form method="POST" action="." id="ask-form">
+                <form method="post" action="." id="ask-form">
                     {% csrf_token %}
                     {{ formset.management_form }}
                     {% for form in formset %}

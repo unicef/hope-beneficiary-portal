@@ -43,7 +43,7 @@ dependencies = [
   "django-stubs[compatible-mypy]",
   "django-tailwind>=4.2",
   "django-unfold",
-  "djangorestframework>=3.17.2,<3.18",
+  "djangorestframework>=3.18.2",
   "drf-spectacular",
   "drf-spectacular-sidecar",
   "inflect>=7.5",
@@ -84,7 +84,6 @@ dev = [
   "seleniumbase",
   "tox>=4.2",
 ]
-
 docs = [
   "cairosvg>=2.7.1",
   "markupsafe>=2.1.5",
@@ -109,7 +108,6 @@ docs = [
   "pymdown-extensions>=11.0.1",
   "watchdog>=6",
 ]
-
 type-check = [
   "django-stubs[compatible-mypy]",
   "djangorestframework-stubs",
@@ -128,30 +126,29 @@ type-check = [
 ]
 
 [tool.hatch]
-build.hooks.vcs.version-file = "src/hope_portal/version.py"
 version.source = "vcs"
+version.fallback-version = "0.0.0"
+build.hooks.vcs.version-file = "src/hope_portal/version.py"
 raw-options = { root = "../.." }
 
 [tool.hatch.version.raw-options]
 local_scheme = "no-local-version"
 
-[tool.hatch.build.targets.sdist]
-ignore-vcs = true
-include = [
+[tool.hatch.build.targets]
+wheel.packages = [
+  "src/hope_portal",
+]
+wheel.exclude = [
+  "~*",
+]
+sdist.include = [
   "src/hope_portal/**/*.*",
 ]
-exclude = [
+sdist.exclude = [
   "~*",
   "src/hope_portal/ui/theme/static_src/**/*.*",
 ]
-
-[tool.hatch.build.targets.wheel]
-packages = [
-  "src/hope_portal",
-]
-exclude = [
-  "~*",
-]
+sdist.ignore-vcs = true
 
 [tool.uv]
 package = true
