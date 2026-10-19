@@ -62,17 +62,18 @@ The portal reduces the need for beneficiaries to rely solely on intermediaries a
 
 After identity verification, beneficiaries can:
 
-1. View their household profile and demographic details.
 
-2. View linked programmes, payment statuses, and grievance tickets.
+- View their household profile and demographic details.
 
-3. View payments already made to them and upcoming payments, when available.
+- View linked programmes, payment statuses, and grievance tickets.
 
-4. Submit a new grievance, concern, feedback, complaint, or request.
+- View payments already made to them and upcoming payments, when available.
 
-5. Request a correction or update to information recorded about them.
+- Submit a new grievance, concern, feedback, complaint, or request.
 
-6. Create, view, or reset their portal login credentials, including their username and password.
+- Request a correction or update to information recorded about them.
+
+- Create, view, or reset their portal login credentials, including their username and password.
 
 The portal includes anti-abuse and data-protection measures to safeguard beneficiary information. Login attempts are rate-limited, and repeated unsuccessful identity-verification attempts may result in a temporary lockout. These measures help prevent unauthorized access and ensure that beneficiary information remains secure.
 
