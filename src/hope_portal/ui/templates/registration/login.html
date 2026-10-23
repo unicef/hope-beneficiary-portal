@@ -29,8 +29,10 @@
     {% if config.LOGIN_SSO %}
         <div class="flex flex-col justify-center items-center my-4">
             <div class="m-auto">
-                <a class="btn btn-primary"
-                   href="{% url "social:begin" "azuread-tenant-oauth2" %}">{% trans "Login with Azure" %}</a>
+                <form method="post" action="{% url "social:begin" "azuread-tenant-oauth2" %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit">{% trans "Login with Azure" %}</button>
+                </form>
             </div>
         </div>
     {% endif %}

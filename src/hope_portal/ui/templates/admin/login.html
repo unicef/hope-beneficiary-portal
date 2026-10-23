@@ -14,6 +14,17 @@
                     link.href = url.pathname + url.search + url.hash;
                 }
             });
+            // social:begin only accepts POST, so the SSO button may be rendered as a form
+            document.querySelectorAll('form[action*="azuread-tenant-oauth2"]').forEach(function (form) {
+                if (form.querySelector('input[name="next"]')) {
+                    return;
+                }
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "next";
+                input.value = next;
+                form.appendChild(input);
+            });
         });
     </script>
 {% endblock %}
